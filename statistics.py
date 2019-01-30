@@ -3,11 +3,11 @@ import pandas as pd
 import os
 
 
-def statistics_per_node(dataset_path='./traces/out-2019-01JAN-28-01.cap', window_size=10):
+def tumbling_statistics_per_node(path, window_size=10):
 	# Compute a dictionary containing all the statistics from each node of the dataset
 
     # Read the rank of each node
-    nodes = pd.read_csv(dataset_path, 
+    nodes = pd.read_csv(path, 
                             sep=';|seq=| hop|time = |ms',
                             na_filter=True,
                             usecols=[1,3,5], 
