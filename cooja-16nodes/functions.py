@@ -113,9 +113,11 @@ def createNodes(dict):
             ttl=p.get("ttl")
             pack=packet(rtt,pkt,ttl)
             pktsList.append(pack)
+            
         min_rtt=dict.get(ip).get("min_rtt")
         max_rtt=dict.get(ip).get("max_rtt")
         responses=dict.get(ip).get("responses")
+        
         hop=64-(int(pkts[0:1]["ttl"]))
         #print(type(pkts[0:1]["ttl"]))
         #print(pkts[0:1]["ttl"])
@@ -134,15 +136,6 @@ def getIps(list):
     return ips
 
 
-def MLPreparation(data):
-    # Calculate all the statistics
-    statistics = {}	# <node_id, statistics of the node>
-    
-    for network in data:
-        for node in network:
-            print(node.pkts["rtt"].describe())
-  
-    
-   
+
 
 
