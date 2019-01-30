@@ -1,4 +1,6 @@
 import pandas as pd
+import json
+import networkx as nx
 
 
 def process_iotlab_aggregated(path, tracefile):
@@ -129,3 +131,92 @@ def separate_outliers(hop_nodes):
     outliers.fillna(value=pd.np.nan, inplace=True)
 
     return std_values, outliers
+
+
+def produce_iotlab_topology(path, tracefile):
+    # Load node properties to retrieve x, y location
+    fo = open(path + 'nodes.out', 'r')
+    data = fo.read()
+    fo.close()
+
+    # iot-lab node properties are provided in json format
+    dataset = json.loads(data)
+    locations = {}
+    for row in dataset['items']:
+        if row['archi'] == 'm3:at86rf231' and row['x'] != ' ':
+            addr = int(row['network_address'].split('.')[0].split('-')[1])
+            # locations[addr] = (float(row['x']), float(row['y']), float(row['z']))
+            locations[addr] = (float(row['x']), float(row['y']))
+
+    # import node IDs
+    addr = pd.read_csv(path + 'addr-' + tracefile + '.cap',
+                       sep='[ ;:/-]',
+                       header=None,
+                       usecols=[2, 23],
+                       names=['node_id', 'ipv6_addr'],
+                       engine='python')
+
+    addr['node_id'] = addr['node_id'].convert_objects(convert_numeric=True)
+    addr = addr.drop_duplicates(subset=['node_id'], keep="first").sort_values(by=['node_id'])
+    addr.set_index('node_id')
+
+    # Read the rank of each node
+    rank = pd.read_csv(path + 'dodag-' + tracefile + '.cap',
+                       sep=';|R: | \| OP:',
+                       na_filter=True,
+                       header=None,
+                       usecols=[1, 3],
+                       names=['node_id', 'rank'],
+                       engine='python').dropna()
+
+    rank.set_index('node_id')
+
+    # Merge all data
+    addr['rank'] = rank['rank'].convert_objects(convert_numeric=True)
+
+    # build-up lookup dictionary
+    ipv6 = {}
+    for index, row in addr.iterrows():
+        ipv6[row['ipv6_addr']] = row['node_id']
+
+    # import RPL/dodag parents
+    rpl = pd.read_csv(path + 'rpl-' + tracefile + '.cap',
+                      sep='[ ;:/-]',
+                      header=None,
+                      usecols=[2, 11],
+                      names=['node_id', 'rpl_parent'],
+                      engine='python')
+
+    rpl['node_id'] = rpl['node_id'].convert_objects(convert_numeric=True)
+    rpl = rpl.drop_duplicates(subset=['node_id', 'rpl_parent'], keep="first").sort_values(by=['node_id'])
+    rpl.set_index('node_id')
+
+    # create network graph
+    G = nx.DiGraph()
+
+    for index, row in addr.iterrows():
+        G.add_node(row['node_id'], addr=row['ipv6_addr'], loc=locations.get(row['node_id'], (0, 0, 0)))
+        G.node[row['node_id']]['id'] = str(row['node_id'])
+        G.node[row['node_id']]['addr'] = row['ipv6_addr']
+        G.node[row['node_id']]['loc'] = locations.get(row['node_id'], (0, 0, 0))
+
+        if row['rank'] == 256:
+            G.node[row['node_id']]['color'] = 'red'
+
+        elif row['rank'] == 512:
+            G.node[row['node_id']]['color'] = 'green'
+
+        elif row['rank'] == 768:
+            G.node[row['node_id']]['color'] = 'blue'
+
+        elif row['rank'] == 1024:
+            G.node[row['node_id']]['color'] = 'yellow'
+
+        else:
+            G.node[row['node_id']]['color'] = 'cyan'
+
+    for index, row in rpl.iterrows():
+        if row['rpl_parent'] in ipv6 and row['node_id'] in G.nodes() and ipv6[row['rpl_parent']] in G.nodes():
+            G.add_edge(row['node_id'], ipv6[row['rpl_parent']])
+
+    return G
