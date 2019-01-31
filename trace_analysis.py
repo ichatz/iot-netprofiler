@@ -220,3 +220,66 @@ def produce_iotlab_topology(path, tracefile):
             G.add_edge(row['node_id'], ipv6[row['rpl_parent']])
 
     return G
+
+
+def process_iotlab_node_by_node(path, tracefile):
+    # Read the ip of each node
+    ips = pd.read_csv(path + 'addr-' + tracefile + '.cap',
+                      sep=';|addr:|/',
+                      na_filter=True,
+                      usecols=[1, 3, 4],
+                      header=None,
+                      names=['prefix', 'node_id', 'addr', 'ip', 'scope'],
+                      engine='python').dropna()
+
+    # extract the ip addresses
+    ips = ips[ips.scope == '64  scope: global'].reset_index(drop=True).drop(['scope'], axis=1)
+
+    # Read the rank of each node
+    rank = pd.read_csv(path + 'dodag-' + tracefile + '.cap',
+                       sep=';|R: | \| OP:',
+                       na_filter=True,
+                       header=None,
+                       usecols=[1, 3],
+                       names=['node_id', 'rank'],
+                       engine='python').dropna()
+
+    # compute the hop of each node
+    rank['rank'] = rank['rank'].convert_objects(convert_numeric=True)
+
+    # Merge all data
+    node_ip_and_rank = pd.merge(ips, rank, how='inner').drop_duplicates()
+
+    # Load the ICMP traces and parse the RTT
+    packets = pd.read_csv(path + 'trace-' + tracefile + '.cap',
+                          sep=';|seq=| hop|time = |ms',
+                          na_filter=True,
+                          header=None,
+                          usecols=[1, 3, 5],
+                          names=['node_id', 'seq', 'rtt'],
+                          engine='python').dropna().drop_duplicates()
+
+    packets = packets.sort_values(by=['node_id', 'seq'], ascending=True, na_position='first')
+    packets = packets[packets['rtt'] > 1]
+
+    max_seq = packets['seq'].max()
+
+    # Compute the 2 dimensional array
+    d_nodes = {}  # <node_id, DataFrame containing seq and rtt columns>
+    for n in packets.index:
+        if packets['node_id'][n] in d_nodes:
+            d_nodes[packets['node_id'][n]] = d_nodes[packets['node_id'][n]].append(
+                pd.DataFrame({'seq': [int(packets['seq'][n])], packets['node_id'][n]: [packets['rtt'][n]]}))
+        else:
+            d_nodes[packets['node_id'][n]] = pd.DataFrame(
+                {'seq': [int(packets['seq'][n])], packets['node_id'][n]: [packets['rtt'][n]]})
+
+    # create the 2 dimensional array
+    nodes = pd.DataFrame([seq for seq in range(1, max_seq + 1)], columns=['seq']).set_index('seq')
+    for node in d_nodes.keys():
+        nodes = nodes.join(d_nodes[node].set_index('seq'))
+
+    nodes = nodes[~nodes.index.duplicated(keep='first')]
+
+
+    return nodes
