@@ -281,5 +281,30 @@ def process_iotlab_node_by_node(path, tracefile):
 
     nodes = nodes[~nodes.index.duplicated(keep='first')]
 
+    # Each node communicates with the root of the DODAG through a certain number of hops.
+    # The network was configured in order to have three nodes communicating directly with the root.
+    rank_to_hops = sorted([int(rank) for rank in list(node_ip_and_rank['rank'].drop_duplicates())])
 
-    return nodes
+    # remove root (if it exists)
+    if 256 in rank_to_hops:
+        rank_to_hops.remove(256)
+
+    hops = {}
+    for node in node_ip_and_rank.index:
+        if not node_ip_and_rank['node_id'][node] in d_nodes.keys():
+            continue
+
+        if not node_ip_and_rank['rank'][node] in rank_to_hops:
+            continue
+
+        if (rank_to_hops.index(node_ip_and_rank['rank'][node]) + 1) in hops:
+            # The key should be created
+            hops[rank_to_hops.index(node_ip_and_rank['rank'][node]) + 1].append(node_ip_and_rank['node_id'][node])
+        else:
+            # Just append to the list of nodes
+            hops[rank_to_hops.index(node_ip_and_rank['rank'][node]) + 1] = [node_ip_and_rank['node_id'][node]]
+
+    return nodes, hops
+
+
+
