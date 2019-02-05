@@ -308,3 +308,40 @@ def process_iotlab_node_by_node(path, tracefile):
 
 
 
+def separate_outliers_node_by_node(nodes):
+    window_size = 10
+    std_values = pd.DataFrame(columns=[node for node in 
+        list(nodes.keys())])  # Maintain x(t) if mean-2*std <= x(t) <? mean+2*std
+    outliers = pd.DataFrame(
+        columns=[node for node in list(nodes.keys())])  # Maintain x(t) otherwise
+
+    for n in nodes.keys():
+        # Returns two DataFrames containing standard values and outliers
+        mn = nodes[n].mean()
+        std = nodes[n].std()
+        std_window = pd.Series([])  # Standard values
+        out_window = pd.Series([])  # Outliers
+
+        for window in (nodes[n].groupby(nodes[n].index // window_size * window_size)):
+            std_curr = []
+            out_curr = []
+            for x in window[1]:
+                if mn - 2 * std <= x and x <= mn + 2 * std:
+                    std_curr.append(x)
+                    out_curr.append(None)
+                else:
+                    std_curr.append(None)
+                    out_curr.append(x)
+
+            std_window = std_window.append(pd.Series(std_curr))
+            out_window = out_window.append(pd.Series(out_curr))
+
+        std_values[n] = std_window
+        outliers[n] = out_window
+
+    std_values = std_values.reset_index().drop(columns=['index'])
+    std_values.fillna(value=pd.np.nan, inplace=True)
+    outliers = outliers.reset_index().drop(columns=['index'])
+    outliers.fillna(value=pd.np.nan, inplace=True)
+
+    return std_values, outliers
