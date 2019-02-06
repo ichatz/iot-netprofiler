@@ -220,3 +220,4 @@ def produce_iotlab_topology(path, tracefile):
             G.add_edge(row['node_id'], ipv6[row['rpl_parent']])
 
     return G
+
