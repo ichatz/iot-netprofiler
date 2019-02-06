@@ -65,7 +65,7 @@ def tumbling_packet_loss_per_hop(path, tracefile, window_size=10):
     
     packet_loss = pd.DataFrame()
     for hop in hop_nodes.columns.values:
-        packet_loss_hop = hop_nodes[hop].groupby(hop_nodes[hop].index // window_size * window_size).count()
+        packet_loss_hop = hop_nodes[hop].groupby(hop_nodes[hop].index // window_size * window_size).dropna().count()
         packet_loss_hop[hop] = pd.to_numeric(packet_loss_hop, downcast='float')
         for index, value in packet_loss_hop.items():
             packet_loss_hop.at[index] = value / window_size
