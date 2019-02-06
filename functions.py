@@ -26,27 +26,29 @@ class node(object):
     min_rtt= 0
     max_rtt= 0
     pkts=pd.DataFrame()
+    pktsC=pd.DataFrame()
     responses=0
     
     
     # The class "constructor" - It's actually an initializer 
-    def __init__(self,ip,hop,min_rtt,max_rtt,pkts,responses):
+    def __init__(self,ip,hop,min_rtt,max_rtt,pkts,responses,pktsC):
         self.ip = ip
         self.hop=hop
         self.min_rtt=min_rtt
         self.max_rtt=max_rtt
         self.pkts=pkts
         self.responses=responses
+        self.pktsC=pktsC
 
-    def make_node(ip,hop,min_rtt,max_rtt,pkts,responses):
-        node= node(ip,hop,min_rtt,max_rtt,pkts,responses)
+    def make_node(ip,hop,min_rtt,max_rtt,pkts,responses,pktsC):
+        node= node(ip,hop,min_rtt,max_rtt,pkts,responses,pktsC)
         return node
     
     
 class packet(object):
-    rtt=0
-    pkt=0
-    ttl=0    
+    rtt=np.NaN
+    pkt=np.NaN
+    ttl=np.NaN   
     def __init__(self,rtt,pkt,ttl):
         self.rtt=rtt
         self.pkt=pkt
@@ -103,6 +105,7 @@ def createNodes(dict):
         pkts=pd.DataFrame(dict[ip]['pkts'])
         #(ip,hop,min_rtt,max_rtt,pkts,responses)
         #print(dict.get(ip).get("max_rtt"))
+        #findMissingPackets(dict.get(ip))
         pkts1=dict.get(ip).get("pkts")
         pktsList=[]
         for p in pkts1:
@@ -119,13 +122,34 @@ def createNodes(dict):
         hop=64-(int(pkts[0:1]["ttl"]))
         #print(type(pkts[0:1]["ttl"]))
         #print(pkts[0:1]["ttl"])
-        n=node(ip,hop,min_rtt,max_rtt,pkts,responses)
+        n=node(ip,hop,min_rtt,max_rtt,pkts,responses,pkts)
         
         nodeList.append(n)
         #print(type(nodeList[0].pkts[0]))
         
     return nodeList
- 
+
+
+
+def findMissingPackets(node):
+    #print(node.pkts["pkt"])
+    print("Executed")
+    maxP=-1
+    
+    for el in node.pkts["pkt"]:
+        if(el>maxP): maxP=int(el)
+    #print(maxP)
+    pkt=[None]*(maxP+1)
+    for i in range(len(node.pkts["pkt"])):
+        index=int(node.pkts["pkt"][i])
+        #print(index)
+        pkt[index]=node.pkts["rtt"][i]
+        #pkt[)]=node.pkts["pkt"][i]
+    return pkt
+    
+    
+
+
     
 def getIps(list):
     ips=[]
