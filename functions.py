@@ -167,6 +167,27 @@ def MLPreparation(data):
             print(node.pkts["rtt"].describe())
   
     
-   
+def getOutliers(df):
+    df1=df["rtt"]
+    std=df1.std()
+    mean=df1.mean()
+    a1=df["rtt"]>mean+(2*std)
+    a2=df["rtt"]<mean-(2*std)
+    return(df[a1 | a2])
 
+def getStdValues(df):
+    df1=df["rtt"]
+    std=df1.std()
+    mean=df1.mean()
+    a1=df["rtt"]<mean+(2*std)
+    a2=df["rtt"]>mean-(2*std)
+    return(df[a1 & a2])   
 
+def getPings(data):
+    pings=[]
+    for i in range(len(data)):
+        packetN=-1
+        for j in range(len(data[i])):
+            if(len(data[i][j].pkts)>packetN): packetN=len(data[i][j].pkts)
+        pings.append(packetN)
+    return pings
