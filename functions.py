@@ -23,28 +23,20 @@ import json
 class node(object):
     ip = ""
     hop= 0
-    min_rtt= 0
-    max_rtt= 0
     pkts=pd.DataFrame()
-    pktsC=pd.DataFrame()
-    responses=0
     
     
     # The class "constructor" - It's actually an initializer 
-    def __init__(self,ip,hop,min_rtt,max_rtt,pkts,responses,pktsC):
+    def __init__(self,ip,hop,pkts):
         self.ip = ip
         self.hop=hop
-        self.min_rtt=min_rtt
-        self.max_rtt=max_rtt
         self.pkts=pkts
-        self.responses=responses
-        self.pktsC=pktsC
-
-    def make_node(ip,hop,min_rtt,max_rtt,pkts,responses,pktsC):
-        node= node(ip,hop,min_rtt,max_rtt,pkts,responses,pktsC)
+        
+    def make_node(ip,hop,pkts):
+        node= node(ip,hop,pkts)
         return node
     
-    
+'''    
 class packet(object):
     rtt=np.NaN
     pkt=np.NaN
@@ -57,6 +49,7 @@ class packet(object):
     
     def make_packet(rtt,pkt,ttl):
         package=package(rtt,pkt,ttl)
+'''
 
 def coojaJsonImporter(dir):
         
@@ -107,22 +100,18 @@ def createNodes(dict):
         #print(dict.get(ip).get("max_rtt"))
         #findMissingPackets(dict.get(ip))
         pkts1=dict.get(ip).get("pkts")
-        pktsList=[]
+        #pktsList=[]
         for p in pkts1:
             #print(p.get("rtt"))
              #make_packet(rtt,pkt,ttl)
             rtt=p.get("rtt")
             pkt=p.get("pkt")
-            ttl=p.get("ttl")
-            pack=packet(rtt,pkt,ttl)
-            pktsList.append(pack)
-        min_rtt=dict.get(ip).get("min_rtt")
-        max_rtt=dict.get(ip).get("max_rtt")
-        responses=dict.get(ip).get("responses")
+            #pack=packet(rtt,pkt,ttl)
+            #pktsList.append(pack)
         hop=64-(int(pkts[0:1]["ttl"]))
         #print(type(pkts[0:1]["ttl"]))
         #print(pkts[0:1]["ttl"])
-        n=node(ip,hop,min_rtt,max_rtt,pkts,responses,pkts)
+        n=node(ip,hop,pkts)
         
         nodeList.append(n)
         #print(type(nodeList[0].pkts[0]))
@@ -215,7 +204,7 @@ def printBigPlot(data,figsize,namefile):
             ax.set_xlim([-500, 8000])
     directory="./figures"
     if not os.path.exists(directory):
-    os.makedirs(directory)
+        os.makedirs(directory)
     fig.savefig(directory+namefile+".pdf")   # save the figure to file
     plt.show()      
 
