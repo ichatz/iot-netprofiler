@@ -142,7 +142,6 @@ def findMissingPackets(node):
 
 
 
-
 def getIps(list):
     ips=[]
     for n in list:
@@ -192,6 +191,14 @@ def getPings(data):
         pings.append(packetN)
     return pings
 
+#Lenght of nodes
+def maxNodes(data):
+    maxNodes=-1
+    for i in range(len(data)):
+        for j in range(len(data[i])):
+             if (len(data[i])>maxNodes): maxNodes=len(data[i])
+    return maxNodes
+
 def saveFileFigures(fig,directory,namefile):
     directory=directory+"figures/"
     if not os.path.exists(directory):
@@ -232,9 +239,21 @@ def hopPreparation(data):
     dataHop=[]
 
     listoflists = []
+    #print("Hop Preparation")
+    #print(len(data),len(data[0]))
+
+    maxHopCase=[]
+    for i in range(len(data)):
+        maxHop=-1
+        for j in range(len(data[i])):
+            if(data[i][j].hop>maxHop):
+                maxHop=data[i][j].hop
+        maxHopCase.append(maxHop)
+    #print(maxHopCase)
+    
     for i in range(len(data)):
         sublist = []
-        for j in range(3):
+        for j in range(maxHopCase[i]):
             sublist.append((df_a))
         dataHop.append(sublist)
     #print (listoflists)
@@ -245,6 +264,8 @@ def hopPreparation(data):
             hop=data[i][j].hop-1
 
             dataHop[i][hop]= pd.concat([dataHop[i][hop],data[i][j].pkts],sort=True)
+    #print(len(dataHop),len(dataHop[0]))
+    
     return dataHop
 
 #Print on a file density by Hop (asked by professor)
@@ -271,12 +292,19 @@ def printDensityByHop(directory,data,figsize,namefile,colors,cases):
 
 #Print on a file density by Case (asked by professor)
 def printDensityByCase(directory,data,figsize,namefile,colors,cases):
+    
     print("Printing Density by case for "+directory)
-    data=hopPreparation(data)
-    dataHopT=[*zip(*data)]
-    fig, axs= plt.subplots(3,1, figsize=(15,20),sharey=True, )
+    #print(len(data),len(data[0]))
+    
+    data1=hopPreparation(data)
+    dataHopT=[*zip(*data1)]
+    
+    #print(len(data1),len(data1[0]))
+    #print(len(dataHopT),len(dataHopT[0]))
+    fig, axs= plt.subplots(len(dataHopT[0]),1, figsize=(15,20),sharey=True, )
     for i in range(len(dataHopT)):
-        for j in range(len(dataHopT[i])):
+        for j in range(len(dataHopT[0])):
+            
             dataHopT[i][j]["rtt"].plot.kde(
                 ax=axs[j],
                 label="Hop "+str(i),
@@ -318,19 +346,22 @@ def densityOutliersByCase(directory,data,figsize,namefile,colors,cases):
     fig, axs= plt.subplots(len(data),len(data[0]), figsize=figsize,sharey=True, )
     for i in range(len(data)):
         for j in range(len(data[i])):
+           
             out=getOutliers(data[i][j].pkts)
-            if not out.empty :
+            if not out.empty | len(out)<2:
+                #print(out)
                 ax=axs[i][j]
                 out["rtt"].plot.kde(
                 ax=ax,
                 label=cases[i],
                      color=colors[i]
-            )
-                ax.set_ylabel("Density")
+                )
                 out["rtt"].hist(density=True,alpha=0.3, ax=ax, color=colors[i])
-                ax.set_title("Node "+ str(j))
-                ax.set_xlabel("Time (ms)")
                 ax.legend()
+            ax.set_ylabel("Density")
+            ax.set_title("Node "+ str(j))
+            ax.set_xlabel("Time (ms)")
+                
     saveFileFigures(fig,directory,namefile)
 
 
@@ -352,10 +383,11 @@ def densityOfDelayByCase(directory,data,figsize,namefile,colors,cases):
     saveFileFigures(fig,directory,namefile)
 
 
+    
 #RTT Graph
 def RTTGraph(directory,data,figsize,namefile,colors,cases):
     print("Printing RTT Graph for "+directory)
-    fig, axs= plt.subplots(9,1, figsize=(18,70),sharey=True, )
+    fig, axs= plt.subplots(maxNodes(data),1, figsize=(18,70),sharey=True, )
     for i in range(len(data)):
         for j in range(len(data[i])):
             axs[j].plot(data[i][j].pkts["pkt"],data[i][j].pkts["rtt"],label=cases[i],color=colors[i]   )
