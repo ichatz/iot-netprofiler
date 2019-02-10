@@ -83,7 +83,9 @@ def dict2df_list(dict):
         df=pd.DataFrame(dict[key]['pkts'])
         df['ip']=key
         df['hop']=64-(df['ttl'])
+        df = df.drop(['ttl'], axis=1)
         dfList.append(df)
+
         #print(df)
     return dfList
 
@@ -99,16 +101,17 @@ def createNodes(dict):
         #(ip,hop,min_rtt,max_rtt,pkts,responses)
         #print(dict.get(ip).get("max_rtt"))
         #findMissingPackets(dict.get(ip))
-        pkts1=dict.get(ip).get("pkts")
+        #pkts1=dict.get(ip).get("pkts")
         #pktsList=[]
-        for p in pkts1:
+        #for p in pkts1:
             #print(p.get("rtt"))
              #make_packet(rtt,pkt,ttl)
-            rtt=p.get("rtt")
-            pkt=p.get("pkt")
+            #rtt=p.get("rtt")
+            #pkt=p.get("pkt")
             #pack=packet(rtt,pkt,ttl)
             #pktsList.append(pack)
         hop=64-(int(pkts[0:1]["ttl"]))
+        pkts = pkts.drop(['ttl'], axis=1)
         #print(type(pkts[0:1]["ttl"]))
         #print(pkts[0:1]["ttl"])
         n=node(ip,hop,pkts)
@@ -162,6 +165,14 @@ def getOutliers(df):
     mean=df1.mean()
     a1=df["rtt"]>mean+(2*std)
     a2=df["rtt"]<mean-(2*std)
+    return(df[a1 | a2])
+
+def get_IQR_Outliers(df):
+    df1 = df["rtt"]
+    std = df1.std()
+    mean = df1.mean()
+    a1 = df["rtt"]>mean+(2*std)
+    a2 = df["rtt"]<mean-(2*std)
     return(df[a1 | a2])
 
 def getStdValues(df):
