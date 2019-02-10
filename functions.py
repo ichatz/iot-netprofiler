@@ -23,43 +23,36 @@ from pandas.plotting import scatter_matrix
 class node(object):
     ip = ""
     hop= 0
-    min_rtt= 0
-    max_rtt= 0
     pkts=pd.DataFrame()
-    pktsC=pd.DataFrame()
-    responses=0
-    
-    
-    # The class "constructor" - It's actually an initializer 
-    def __init__(self,ip,hop,min_rtt,max_rtt,pkts,responses,pktsC):
+
+
+    # The class "constructor" - It's actually an initializer
+    def __init__(self,ip,hop,pkts):
         self.ip = ip
         self.hop=hop
-        self.min_rtt=min_rtt
-        self.max_rtt=max_rtt
         self.pkts=pkts
-        self.responses=responses
-        self.pktsC=pktsC
 
-    def make_node(ip,hop,min_rtt,max_rtt,pkts,responses,pktsC):
-        node= node(ip,hop,min_rtt,max_rtt,pkts,responses,pktsC)
+    def make_node(ip,hop,pkts):
+        node= node(ip,hop,pkts)
         return node
-    
-    
+
+'''
 class packet(object):
     rtt=np.NaN
     pkt=np.NaN
-    ttl=np.NaN   
+    ttl=np.NaN
     def __init__(self,rtt,pkt,ttl):
         self.rtt=rtt
         self.pkt=pkt
         self.ttl=ttl
-    
-    
+
+
     def make_packet(rtt,pkt,ttl):
         package=package(rtt,pkt,ttl)
+'''
 
 def coojaJsonImporter(dir):
-        
+
         dataList=[]
 
         for file in os.listdir(dir):
@@ -76,13 +69,13 @@ def dict2df(dict):
     for key in dict.keys():
         df=pd.DataFrame(dict[key]['pkts'])
         df['ip']=key
-        
+
         #dfList.append(df)
         #print(df)
         bigdata=bigdata.append(df,ignore_index=True)
 
     return bigdata
-        
+
 def dict2df_list(dict):
     dfList=[]
     #dfList(pd.DataFrame(dict))
@@ -90,14 +83,16 @@ def dict2df_list(dict):
         df=pd.DataFrame(dict[key]['pkts'])
         df['ip']=key
         df['hop']=64-(df['ttl'])
+        df = df.drop(['ttl'], axis=1)
         dfList.append(df)
+
         #print(df)
     return dfList
 
 
 ###Function to create nodes, create a list of nodes
-### 
-    
+###
+
 def createNodes(dict):
     nodeList=[]
     #dfList(pd.DataFrame(dict))
@@ -106,27 +101,24 @@ def createNodes(dict):
         #(ip,hop,min_rtt,max_rtt,pkts,responses)
         #print(dict.get(ip).get("max_rtt"))
         #findMissingPackets(dict.get(ip))
-        pkts1=dict.get(ip).get("pkts")
-        pktsList=[]
-        for p in pkts1:
+        #pkts1=dict.get(ip).get("pkts")
+        #pktsList=[]
+        #for p in pkts1:
             #print(p.get("rtt"))
              #make_packet(rtt,pkt,ttl)
-            rtt=p.get("rtt")
-            pkt=p.get("pkt")
-            ttl=p.get("ttl")
-            pack=packet(rtt,pkt,ttl)
-            pktsList.append(pack)
-        min_rtt=dict.get(ip).get("min_rtt")
-        max_rtt=dict.get(ip).get("max_rtt")
-        responses=dict.get(ip).get("responses")
+            #rtt=p.get("rtt")
+            #pkt=p.get("pkt")
+            #pack=packet(rtt,pkt,ttl)
+            #pktsList.append(pack)
         hop=64-(int(pkts[0:1]["ttl"]))
+        pkts = pkts.drop(['ttl'], axis=1)
         #print(type(pkts[0:1]["ttl"]))
         #print(pkts[0:1]["ttl"])
-        n=node(ip,hop,min_rtt,max_rtt,pkts,responses,pkts)
-        
+        n=node(ip,hop,pkts)
+
         nodeList.append(n)
         #print(type(nodeList[0].pkts[0]))
-        
+
     return nodeList
 
 
@@ -135,7 +127,7 @@ def findMissingPackets(node):
     #print(node.pkts["pkt"])
     print("Executed")
     maxP=-1
-    
+
     for el in node.pkts["pkt"]:
         if(el>maxP): maxP=int(el)
     #print(maxP)
@@ -146,11 +138,11 @@ def findMissingPackets(node):
         pkt[index]=node.pkts["rtt"][i]
         #pkt[)]=node.pkts["pkt"][i]
     return pkt
-    
-    
 
 
-    
+
+
+
 def getIps(list):
     ips=[]
     for n in list:
@@ -161,12 +153,12 @@ def getIps(list):
 def MLPreparation(data):
     # Calculate all the statistics
     statistics = {}	# <node_id, statistics of the node>
-    
+
     for network in data:
         for node in network:
             print(node.pkts["rtt"].describe())
-  
-    
+
+
 def getOutliers(df):
     df1=df["rtt"]
     std=df1.std()
@@ -175,13 +167,21 @@ def getOutliers(df):
     a2=df["rtt"]<mean-(2*std)
     return(df[a1 | a2])
 
+def get_IQR_Outliers(df):
+    df1 = df["rtt"]
+    std = df1.std()
+    mean = df1.mean()
+    a1 = df["rtt"]>mean+(2*std)
+    a2 = df["rtt"]<mean-(2*std)
+    return(df[a1 | a2])
+
 def getStdValues(df):
     df1=df["rtt"]
     std=df1.std()
     mean=df1.mean()
     a1=df["rtt"]<mean+(2*std)
     a2=df["rtt"]>mean-(2*std)
-    return(df[a1 & a2])   
+    return(df[a1 & a2])
 
 def getPings(data):
     pings=[]
@@ -198,7 +198,7 @@ def saveFileFigures(fig,directory,namefile):
         os.makedirs(directory)
         print(directory)
     fig.savefig(directory+namefile+".pdf")   # save the figure to file
-    #plt.show() 
+    #plt.show()
 
 
 #Prints on a file the big matrix (asked by professor)
@@ -223,10 +223,10 @@ def printBigPlot(directory,data,figsize,namefile,colors,cases):
             ax.set_xlabel("Time (ms)")
             ax.legend()
             ax.set_xlim([-500, 8000])
-    saveFileFigures(fig,directory,namefile)    
+    saveFileFigures(fig,directory,namefile)
 
-#Prepare the hop data    
-def hopPreparation(data):    
+#Prepare the hop data
+def hopPreparation(data):
     hoplist=[]
     df_a = pd.DataFrame( columns = ['pkt'])
     dataHop=[]
@@ -249,7 +249,7 @@ def hopPreparation(data):
 
 #Print on a file density by Hop (asked by professor)
 def printDensityByHop(directory,data,figsize,namefile,colors,cases):
-    
+
     print("Printing Density by Hop for "+directory)
     dataHop=hopPreparation(data)
     fig, axs= plt.subplots(len(dataHop),1, figsize=(15,20),sharey=True, )
@@ -258,7 +258,7 @@ def printDensityByHop(directory,data,figsize,namefile,colors,cases):
             dataHop[i][j]['rtt'].plot.kde(
                 ax=axs[j],
                 label=cases[i],color=colors[i]
-            ) 
+            )
 
             dataHop[i][j]["rtt"].hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
 
@@ -267,10 +267,10 @@ def printDensityByHop(directory,data,figsize,namefile,colors,cases):
             axs[j].legend()
 
             axs[j].set_xlim([-40, 6000])
-    saveFileFigures(fig,directory,namefile)  
-    
+    saveFileFigures(fig,directory,namefile)
+
 #Print on a file density by Case (asked by professor)
-def printDensityByCase(directory,data,figsize,namefile,colors,cases): 
+def printDensityByCase(directory,data,figsize,namefile,colors,cases):
     print("Printing Density by case for "+directory)
     data=hopPreparation(data)
     dataHopT=[*zip(*data)]
@@ -281,7 +281,7 @@ def printDensityByCase(directory,data,figsize,namefile,colors,cases):
                 ax=axs[j],
                 label="Hop "+str(i),
                 color=colors[i]
-            ) 
+            )
 
             dataHopT[i][j]["rtt"].hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
             axs[j].set_title(""+ cases[i-j])
@@ -311,7 +311,7 @@ def densityOfDelayByCaseNoOutliers(directory,data,figsize,namefile,colors,cases)
                 ax.set_xlabel("Time (ms)")
                 ax.legend()
     saveFileFigures(fig,directory,namefile)
-    
+
 #Density of outliers in every node by Case
 def densityOutliersByCase(directory,data,figsize,namefile,colors,cases):
     print("Printing Density of outliers in every node by Case for "+directory)
@@ -332,8 +332,8 @@ def densityOutliersByCase(directory,data,figsize,namefile,colors,cases):
                 ax.set_xlabel("Time (ms)")
                 ax.legend()
     saveFileFigures(fig,directory,namefile)
-    
-    
+
+
 #Distibution of the delay divided by Node in the differents Cases
 def densityOfDelayByCase(directory,data,figsize,namefile,colors,cases):
     print("Printing Density of delay in every node by Case for "+directory)
@@ -351,7 +351,7 @@ def densityOfDelayByCase(directory,data,figsize,namefile,colors,cases):
             axs[j].legend()
     saveFileFigures(fig,directory,namefile)
 
-   
+
 #RTT Graph
 def RTTGraph(directory,data,figsize,namefile,colors,cases):
     print("Printing RTT Graph for "+directory)
@@ -362,8 +362,5 @@ def RTTGraph(directory,data,figsize,namefile,colors,cases):
             axs[j].set_title("Node "+ str(j))
             axs[j].set_xlabel("Packet Number")
             axs[j].set_ylabel("Time (ms)")
-            axs[j].legend()   
-    saveFileFigures(fig,directory,namefile) 
-
-
-
+            axs[j].legend()
+    saveFileFigures(fig,directory,namefile)
