@@ -112,6 +112,7 @@ def createNodes(dict):
             #pktsList.append(pack)
         hop=64-(int(pkts[0:1]["ttl"]))
         pkts = pkts.drop(['ttl'], axis=1)
+        pkts=pkts.rename(columns={"pkt":"seq"})
         #print(type(pkts[0:1]["ttl"]))
         #print(pkts[0:1]["ttl"])
         n=node(ip,hop,pkts)
@@ -210,19 +211,23 @@ def printBigPlot(directory,data,figsize,namefile,colors,cases):
         for j in range(len(data[i])):
         #print(i,j)
             ax=axs[i][j]
-            data[i][j].pkts["rtt"].plot.kde(
-                ax=ax,
-                label="Case " +str(cases[i]),
-                color=colors[i]
-
-            )
-
+            d=data[i][j].pkts["rtt"]
             ax.set_ylabel("Density")
-            data[i][j].pkts["rtt"].hist(density=True,alpha=0.3,color=colors[i], ax=ax)
             ax.set_title("Node "+ str(j) )
             ax.set_xlabel("Time (ms)")
-            ax.legend()
-            ax.set_xlim([-500, 8000])
+            if not d.empty  | len(d)<2 :
+                d.plot.kde(
+                    ax=ax,
+                    label="Case " +str(cases[i]),
+                    color=colors[i]
+
+                )
+
+
+                d.hist(density=True,alpha=0.3,color=colors[i], ax=ax)
+
+                ax.legend()
+            #ax.set_xlim([-500, 8000])
     saveFileFigures(fig,directory,namefile)
 
 #Prepare the hop data
@@ -266,21 +271,26 @@ def printDensityByHop(directory,data,figsize,namefile,colors,cases):
 
     print("Printing Density by Hop for "+directory)
     dataHop=hopPreparation(data)
-    fig, axs= plt.subplots(len(dataHop),1, figsize=(15,20),sharey=True, )
+    fig, axs= plt.subplots(len(dataHop[0]),1, figsize=(15,20),sharey=True, )
+    #print(len(dataHop),len(dataHop[0]))
     for i in range(len(dataHop)):
         for j in range(len(dataHop[i])):
-            dataHop[i][j]['rtt'].plot.kde(
-                ax=axs[j],
-                label=cases[i],color=colors[i]
-            )
-
-            dataHop[i][j]["rtt"].hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
-
+            #print(i,j)
+            d=dataHop[i][j]['rtt']
             axs[j].set_xlabel("Time (ms)")
             axs[j].set_title("Hop "+ str(j+1))
-            axs[j].legend()
+            if not d.empty | len(d)<2 :
+                d.plot.kde(
+                    ax=axs[j],
+                    label=cases[i],color=colors[i]
+                )
 
-            axs[j].set_xlim([-40, 6000])
+                d.hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
+
+
+                axs[j].legend()
+
+            #axs[j].set_xlim([-40, 6000])
     saveFileFigures(fig,directory,namefile)
 
 #Print on a file density by Case (asked by professor)
@@ -297,19 +307,22 @@ def printDensityByCase(directory,data,figsize,namefile,colors,cases):
     fig, axs= plt.subplots(len(dataHopT[0]),1, figsize=(15,20),sharey=True, )
     for i in range(len(dataHopT)):
         for j in range(len(dataHopT[0])):
-
-            dataHopT[i][j]["rtt"].plot.kde(
-                ax=axs[j],
-                label="Hop "+str(i),
-                color=colors[i]
-            )
-
-            dataHopT[i][j]["rtt"].hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
-            axs[j].set_title(""+ cases[i-j])
+            d=dataHopT[i][j]["rtt"]
+            axs[j].set_title(""+ cases[i])
             axs[j].set_xlabel("Time (ms)")
-            axs[j].legend()
+            axs[j].set_ylabel("Density")
+            if not d.empty | len(d)<2 :
+                d.plot.kde(
+                    ax=axs[j],
+                    label="Hop "+str(i),
+                    color=colors[i]
+                )
 
-            axs[j].set_xlim([-40, 6000])
+                d.hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
+
+                axs[j].legend()
+
+            #axs[j].set_xlim([-40, 6000])
     saveFileFigures(fig,directory,namefile)
 
 #Print Density of delay without outliers in every node by Case
@@ -340,18 +353,21 @@ def densityOutliersByCase(directory,data,figsize,namefile,colors,cases):
     for i in range(len(data)):
         for j in range(len(data[i])):
             out=getOutliers(data[i][j].pkts)
-            if not out.empty :
-                ax=axs[i][j]
+            ax=axs[i][j]
+            ax.set_ylabel("Density")
+            ax.set_title("Node "+ str(j))
+            ax.set_xlabel("Time (ms)")
+            if not out.empty | len(out)<2 :
+
                 out["rtt"].plot.kde(
                 ax=ax,
                 label=cases[i],
                  color=colors[i]
             )
-                ax.set_ylabel("Density")
+
                 out["rtt"].hist(density=True,alpha=0.3, ax=ax, color=colors[i])
                 ax.legend()
-            ax.set_title("Node "+ str(j))
-            ax.set_xlabel("Time (ms)")
+
 
     saveFileFigures(fig,directory,namefile)
 
@@ -362,25 +378,31 @@ def densityOfDelayByCase(directory,data,figsize,namefile,colors,cases):
     fig, axs= plt.subplots(len(data[0]),1, figsize=figsize,sharey=True, )
     for i in range(len(data)):
         for j in range(len(data[i])):
-            data[i][j].pkts["rtt"].plot.kde(
-                ax=axs[j],
-                label=cases[i],color=colors[i]
-            )
-            axs[j].set_ylabel("Time (ms)")
-            data[i][j].pkts["rtt"].hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
+            d=data[i][j].pkts["rtt"]
             axs[j].set_title("Node "+ str(j))
             axs[j].set_xlabel("Time (ms)")
-            axs[j].legend()
+            axs[j].set_ylabel("Density")
+            if not d.empty | len(d)<2 :
+
+
+                d.plot.kde(
+                    ax=axs[j],
+                    label=cases[i],color=colors[i]
+                )
+
+                d.hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
+
+                axs[j].legend()
     saveFileFigures(fig,directory,namefile)
 
 
 #RTT Graph
 def RTTGraph(directory,data,figsize,namefile,colors,cases):
     print("Printing RTT Graph for "+directory)
-    fig, axs= plt.subplots(9,1, figsize=(18,70),sharey=True, )
+    fig, axs= plt.subplots(len(data[0]),1, figsize=figsize,sharey=True, )
     for i in range(len(data)):
         for j in range(len(data[i])):
-            axs[j].plot(data[i][j].pkts["pkt"],data[i][j].pkts["rtt"],label=cases[i],color=colors[i]   )
+            axs[j].plot(data[i][j].pkts["seq"],data[i][j].pkts["rtt"],label=cases[i],color=colors[i]   )
             axs[j].set_title("Node "+ str(j))
             axs[j].set_xlabel("Packet Number")
             axs[j].set_ylabel("Time (ms)")

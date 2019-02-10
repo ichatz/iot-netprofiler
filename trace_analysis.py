@@ -80,10 +80,11 @@ def process_iotlab_node_by_node(path, tracefile):
             hops[node_ip_and_rank['node_id'][node_id]] = rank_to_hops.index(node_ip_and_rank['rank'][node_id]) + 1
 
 
-    obj_node = []  
+    obj_node = []
     # Create a list of Node objects
     for node_id in nodes:
-        obj_node.append(functions.node(node_id, hops[node_id], nodes[node_id]))
+        if(node_id in hops):
+            obj_node.append(functions.node(node_id, hops[node_id], nodes[node_id]))
 
     return obj_node
 
@@ -397,7 +398,7 @@ def process_iotlab_node_by_node(path, tracefile):
 
 def separate_outliers_node_by_node(nodes):
     window_size = 10
-    std_values = pd.DataFrame(columns=[node for node in 
+    std_values = pd.DataFrame(columns=[node for node in
         list(nodes.keys())])  # Maintain x(t) if mean-2*std <= x(t) <? mean+2*std
     outliers = pd.DataFrame(
         columns=[node for node in list(nodes.keys())])  # Maintain x(t) otherwise

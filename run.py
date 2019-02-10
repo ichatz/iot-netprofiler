@@ -13,19 +13,32 @@ import sys
 sys.path.append('../')
 from functions import *
 from pandas.plotting import scatter_matrix
+from trace_analysis import *
 
-
-
-def runCooja(directory,colors,cases):
+def importCooja(directory):
     data=[]
     traces=directory+"traces"
     dataList=coojaJsonImporter(traces)
     for nodeList in dataList:
         data.append(createNodes(nodeList))
+    return data
 
+def importIOTData(directory,tracefiles):
+    data=[]
+
+    #print(tracefiles)
+    for i in range(len(tracefiles)):
+        print("Importing "+directory+tracefiles[i])
+        nodes=process_iotlab_node_by_node(directory, tracefiles[i])
+        data.append(nodes)
+
+    return data
+
+
+def run(data,directory,colors,cases):
 
     #Distribution of the delay in correlation with the Cases
-    dataHop=hopPreparation(data)
+    #dataHop=hopPreparation(data)
     #Distribution of the delay in correlation with the Hops
     printDensityByCase(directory,data,(15,20),"densitybyCase",colors,cases)
 
@@ -33,22 +46,26 @@ def runCooja(directory,colors,cases):
     printDensityByHop(directory,data,(15,20),"densitybyHop",colors,cases)
 
     #Prints on a file the big matrix (asked by professor)
-    printBigPlot(directory,data,(4,8),"Big Plot",colors,cases)
+    printBigPlot(directory,data,(80,10),"Big Plot",colors,cases)
 
     #Print Density of delay without outliers in every node by Case
     densityOfDelayByCaseNoOutliers(directory,data,(15,90),"Density of delay by Case no outliers",colors,cases)
 
     #Density of outliers in every node by Case
-    densityOutliersByCase(directory,data,(30,10),"Density Outliers of Delay by Case",colors,cases)
+    densityOutliersByCase(directory,data,(80,10),"Density Outliers of Delay by Case",colors,cases)
 
     #Distibution of the delay divided by Node in the differents Cases
     densityOfDelayByCase(directory,data,(15,90),"Density of Delay by Case",colors,cases)
 
     #RTT Graph
-    RTTGraph(directory,data,(18,70),"RTT Graph",colors,cases)
+    RTTGraph(directory,data,(18,150),"RTT Graph",colors,cases)
 
 
-colors = [ 'orange','dodgerblue', 'green','violet']
+
+
+
+
+colors = [ 'orange','dodgerblue', 'green','violet',"red","yellow","pink"]
 
 directory="/home/fedebyes/Workspace/Master Thesis/iot-netprofiler/"
 directory=directory+"cooja-9nodes/"
@@ -58,8 +75,8 @@ cases=[
     "Normal Network"
       ]
 #print(getPings(data))
-
-#runCooja(directory,colors,cases)
+#data=importCooja(directory)
+#run(data,directory,colors,cases)
 
 directory="/home/fedebyes/Workspace/Master Thesis/iot-netprofiler/"
 directory=directory+"cooja-16nodes/"
@@ -69,4 +86,30 @@ cases=[
        "Black Hole Network 3",
     "Normal Network"
       ]
-runCooja(directory,colors,cases)
+#data=importCooja(directory)
+
+#run(data,directory,colors,cases)
+
+directory="/home/fedebyes/Workspace/Master Thesis/iot-netprofiler/"
+directory=directory+"iot-lab-25nodes/"
+
+traces=directory+"traces/"
+tracefiles=[
+    "2019-01JAN-28-01",
+    "2019-01JAN-30-1",
+    #"2019-01JAN-30-1b169",
+    #"2019-01JAN-30-1b169b153b182",
+    #"2019-01JAN-30-2",
+    #"2019-01JAN-30-3b113b122b145b166b185"
+]
+
+cases=tracefiles
+
+data=importIOTData(traces,tracefiles)
+
+# for i in range(len(data)):
+#     for j in range(len(data[i])):
+#         #print("iej"+ str(i)+ " "+str(j)
+#        #print(data[i][j].hop)
+#print(data[0][0].pkts)
+run(data,directory,colors,cases)
