@@ -1,4 +1,4 @@
- 
+
 #Modules to install via pip pandas,ipynb
 import pandas as pd
 import numpy as np
@@ -23,7 +23,7 @@ def runCooja(directory,colors,cases):
     for nodeList in dataList:
         data.append(createNodes(nodeList))
 
-    
+
     #Distribution of the delay in correlation with the Cases
     dataHop=hopPreparation(data)
     #Distribution of the delay in correlation with the Hops
@@ -33,7 +33,7 @@ def runCooja(directory,colors,cases):
     printDensityByHop(directory,data,(15,20),"densitybyHop",colors,cases)
 
     #Prints on a file the big matrix (asked by professor)
-    printBigPlot(directory,data,(15,20),"Big Plot",colors,cases)
+    printBigPlot(directory,data,(4,8),"Big Plot",colors,cases)
 
     #Print Density of delay without outliers in every node by Case
     densityOfDelayByCaseNoOutliers(directory,data,(15,90),"Density of delay by Case no outliers",colors,cases)
