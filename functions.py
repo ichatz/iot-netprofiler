@@ -174,8 +174,8 @@ def get_IQR_Outliers(df):
 
     lower_bound = q1 - 1.5 * iqr
     upper_bound = q3 + 1.5 * iqr
-    a1 = df["rtt"] > lower_bound
-    a2 = df["rtt"] < upper_bound
+    a1 = df["rtt"] < lower_bound
+    a2 = df["rtt"] > upper_bound
     return (df[a1 | a2])
 
 def getStdValues(df):
