@@ -191,3 +191,104 @@ def getPings(data):
             if(len(data[i][j].pkts)>packetN): packetN=len(data[i][j].pkts)
         pings.append(packetN)
     return pings
+
+#Prints on a file the big matrix (asked by professor)
+def printBigPlot(data,figsize,namefile):
+    fig, axs= plt.subplots(9,3, figsize=figsize,sharey=True, )
+
+    for i in range(len(data)):
+        for j in range(len(data[i])):
+        #print(i,j)
+            ax=axs[j][i]
+            data[i][j].pkts["rtt"].plot.kde(
+                ax=ax,
+                label="Case " +str(cases[i]),
+                color=colors[i]
+
+            )
+
+            ax.set_ylabel("Density")
+            data[i][j].pkts["rtt"].hist(density=True,alpha=0.3,color=colors[i], ax=ax)
+            ax.set_title("Node "+ str(j) )
+            ax.set_xlabel("Time (ms)")
+            ax.legend()
+            ax.set_xlim([-500, 8000])
+    directory="./figures"
+    if not os.path.exists(directory):
+    os.makedirs(directory)
+    fig.savefig(directory+namefile+".pdf")   # save the figure to file
+    plt.show()      
+
+#Prepare the hop data    
+def hopPreparation(data):    
+    hoplist=[]
+    df_a = pd.DataFrame( columns = ['pkt'])
+    dataHop=[]
+
+    listoflists = []
+    for i in range(len(data)):
+        sublist = []
+        for j in range(3):
+            sublist.append((df_a))
+        dataHop.append(sublist)
+    #print (listoflists)
+
+    for i in range(len(data)):
+        col=[]
+        for j in range(len(data[i])):
+            hop=data[i][j].hop-1
+
+            dataHop[i][hop]= pd.concat([dataHop[i][hop],data[i][j].pkts],sort=True)
+    return dataHop
+
+#Print on a file density by Hop (asked by professor)
+def printDensityByHop(data,figsize,namefile):
+    data=hopPreparation(data)
+    fig, axs= plt.subplots(3,1, figsize=(15,20),sharey=True, )
+    for i in range(len(dataHop)):
+        for j in range(len(dataHop[i])):
+            dataHop[i][j]['rtt'].plot.kde(
+                ax=axs[j],
+                label=cases[i],color=colors[i]
+            ) 
+
+            dataHop[i][j]["rtt"].hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
+
+            axs[j].set_xlabel("Time (ms)")
+            axs[j].set_title("Hop "+ str(j+1))
+            axs[j].legend()
+
+            axs[j].set_xlim([-40, 6000])
+    directory="./figures"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    fig.savefig(directory+namefile+".pdf")   # save the figure to file
+    plt.show()
+    
+#Print on a file density by Case (asked by professor)
+def printDensityByCase(data,figsize,namefile):    
+    data=hopPreparation(data)
+    dataHopT=[*zip(*dataHop)]
+    fig, axs= plt.subplots(3,1, figsize=(15,20),sharey=True, )
+    for i in range(len(dataHopT)):
+        for j in range(len(dataHopT[i])):
+            dataHopT[i][j]["rtt"].plot.kde(
+                ax=axs[j],
+                label="Hop "+str(i),
+                color=colors[i]
+            ) 
+
+            dataHopT[i][j]["rtt"].hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
+            axs[j].set_title(""+ cases[i-j])
+            axs[j].set_xlabel("Time (ms)")
+            axs[j].legend()
+
+            axs[j].set_xlim([-40, 6000])
+            directory="./figures"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    fig.savefig(directory+namefile+".pdf")   # save the figure to file
+    plt.show()    
+
+    
+    
