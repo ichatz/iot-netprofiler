@@ -168,12 +168,15 @@ def getOutliers(df):
     return(df[a1 | a2])
 
 def get_IQR_Outliers(df):
-    df1 = df["rtt"]
-    std = df1.std()
-    mean = df1.mean()
-    a1 = df["rtt"]>mean+(2*std)
-    a2 = df["rtt"]<mean-(2*std)
-    return(df[a1 | a2])
+    # Computer the set of Outliers based on IQR
+    q1, q2, q3 = df['rtt'].quantile([.25, .5, .75])
+    iqr = q3 - q1
+
+    lower_bound = q1 - 1.5 * iqr
+    upper_bound = q3 + 1.5 * iqr
+    a1 = df["rtt"] > lower_bound
+    a2 = df["rtt"] < upper_bound
+    return (df[a1 | a2])
 
 def getStdValues(df):
     df1=df["rtt"]
