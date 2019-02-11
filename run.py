@@ -75,8 +75,8 @@ cases=[
     "Normal Network"
       ]
 #print(getPings(data))
-#data=importCooja(directory)
-#run(data,directory,colors,cases)
+data=importCooja(directory)
+run(data,directory,colors,cases)
 
 directory="/home/fedebyes/Workspace/Master Thesis/iot-netprofiler/"
 directory=directory+"cooja-16nodes/"
@@ -86,9 +86,9 @@ cases=[
        "Black Hole Network 3",
     "Normal Network"
       ]
-#data=importCooja(directory)
+data=importCooja(directory)
 
-#run(data,directory,colors,cases)
+run(data,directory,colors,cases)
 
 directory="/home/fedebyes/Workspace/Master Thesis/iot-netprofiler/"
 directory=directory+"iot-lab-25nodes/"
