@@ -20,3 +20,7 @@ for i in "${nodes[@]}"
     echo $resp
     sleep 1
   done
+
+resp=`lynx -dump http://[fd00::212:7401:1:101] > $logfile_routes.log`
+echo $resp
+
