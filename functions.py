@@ -131,12 +131,12 @@ def findMissingPackets(node):
     print("Executed")
     maxP=-1
 
-    for el in node.pkts["pkt"]:
+    for el in node.pkts["seq"]:
         if(el>maxP): maxP=int(el)
     #print(maxP)
     pkt=[None]*(maxP+1)
-    for i in range(len(node.pkts["pkt"])):
-        index=int(node.pkts["pkt"][i])
+    for i in range(len(node.pkts["seq"])):
+        index=int(node.pkts["seq"][i])
         #print(index)
         pkt[index]=node.pkts["rtt"][i]
         #pkt[)]=node.pkts["pkt"][i]
