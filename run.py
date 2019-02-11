@@ -80,4 +80,5 @@ tracefiles=[
 ]
 
 data = importIOTData(directory,tracefiles)
+directory=os.getcwd() + "/iot-lab-25nodes/"
 run(data,directory,colors,cases)

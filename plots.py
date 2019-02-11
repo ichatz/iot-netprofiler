@@ -1,14 +1,7 @@
-# This module implement all functions that we need in order to plot graphs
-
-import os
+from functions import *
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from pandas.plotting import scatter_matrix
-import sys
-sys.path.append('../')
-from functions import *
-
+import os
 
 def saveFileFigures(fig,directory,namefile):
     directory=directory+"figures/"
@@ -47,56 +40,11 @@ def printBigPlot(directory,data,figsize,namefile,colors,cases):
             #ax.set_xlim([-500, 8000])
     saveFileFigures(fig,directory,namefile)
 
-
-def getMaxHop(data):
-    maxHopCase=[]
-    for i in range(len(data)):
-        maxHop=-1
-        for j in range(len(data[i])):
-            if(data[i][j].hop>maxHop):
-                maxHop=data[i][j].hop
-        maxHopCase.append(maxHop)
-    return maxHopCase
-
-
-
-#Prepare the hop data
-def hopPreparation(data):
-    hoplist=[]
-    df_a = pd.DataFrame( columns = ['pkt'])
-    dataHop=[]
-
-    listoflists = []
-    #print("Hop Preparation")
-    #print(len(data),len(data[0]))
-
-    maxHopCase=getMaxHop(data)
-    #print(maxHopCase)
-
-    for i in range(len(data)):
-        sublist = []
-        for j in range(maxHopCase[i]):
-            sublist.append((df_a))
-        dataHop.append(sublist)
-    #print (listoflists)
-
-    for i in range(len(data)):
-        col=[]
-        for j in range(len(data[i])):
-            hop=data[i][j].hop-1
-
-            dataHop[i][hop]= pd.concat([dataHop[i][hop],data[i][j].pkts],sort=True)
-    #print(len(dataHop),len(dataHop[0]))
-
-    return dataHop
-
 #Print on a file density by Hop (asked by professor)
-#Must fix len dataHop to give right max dimension
 def printDensityByHop(directory,data,figsize,namefile,colors,cases):
 
     print("Printing Density by Hop for "+directory)
     dataHop=hopPreparation(data)
-    print(len(dataHop[0]))
     fig, axs= plt.subplots(len(dataHop[0]),1, figsize=(15,20),sharey=True, )
     #print(len(dataHop),len(dataHop[0]))
     for i in range(len(dataHop)):
