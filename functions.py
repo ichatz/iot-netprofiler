@@ -65,32 +65,6 @@ def coojaJsonImporter(dir):
 
         return dataList
 
-def dict2df(dict):
-    dfList=[]
-    bigdata=pd.DataFrame()
-    for key in dict.keys():
-        df=pd.DataFrame(dict[key]['pkts'])
-        df['ip']=key
-
-        #dfList.append(df)
-        #print(df)
-        bigdata=bigdata.append(df,ignore_index=True)
-
-    return bigdata
-
-def dict2df_list(dict):
-    dfList=[]
-    #dfList(pd.DataFrame(dict))
-    for key in dict.keys():
-        df=pd.DataFrame(dict[key]['pkts'])
-        df['ip']=key
-        df['hop']=64-(df['ttl'])
-        df = df.drop(['ttl'], axis=1)
-        dfList.append(df)
-
-        #print(df)
-    return dfList
-
 
 ###Function to create nodes, create a list of nodes
 ###
@@ -100,18 +74,7 @@ def createNodes(dict):
     #dfList(pd.DataFrame(dict))
     for ip in dict.keys():
         pkts=pd.DataFrame(dict[ip]['pkts'])
-        #(ip,hop,min_rtt,max_rtt,pkts,responses)
-        #print(dict.get(ip).get("max_rtt"))
-        #findMissingPackets(dict.get(ip))
-        #pkts1=dict.get(ip).get("pkts")
-        #pktsList=[]
-        #for p in pkts1:
-            #print(p.get("rtt"))
-             #make_packet(rtt,pkt,ttl)
-            #rtt=p.get("rtt")
-            #pkt=p.get("pkt")
-            #pack=packet(rtt,pkt,ttl)
-            #pktsList.append(pack)
+        
         hop=64-(int(pkts[0:1]["ttl"]))
         pkts = pkts.drop(['ttl'], axis=1)
         pkts=pkts.rename(columns={"pkt":"seq"})
@@ -120,7 +83,6 @@ def createNodes(dict):
         n=node(ip,hop,pkts)
 
         nodeList.append(n)
-        #print(type(nodeList[0].pkts[0]))
 
     return nodeList
 

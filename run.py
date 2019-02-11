@@ -76,8 +76,16 @@ tracefiles=[
     "2019-01JAN-30-1b169",
     "2019-01JAN-30-1b169b153b182",
     "2019-01JAN-30-2",
-    #"2019-01JAN-30-3b113b122b145b166b185"
+    "2019-01JAN-30-3b113b122b145b166b185"
 ]
+
+cases=[
+      "2019-01JAN-30-1",
+    "2019-01JAN-30-1b169",
+    "2019-01JAN-30-1b169b153b182",
+    "2019-01JAN-30-2",
+    "2019-01JAN-30-3b113b122b145b166b185"
+      ]
 
 data = importIOTData(directory,tracefiles)
 directory=os.getcwd() + "/iot-lab-25nodes/"
