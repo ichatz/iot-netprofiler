@@ -91,6 +91,7 @@ def hopPreparation(data):
     return dataHop
 
 #Print on a file density by Hop (asked by professor)
+#Must fix len dataHop to give right max dimension
 def printDensityByHop(directory,data,figsize,namefile,colors,cases):
 
     print("Printing Density by Hop for "+directory)

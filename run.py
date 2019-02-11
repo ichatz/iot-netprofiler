@@ -40,10 +40,10 @@ def run(data,directory,colors,cases):
     #Distribution of the delay in correlation with the Cases
     #dataHop=hopPreparation(data)
     #Distribution of the delay in correlation with the Hops
-    #printDensityByCase(directory,data,(15,20),"densitybyCase",colors,cases)
+    printDensityByCase(directory,data,(15,20),"densitybyCase",colors,cases)
 
     #Distribution by Hop
-    printDensityByHop(directory,data,(15,20),"densitybyHop",colors,cases)
+    #printDensityByHop(directory,data,(15,20),"densitybyHop",colors,cases)
 
     #Prints on a file the big matrix (asked by professor)
     printBigPlot(directory,data,(80,10),"Big Plot",colors,cases)
@@ -95,7 +95,7 @@ tracefiles=[
     "2019-01JAN-30-1b169",
     "2019-01JAN-30-1b169b153b182",
     "2019-01JAN-30-2",
-    "2019-01JAN-30-3b113b122b145b166b185"
+    #"2019-01JAN-30-3b113b122b145b166b185"
 ]
 
 data = importIOTData(directory,tracefiles)
