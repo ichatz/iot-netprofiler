@@ -17,23 +17,24 @@ from plots import *
 
 
 def run(data,directory,colors,cases):
+    hops = hopPreparation(data)
 
     #Distribution of the delay in correlation with the Cases
     #dataHop=hopPreparation(data)
     #Distribution of the delay in correlation with the Hops
-    printDensityByCase(directory,data,(15,20),"densitybyCase",colors,cases)
+    printDensityByCase(directory,data,hops,(15,20),"densitybyCase",colors,cases)
 
     #Distribution by Hop
     #printDensityByHop(directory,data,(15,20),"densitybyHop",colors,cases)
 
     #Prints on a file the big matrix (asked by professor)
-    printBigPlot(directory,data,(80,10),"Big Plot",colors,cases)
+    printBigPlot(directory,data,(90,20),"Big Plot",colors,cases)
 
     #Print Density of delay without outliers in every node by Case
     densityOfDelayByCaseNoOutliers(directory,data,(15,90),"Density of delay by Case no outliers",colors,cases)
 
     #Density of outliers in every node by Case
-    densityOutliersByCase(directory,data,(80,10),"Density Outliers of Delay by Case",colors,cases)
+    densityOutliersByCase(directory,data,(90,20),"Density Outliers of Delay by Case",colors,cases)
 
     #Distibution of the delay divided by Node in the differents Cases
     densityOfDelayByCase(directory,data,(15,90),"Density of Delay by Case",colors,cases)

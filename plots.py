@@ -42,10 +42,10 @@ def printBigPlot(directory,data,figsize,namefile,colors,cases):
     saveFileFigures(fig,directory,namefile)
 
 #Print on a file density by Hop (asked by professor)
-def printDensityByHop(directory,data,figsize,namefile,colors,cases):
+def printDensityByHop(directory,data,hops,figsize,namefile,colors,cases):
 
     print("Printing Density by Hop for "+directory)
-    dataHop=hopPreparation(data)
+    #dataHop=hopPreparation(data)
     fig, axs= plt.subplots(len(dataHop[0]),1, figsize=(15,20),sharey=True, )
     #print(len(dataHop),len(dataHop[0]))
     for i in range(len(dataHop)):
@@ -70,13 +70,13 @@ def printDensityByHop(directory,data,figsize,namefile,colors,cases):
     saveFileFigures(fig,directory,namefile)
 
 #Print on a file density by Case (asked by professor)
-def printDensityByCase(directory,data,figsize,namefile,colors,cases):
+def printDensityByCase(directory,data,hops,figsize,namefile,colors,cases):
 
     print("Printing Density by case for "+directory)
     #print(len(data),len(data[0]))
 
-    data1=hopPreparation(data)
-    dataHopT=[*zip(*data1)]
+    #data1=hopPreparation(data)
+    dataHopT=[*zip(*hops)]
 
     #print(len(data1),len(data1[0]))
     #print(len(dataHopT),len(dataHopT[0]))
