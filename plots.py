@@ -23,7 +23,7 @@ def printBigPlot(directory,data,figsize,namefile,colors,cases):
             ax=axs[i][j]
             d=data[i][j].pkts["rtt"]
             ax.set_ylabel("Density")
-            ax.set_title("Node "+ str(j) )
+            ax.set_title("Node "+ str(data[i][j].ip) )
             ax.set_xlabel("Time (ms)")
             if not d.empty  | len(d)<2 :
                 d.plot.kde(
@@ -38,13 +38,14 @@ def printBigPlot(directory,data,figsize,namefile,colors,cases):
 
                 ax.legend()
             #ax.set_xlim([-500, 8000])
+    plt.tight_layout()
     saveFileFigures(fig,directory,namefile)
 
 #Print on a file density by Hop (asked by professor)
-def printDensityByHop(directory,data,figsize,namefile,colors,cases):
+def printDensityByHop(directory,data,hops,figsize,namefile,colors,cases):
 
     print("Printing Density by Hop for "+directory)
-    dataHop=hopPreparation(data)
+    #dataHop=hopPreparation(data)
     fig, axs= plt.subplots(len(dataHop[0]),1, figsize=(15,20),sharey=True, )
     #print(len(dataHop),len(dataHop[0]))
     for i in range(len(dataHop)):
@@ -65,16 +66,17 @@ def printDensityByHop(directory,data,figsize,namefile,colors,cases):
                 axs[j].legend()
 
             #axs[j].set_xlim([-40, 6000])
+    plt.tight_layout()
     saveFileFigures(fig,directory,namefile)
 
 #Print on a file density by Case (asked by professor)
-def printDensityByCase(directory,data,figsize,namefile,colors,cases):
+def printDensityByCase(directory,data,hops,figsize,namefile,colors,cases):
 
     print("Printing Density by case for "+directory)
     #print(len(data),len(data[0]))
 
-    data1=hopPreparation(data)
-    dataHopT=[*zip(*data1)]
+    #data1=hopPreparation(data)
+    dataHopT=[*zip(*hops)]
 
     #print(len(data1),len(data1[0]))
     #print(len(dataHopT),len(dataHopT[0]))
@@ -96,7 +98,8 @@ def printDensityByCase(directory,data,figsize,namefile,colors,cases):
 
                 axs[j].legend()
 
-            #axs[j].set_xlim([-40, 6000])
+    plt.tight_layout()
+    #axs[j].set_xlim([-40, 6000])
     saveFileFigures(fig,directory,namefile)
 
 #Print Density of delay without outliers in every node by Case
@@ -115,9 +118,10 @@ def densityOfDelayByCaseNoOutliers(directory,data,figsize,namefile,colors,cases)
             )
                 ax.set_ylabel("Density")
                 out["rtt"].hist(density=True,alpha=0.3, ax=ax, color=colors[i])
-                ax.set_title("Node "+ str(j))
+                ax.set_title("Node "+ str(data[i][j].ip))
                 ax.set_xlabel("Time (ms)")
                 ax.legend()
+    plt.tight_layout()
     saveFileFigures(fig,directory,namefile)
 
 #Density of outliers in every node by Case
@@ -129,7 +133,7 @@ def densityOutliersByCase(directory,data,figsize,namefile,colors,cases):
             out=getOutliers(data[i][j].pkts)
             ax=axs[i][j]
             ax.set_ylabel("Density")
-            ax.set_title("Node "+ str(j))
+            ax.set_title("Node "+ str(data[i][j].ip))
             ax.set_xlabel("Time (ms)")
             if not out.empty | len(out)<2 :
 
@@ -142,7 +146,7 @@ def densityOutliersByCase(directory,data,figsize,namefile,colors,cases):
                 out["rtt"].hist(density=True,alpha=0.3, ax=ax, color=colors[i])
                 ax.legend()
 
-
+    plt.tight_layout()
     saveFileFigures(fig,directory,namefile)
 
 
@@ -153,7 +157,7 @@ def densityOfDelayByCase(directory,data,figsize,namefile,colors,cases):
     for i in range(len(data)):
         for j in range(len(data[i])):
             d=data[i][j].pkts["rtt"]
-            axs[j].set_title("Node "+ str(j))
+            axs[j].set_title("Node "+ str(data[i][j].ip))
             axs[j].set_xlabel("Time (ms)")
             axs[j].set_ylabel("Density")
             if not d.empty | len(d)<2 :
@@ -167,6 +171,7 @@ def densityOfDelayByCase(directory,data,figsize,namefile,colors,cases):
                 d.hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
 
                 axs[j].legend()
+    plt.tight_layout()
     saveFileFigures(fig,directory,namefile)
 
 
@@ -177,8 +182,9 @@ def RTTGraph(directory,data,figsize,namefile,colors,cases):
     for i in range(len(data)):
         for j in range(len(data[i])):
             axs[j].plot(data[i][j].pkts["seq"],data[i][j].pkts["rtt"],label=cases[i],color=colors[i]   )
-            axs[j].set_title("Node "+ str(j))
+            axs[j].set_title("Node "+ str(data[i][j].ip))
             axs[j].set_xlabel("Packet Number")
             axs[j].set_ylabel("Time (ms)")
             axs[j].legend()
+    plt.tight_layout()
     saveFileFigures(fig,directory,namefile)
