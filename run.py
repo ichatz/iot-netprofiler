@@ -1,8 +1,6 @@
-
 #Modules to install via pip pandas,ipynb
 import pandas as pd
 import numpy as np
-
 import matplotlib.pyplot as plt
 import json
 from pprint import pprint
@@ -14,9 +12,11 @@ sys.path.append('../')
 from functions import *
 from pandas.plotting import scatter_matrix
 from trace_analysis import *
+from plots import *
 
 def importCooja(directory):
     data=[]
+    print(directory)
     traces=directory+"traces"
     dataList=coojaJsonImporter(traces)
     for nodeList in dataList:
@@ -67,19 +67,24 @@ def run(data,directory,colors,cases):
 
 colors = [ 'orange','dodgerblue', 'green','violet',"red","yellow","pink"]
 
-directory="/home/fedebyes/Workspace/Master Thesis/iot-netprofiler/"
-directory=directory+"cooja-9nodes/"
+directory=os.getcwd() +"/cooja-9nodes/"
 cases=[
       "Black Hole Network 1",
         "Black Hole Network 2",
     "Normal Network"
       ]
+<<<<<<< HEAD
 #print(getPings(data))
 data=importCooja(directory)
 run(data,directory,colors,cases)
+=======
+>>>>>>> 140957eb994d55c93d593619723fae7d428da41c
 
-directory="/home/fedebyes/Workspace/Master Thesis/iot-netprofiler/"
-directory=directory+"cooja-16nodes/"
+data=importCooja(directory)
+run(data,directory,colors,cases)
+print(getPings(data))
+
+directory=os.getcwd() + "/cooja-16nodes/"
 cases=[
       "Black Hole Network 1",
         "Black Hole Network 2",
@@ -90,26 +95,19 @@ data=importCooja(directory)
 
 run(data,directory,colors,cases)
 
-directory="/home/fedebyes/Workspace/Master Thesis/iot-netprofiler/"
-directory=directory+"iot-lab-25nodes/"
-
-traces=directory+"traces/"
+directory=os.getcwd() + "/iot-lab-25nodes/traces/"
 tracefiles=[
-    "2019-01JAN-28-01",
     "2019-01JAN-30-1",
-    #"2019-01JAN-30-1b169",
-    #"2019-01JAN-30-1b169b153b182",
-    #"2019-01JAN-30-2",
+    "2019-01JAN-30-1b169",
+    "2019-01JAN-30-1b169b153b182",
+    "2019-01JAN-30-2",
     #"2019-01JAN-30-3b113b122b145b166b185"
 ]
 
-cases=tracefiles
-
-data=importIOTData(traces,tracefiles)
-
+#data = importIOTData(directory,tracefiles)
 # for i in range(len(data)):
 #     for j in range(len(data[i])):
 #         #print("iej"+ str(i)+ " "+str(j)
 #        #print(data[i][j].hop)
 #print(data[0][0].pkts)
-run(data,directory,colors,cases)
+#run(data,directory,colors,cases)
