@@ -65,32 +65,6 @@ def coojaJsonImporter(dir):
 
         return dataList
 
-def dict2df(dict):
-    dfList=[]
-    bigdata=pd.DataFrame()
-    for key in dict.keys():
-        df=pd.DataFrame(dict[key]['pkts'])
-        df['ip']=key
-
-        #dfList.append(df)
-        #print(df)
-        bigdata=bigdata.append(df,ignore_index=True)
-
-    return bigdata
-
-def dict2df_list(dict):
-    dfList=[]
-    #dfList(pd.DataFrame(dict))
-    for key in dict.keys():
-        df=pd.DataFrame(dict[key]['pkts'])
-        df['ip']=key
-        df['hop']=64-(df['ttl'])
-        df = df.drop(['ttl'], axis=1)
-        dfList.append(df)
-
-        #print(df)
-    return dfList
-
 
 ###Function to create nodes, create a list of nodes
 ###
@@ -100,18 +74,7 @@ def createNodes(dict):
     #dfList(pd.DataFrame(dict))
     for ip in dict.keys():
         pkts=pd.DataFrame(dict[ip]['pkts'])
-        #(ip,hop,min_rtt,max_rtt,pkts,responses)
-        #print(dict.get(ip).get("max_rtt"))
-        #findMissingPackets(dict.get(ip))
-        #pkts1=dict.get(ip).get("pkts")
-        #pktsList=[]
-        #for p in pkts1:
-            #print(p.get("rtt"))
-             #make_packet(rtt,pkt,ttl)
-            #rtt=p.get("rtt")
-            #pkt=p.get("pkt")
-            #pack=packet(rtt,pkt,ttl)
-            #pktsList.append(pack)
+        
         hop=64-(int(pkts[0:1]["ttl"]))
         pkts = pkts.drop(['ttl'], axis=1)
         pkts=pkts.rename(columns={"pkt":"seq"})
@@ -120,7 +83,6 @@ def createNodes(dict):
         n=node(ip,hop,pkts)
 
         nodeList.append(n)
-        #print(type(nodeList[0].pkts[0]))
 
     return nodeList
 
@@ -195,42 +157,7 @@ def getPings(data):
         pings.append(packetN)
     return pings
 
-def saveFileFigures(fig,directory,namefile):
-    directory=directory+"figures/"
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-        print(directory)
-    fig.savefig(directory+namefile+".pdf")   # save the figure to file
-    #plt.show()
 
-
-#Prints on a file the big matrix (asked by professor)
-def printBigPlot(directory,data,figsize,namefile,colors,cases):
-    print("Printing Big Plot for "+directory)
-    fig, axs= plt.subplots(len(data),len(data[0]), figsize=figsize,sharey=True, )
-
-    for i in range(len(data)):
-        for j in range(len(data[i])):
-        #print(i,j)
-            ax=axs[i][j]
-            d=data[i][j].pkts["rtt"]
-            ax.set_ylabel("Density")
-            ax.set_title("Node "+ str(j) )
-            ax.set_xlabel("Time (ms)")
-            if not d.empty  | len(d)<2 :
-                d.plot.kde(
-                    ax=ax,
-                    label="Case " +str(cases[i]),
-                    color=colors[i]
-
-                )
-
-
-                d.hist(density=True,alpha=0.3,color=colors[i], ax=ax)
-
-                ax.legend()
-            #ax.set_xlim([-500, 8000])
-    saveFileFigures(fig,directory,namefile)
 
 #Prepare the hop data
 def hopPreparation(data):
@@ -268,166 +195,4 @@ def hopPreparation(data):
 
     return dataHop
 
-#Print on a file density by Hop (asked by professor)
-def printDensityByHop(directory,data,figsize,namefile,colors,cases):
 
-    print("Printing Density by Hop for "+directory)
-    dataHop=hopPreparation(data)
-    fig, axs= plt.subplots(len(dataHop[0]),1, figsize=(15,20),sharey=True, )
-    #print(len(dataHop),len(dataHop[0]))
-    for i in range(len(dataHop)):
-        for j in range(len(dataHop[i])):
-            #print(i,j)
-            d=dataHop[i][j]['rtt']
-            axs[j].set_xlabel("Time (ms)")
-            axs[j].set_title("Hop "+ str(j+1))
-            if not d.empty | len(d)<2 :
-                d.plot.kde(
-                    ax=axs[j],
-                    label=cases[i],color=colors[i]
-                )
-
-                d.hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
-
-
-                axs[j].legend()
-
-            #axs[j].set_xlim([-40, 6000])
-    saveFileFigures(fig,directory,namefile)
-
-#Print on a file density by Case (asked by professor)
-def printDensityByCase(directory,data,figsize,namefile,colors,cases):
-
-    print("Printing Density by case for "+directory)
-    #print(len(data),len(data[0]))
-
-    data1=hopPreparation(data)
-    dataHopT=[*zip(*data1)]
-
-    #print(len(data1),len(data1[0]))
-    #print(len(dataHopT),len(dataHopT[0]))
-    fig, axs= plt.subplots(len(dataHopT[0]),1, figsize=(15,20),sharey=True, )
-    for i in range(len(dataHopT)):
-        for j in range(len(dataHopT[0])):
-            d=dataHopT[i][j]["rtt"]
-            axs[j].set_title(""+ cases[i])
-            axs[j].set_xlabel("Time (ms)")
-            axs[j].set_ylabel("Density")
-            if not d.empty | len(d)<2 :
-                d.plot.kde(
-                    ax=axs[j],
-                    label="Hop "+str(i),
-                    color=colors[i]
-                )
-
-                d.hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
-
-                axs[j].legend()
-
-            #axs[j].set_xlim([-40, 6000])
-    saveFileFigures(fig,directory,namefile)
-
-#Print Density of delay without outliers in every node by Case
-def densityOfDelayByCaseNoOutliers(directory,data,figsize,namefile,colors,cases):
-    print("Printing Density of delay without outliers in every node by Case for "+directory)
-    fig, axs= plt.subplots(len(data[0]),1, figsize=figsize,sharey=True, )
-    for i in range(len(data)):
-        for j in range(len(data[i])):
-            out=getStdValues(data[i][j].pkts)
-            if not out.empty :
-                ax=axs[j]
-                out["rtt"].plot.kde(
-                ax=ax,
-                label=cases[i],
-                     color=colors[i]
-            )
-                ax.set_ylabel("Density")
-                out["rtt"].hist(density=True,alpha=0.3, ax=ax, color=colors[i])
-                ax.set_title("Node "+ str(j))
-                ax.set_xlabel("Time (ms)")
-                ax.legend()
-    saveFileFigures(fig,directory,namefile)
-
-#Density of outliers in every node by Case
-def densityOutliersByCase(directory,data,figsize,namefile,colors,cases):
-    print("Printing Density of outliers in every node by Case for "+directory)
-    fig, axs= plt.subplots(len(data),len(data[0]), figsize=figsize,sharey=True, )
-    for i in range(len(data)):
-        for j in range(len(data[i])):
-            out=getOutliers(data[i][j].pkts)
-            ax=axs[i][j]
-            ax.set_ylabel("Density")
-            ax.set_title("Node "+ str(j))
-            ax.set_xlabel("Time (ms)")
-            if not out.empty | len(out)<2 :
-
-                out["rtt"].plot.kde(
-                ax=ax,
-                label=cases[i],
-                 color=colors[i]
-            )
-
-                out["rtt"].hist(density=True,alpha=0.3, ax=ax, color=colors[i])
-                ax.legend()
-
-
-    saveFileFigures(fig,directory,namefile)
-
-
-#Distibution of the delay divided by Node in the differents Cases
-def densityOfDelayByCase(directory,data,figsize,namefile,colors,cases):
-    print("Printing Density of delay in every node by Case for "+directory)
-    fig, axs= plt.subplots(len(data[0]),1, figsize=figsize,sharey=True, )
-    for i in range(len(data)):
-        for j in range(len(data[i])):
-            d=data[i][j].pkts["rtt"]
-            axs[j].set_title("Node "+ str(j))
-            axs[j].set_xlabel("Time (ms)")
-            axs[j].set_ylabel("Density")
-            if not d.empty | len(d)<2 :
-
-
-                d.plot.kde(
-                    ax=axs[j],
-                    label=cases[i],color=colors[i]
-                )
-
-                d.hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
-
-                axs[j].legend()
-    saveFileFigures(fig,directory,namefile)
-
-
-#RTT Graph
-def RTTGraph(directory,data,figsize,namefile,colors,cases):
-    print("Printing RTT Graph for "+directory)
-    fig, axs= plt.subplots(len(data[0]),1, figsize=figsize,sharey=True, )
-    for i in range(len(data)):
-        for j in range(len(data[i])):
-            axs[j].plot(data[i][j].pkts["seq"],data[i][j].pkts["rtt"],label=cases[i],color=colors[i]   )
-            axs[j].set_title("Node "+ str(j))
-            axs[j].set_xlabel("Packet Number")
-            axs[j].set_ylabel("Time (ms)")
-            axs[j].legend()
-    saveFileFigures(fig,directory,namefile)
-
-
-def importCooja(directory):
-    data=[]
-    print(directory)
-    traces=directory+"traces"
-    dataList=coojaJsonImporter(traces)
-    for nodeList in dataList:
-        data.append(createNodes(nodeList))
-    return data
-
-def importIOTData(directory,tracefiles):
-    data=[]
-
-    #print(tracefiles)
-    for i in range(len(tracefiles)):
-        print("Importing "+directory+tracefiles[i])
-        nodes=process_iotlab_node_by_node(directory, tracefiles[i])
-        data.append(nodes)
-
-    return data

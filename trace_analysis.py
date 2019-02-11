@@ -4,6 +4,29 @@ import networkx as nx
 import os
 import functions  # Import Node class
 
+
+def importCooja(directory):
+    # Import trace files from the directory
+    data=[]
+    print(directory)
+    traces=directory+"traces"
+    dataList=coojaJsonImporter(traces)
+    for nodeList in dataList:
+        data.append(createNodes(nodeList))
+    return data
+
+def importIOTData(directory,tracefiles):
+    # Import trace files from the directory
+    data=[]
+
+    #print(tracefiles)
+    for i in range(len(tracefiles)):
+        print("Importing "+directory+tracefiles[i])
+        nodes=process_iotlab_node_by_node(directory, tracefiles[i])
+        data.append(nodes)
+
+    return data
+
 def coojaJsonImporter(dir):
   # Input: directory containing the tracefiles
     # Return: computes a list of tracefiles in the directory
