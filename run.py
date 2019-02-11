@@ -40,7 +40,7 @@ def run(data,directory,colors,cases):
     #Distribution of the delay in correlation with the Cases
     #dataHop=hopPreparation(data)
     #Distribution of the delay in correlation with the Hops
-    printDensityByCase(directory,data,(15,20),"densitybyCase",colors,cases)
+    #printDensityByCase(directory,data,(15,20),"densitybyCase",colors,cases)
 
     #Distribution by Hop
     printDensityByHop(directory,data,(15,20),"densitybyHop",colors,cases)
@@ -73,16 +73,11 @@ cases=[
         "Black Hole Network 2",
     "Normal Network"
       ]
-<<<<<<< HEAD
-#print(getPings(data))
-data=importCooja(directory)
-run(data,directory,colors,cases)
-=======
->>>>>>> 140957eb994d55c93d593619723fae7d428da41c
 
-data=importCooja(directory)
-run(data,directory,colors,cases)
-print(getPings(data))
+
+#data=importCooja(directory)
+#run(data,directory,colors,cases)
+
 
 directory=os.getcwd() + "/cooja-16nodes/"
 cases=[
@@ -91,9 +86,8 @@ cases=[
        "Black Hole Network 3",
     "Normal Network"
       ]
-data=importCooja(directory)
-
-run(data,directory,colors,cases)
+#data=importCooja(directory)
+#run(data,directory,colors,cases)
 
 directory=os.getcwd() + "/iot-lab-25nodes/traces/"
 tracefiles=[
@@ -101,13 +95,8 @@ tracefiles=[
     "2019-01JAN-30-1b169",
     "2019-01JAN-30-1b169b153b182",
     "2019-01JAN-30-2",
-    #"2019-01JAN-30-3b113b122b145b166b185"
+    "2019-01JAN-30-3b113b122b145b166b185"
 ]
 
-#data = importIOTData(directory,tracefiles)
-# for i in range(len(data)):
-#     for j in range(len(data[i])):
-#         #print("iej"+ str(i)+ " "+str(j)
-#        #print(data[i][j].hop)
-#print(data[0][0].pkts)
-#run(data,directory,colors,cases)
+data = importIOTData(directory,tracefiles)
+run(data,directory,colors,cases)

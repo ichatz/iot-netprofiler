@@ -47,6 +47,19 @@ def printBigPlot(directory,data,figsize,namefile,colors,cases):
             #ax.set_xlim([-500, 8000])
     saveFileFigures(fig,directory,namefile)
 
+
+def getMaxHop(data):
+    maxHopCase=[]
+    for i in range(len(data)):
+        maxHop=-1
+        for j in range(len(data[i])):
+            if(data[i][j].hop>maxHop):
+                maxHop=data[i][j].hop
+        maxHopCase.append(maxHop)
+    return maxHopCase
+
+
+
 #Prepare the hop data
 def hopPreparation(data):
     hoplist=[]
@@ -57,13 +70,7 @@ def hopPreparation(data):
     #print("Hop Preparation")
     #print(len(data),len(data[0]))
 
-    maxHopCase=[]
-    for i in range(len(data)):
-        maxHop=-1
-        for j in range(len(data[i])):
-            if(data[i][j].hop>maxHop):
-                maxHop=data[i][j].hop
-        maxHopCase.append(maxHop)
+    maxHopCase=getMaxHop(data)
     #print(maxHopCase)
 
     for i in range(len(data)):
@@ -88,6 +95,7 @@ def printDensityByHop(directory,data,figsize,namefile,colors,cases):
 
     print("Printing Density by Hop for "+directory)
     dataHop=hopPreparation(data)
+    print(len(dataHop[0]))
     fig, axs= plt.subplots(len(dataHop[0]),1, figsize=(15,20),sharey=True, )
     #print(len(dataHop),len(dataHop[0]))
     for i in range(len(dataHop)):
