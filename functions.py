@@ -13,11 +13,13 @@ import import_ipynb
 import sys
 sys.path.append('../')
 from pandas.plotting import scatter_matrix
-
+from trace_analysis import *
 #Object idea= List of nodes
 #Node has (ip,hop,min_rtt,max_rtt,pkts,responses)
 #pkt is a dataframe with packets
 #hop is from 64-ttl
+
+
 
 
 class node(object):
@@ -408,3 +410,24 @@ def RTTGraph(directory,data,figsize,namefile,colors,cases):
             axs[j].set_ylabel("Time (ms)")
             axs[j].legend()
     saveFileFigures(fig,directory,namefile)
+
+
+def importCooja(directory):
+    data=[]
+    print(directory)
+    traces=directory+"traces"
+    dataList=coojaJsonImporter(traces)
+    for nodeList in dataList:
+        data.append(createNodes(nodeList))
+    return data
+
+def importIOTData(directory,tracefiles):
+    data=[]
+
+    #print(tracefiles)
+    for i in range(len(tracefiles)):
+        print("Importing "+directory+tracefiles[i])
+        nodes=process_iotlab_node_by_node(directory, tracefiles[i])
+        data.append(nodes)
+
+    return data

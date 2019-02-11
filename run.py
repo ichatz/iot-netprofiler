@@ -14,25 +14,6 @@ from pandas.plotting import scatter_matrix
 from trace_analysis import *
 from plots import *
 
-def importCooja(directory):
-    data=[]
-    print(directory)
-    traces=directory+"traces"
-    dataList=coojaJsonImporter(traces)
-    for nodeList in dataList:
-        data.append(createNodes(nodeList))
-    return data
-
-def importIOTData(directory,tracefiles):
-    data=[]
-
-    #print(tracefiles)
-    for i in range(len(tracefiles)):
-        print("Importing "+directory+tracefiles[i])
-        nodes=process_iotlab_node_by_node(directory, tracefiles[i])
-        data.append(nodes)
-
-    return data
 
 
 def run(data,directory,colors,cases):
