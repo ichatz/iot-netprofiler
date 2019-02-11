@@ -83,6 +83,7 @@ def findMissingPackets(node):
 
 
 def getIps(list):
+    # Return the ips/node_ids contained in the list
     ips=[]
     for n in list:
         ips.append(n.ip)
@@ -99,6 +100,7 @@ def MLPreparation(data):
 
 
 def getOutliers(df):
+    # Computer the outliers as x(t) out of mean - 2std <= x(t) <= mean + 2std
     df1=df["rtt"]
     std=df1.std()
     mean=df1.mean()
@@ -107,6 +109,7 @@ def getOutliers(df):
     return(df[a1 | a2])
 
 def get_IQR_Outliers(df):
+    # Computer the outliers through IQR
     df1 = df["rtt"]
     std = df1.std()
     mean = df1.mean()
@@ -115,6 +118,8 @@ def get_IQR_Outliers(df):
     return(df[a1 | a2])
 
 def getStdValues(df):
+    # Computer values in the interval mean - 2std <= x(t) <= mean + 2std
+    df1=df["rtt"]
     df1=df["rtt"]
     std=df1.std()
     mean=df1.mean()
@@ -123,10 +128,13 @@ def getStdValues(df):
     return(df[a1 & a2])
 
 def getPings(data):
+    # For each experiment compute the number of pings that succeded 
+
     pings=[]
     for i in range(len(data)):
         packetN=-1
         for j in range(len(data[i])):
             if(len(data[i][j].pkts)>packetN): packetN=len(data[i][j].pkts)
         pings.append(packetN)
-    return pings
+
+    return pings # List of succeded pings

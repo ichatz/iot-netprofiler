@@ -73,9 +73,10 @@ cases=[
         "Black Hole Network 2",
     "Normal Network"
       ]
-#print(getPings(data))
+
 data=importCooja(directory)
 run(data,directory,colors,cases)
+print(getPings(data))
 
 directory=os.getcwd() + "/cooja-16nodes/"
 cases=[
