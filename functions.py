@@ -196,3 +196,14 @@ def hopPreparation(data):
     return dataHop
 
 
+def getPercentageMissingPackets(node,lenght):
+    missing=0
+    #print(len(node.pkts))
+    missing=lenght-len(node)
+    #print(lenght,missing)
+    if(missing!=0):
+        result=missing/lenght
+    else: result=0
+    #print(maxS/missing)
+    return result*100
+
