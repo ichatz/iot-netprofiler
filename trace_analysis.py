@@ -2,77 +2,46 @@ import pandas as pd
 import json
 import networkx as nx
 import os
-import functions  # Import Node class
+import node
 
 
 def importCooja(directory):
     # Import trace files from the directory
-    data=[]
+    data = []
     print(directory)
-    traces=directory+"traces"
-    dataList=coojaJsonImporter(traces)
+    traces = directory + "traces"
+    dataList = coojaJsonImporter(traces)
     for nodeList in dataList:
-        data.append(createNodes(nodeList))
+        data.append(node.createNodes(nodeList))
     return data
 
-def importIOTData(directory,tracefiles):
-    # Import trace files from the directory
-    data=[]
 
-    #print(tracefiles)
+def importIOTData(directory, tracefiles):
+    # Import trace files from the directory
+    data = []
+
+    # print(tracefiles)
     for i in range(len(tracefiles)):
-        print("Importing "+directory+tracefiles[i])
-        nodes=process_iotlab_node_by_node(directory, tracefiles[i])
+        print("Importing " + directory + tracefiles[i])
+        nodes = process_iotlab_node_by_node(directory, tracefiles[i])
         data.append(nodes)
 
     return data
 
+
 def coojaJsonImporter(dir):
-  # Input: directory containing the tracefiles
+    # Input: directory containing the tracefiles
     # Return: computes a list of tracefiles in the directory
 
-    dataList=[]
+    dataList = []
 
     for file in os.listdir(dir):
-        print("Importing "+ file)
-        with open(dir+"/" + file, 'r') as f:
-
+        print("Importing " + file)
+        with open(dir + "/" + file, 'r') as f:
             dataList.append(json.load(f))
 
     return dataList
 
-
-def createNodes(dict):
-  # Input: Cooja json
-  # Return: create a new Node object
-
-  nodeList=[]
-  #dfList(pd.DataFrame(dict))
-  for ip in dict.keys():
-      pkts=pd.DataFrame(dict[ip]['pkts'])
-      #(ip,hop,min_rtt,max_rtt,pkts,responses)
-      #print(dict.get(ip).get("max_rtt"))
-      #findMissingPackets(dict.get(ip))
-      #pkts1=dict.get(ip).get("pkts")
-      #pktsList=[]
-      #for p in pkts1:
-          #print(p.get("rtt"))
-           #make_packet(rtt,pkt,ttl)
-          #rtt=p.get("rtt")
-          #pkt=p.get("pkt")
-          #pack=packet(rtt,pkt,ttl)
-          #pktsList.append(pack)
-      hop=64-(int(pkts[0:1]["ttl"]))
-      pkts = pkts.drop(['ttl'], axis=1)
-      pkts=pkts.rename(columns={"pkt":"seq"})
-      #print(type(pkts[0:1]["ttl"]))
-      #print(pkts[0:1]["ttl"])
-      n=functions.node(ip,hop,pkts)
-
-      nodeList.append(n)
-      #print(type(nodeList[0].pkts[0]))
-
-  return nodeList
 
 def process_iotlab_node_by_node(path, tracefile):
     # Input: path and name of the tracefile that you want to analyze
@@ -153,11 +122,10 @@ def process_iotlab_node_by_node(path, tracefile):
             # Just append to the list of nodes
             hops[node_ip_and_rank['node_id'][node_id]] = rank_to_hops.index(node_ip_and_rank['rank'][node_id]) + 1
 
-
     obj_node = []
     # Create a list of Node objects
     for node_id in nodes:
-        if(node_id in hops):
+        if (node_id in hops):
             obj_node.append(functions.node(node_id, hops[node_id], nodes[node_id]))
 
     return obj_node
@@ -252,7 +220,6 @@ def produce_iotlab_topology(path, tracefile):
     return G
 
 
-'''
 def process_iotlab_aggregated(path, tracefile):
     # Read the ip of each node
     ips = pd.read_csv(path + 'addr-' + tracefile + '.cap',
@@ -383,9 +350,6 @@ def separate_outliers(hop_nodes):
     return std_values, outliers
 
 
-
-
-
 def process_iotlab_node_by_node(path, tracefile):
     # Read the ip of each node
     ips = pd.read_csv(path + 'addr-' + tracefile + '.cap',
@@ -471,11 +435,10 @@ def process_iotlab_node_by_node(path, tracefile):
     return nodes, hops
 
 
-
 def separate_outliers_node_by_node(nodes):
     window_size = 10
     std_values = pd.DataFrame(columns=[node for node in
-        list(nodes.keys())])  # Maintain x(t) if mean-2*std <= x(t) <? mean+2*std
+                                       list(nodes.keys())])  # Maintain x(t) if mean-2*std <= x(t) <? mean+2*std
     outliers = pd.DataFrame(
         columns=[node for node in list(nodes.keys())])  # Maintain x(t) otherwise
 
@@ -512,88 +475,86 @@ def separate_outliers_node_by_node(nodes):
 
 
 def processed_data_for_kmeans(path, tracefile):
-	# Read the ip of each node
-	ips = pd.read_csv(path + 'addr-' + tracefile + '.cap',
-	                  sep=';|addr:|/',
-	                  na_filter=True,
-	                  usecols=[1, 3, 4],
-	                  header=None,
-	                  names=['prefix', 'node_id', 'addr', 'ip', 'scope'],
-	                  engine='python').dropna()
+    # Read the ip of each node
+    ips = pd.read_csv(path + 'addr-' + tracefile + '.cap',
+                      sep=';|addr:|/',
+                      na_filter=True,
+                      usecols=[1, 3, 4],
+                      header=None,
+                      names=['prefix', 'node_id', 'addr', 'ip', 'scope'],
+                      engine='python').dropna()
 
-	# extract the ip addresses
-	ips = ips[ips.scope == '64  scope: global'].reset_index(drop=True).drop(['scope'], axis=1)
+    # extract the ip addresses
+    ips = ips[ips.scope == '64  scope: global'].reset_index(drop=True).drop(['scope'], axis=1)
 
-	# Read the rank of each node
-	rank = pd.read_csv(path + 'dodag-' + tracefile + '.cap',
-	                   sep=';|R: | \| OP:',
-	                   na_filter=True,
-	                   header=None,
-	                   usecols=[1, 3],
-	                   names=['node_id', 'rank'],
-	                   engine='python').dropna()
+    # Read the rank of each node
+    rank = pd.read_csv(path + 'dodag-' + tracefile + '.cap',
+                       sep=';|R: | \| OP:',
+                       na_filter=True,
+                       header=None,
+                       usecols=[1, 3],
+                       names=['node_id', 'rank'],
+                       engine='python').dropna()
 
-	# compute the hop of each node
-	rank['rank'] = rank['rank'].convert_objects(convert_numeric=True)
+    # compute the hop of each node
+    rank['rank'] = rank['rank'].convert_objects(convert_numeric=True)
 
-	# Merge all data
-	node_ip_and_rank = pd.merge(ips, rank, how='inner').drop_duplicates()
+    # Merge all data
+    node_ip_and_rank = pd.merge(ips, rank, how='inner').drop_duplicates()
 
-	# Load the ICMP traces and parse the RTT
-	packets = pd.read_csv(path + 'trace-' + tracefile + '.cap',
-	                      sep=';|seq=| hop|time = |ms',
-	                      na_filter=True,
-	                      header=None,
-	                      usecols=[1, 3, 5],
-	                      names=['node_id', 'seq', 'rtt'],
-	                      engine='python').dropna().drop_duplicates()
+    # Load the ICMP traces and parse the RTT
+    packets = pd.read_csv(path + 'trace-' + tracefile + '.cap',
+                          sep=';|seq=| hop|time = |ms',
+                          na_filter=True,
+                          header=None,
+                          usecols=[1, 3, 5],
+                          names=['node_id', 'seq', 'rtt'],
+                          engine='python').dropna().drop_duplicates()
 
-	packets = packets.sort_values(by=['node_id', 'seq'], ascending=True, na_position='first')
-	packets = packets[packets['rtt'] > 1]
+    packets = packets.sort_values(by=['node_id', 'seq'], ascending=True, na_position='first')
+    packets = packets[packets['rtt'] > 1]
 
-	max_seq = packets['seq'].max()
+    max_seq = packets['seq'].max()
 
-	# Compute the 2 dimensional array
-	d_nodes = {}  # <node_id, DataFrame containing seq and rtt columns>
-	for n in packets.index:
-	    if packets['node_id'][n] in d_nodes:
-	        d_nodes[packets['node_id'][n]] = d_nodes[packets['node_id'][n]].append(
-	            pd.DataFrame({'seq': [int(packets['seq'][n])], packets['node_id'][n]: [packets['rtt'][n]]}))
-	    else:
-	        d_nodes[packets['node_id'][n]] = pd.DataFrame(
-	            {'seq': [int(packets['seq'][n])], packets['node_id'][n]: [packets['rtt'][n]]})
+    # Compute the 2 dimensional array
+    d_nodes = {}  # <node_id, DataFrame containing seq and rtt columns>
+    for n in packets.index:
+        if packets['node_id'][n] in d_nodes:
+            d_nodes[packets['node_id'][n]] = d_nodes[packets['node_id'][n]].append(
+                pd.DataFrame({'seq': [int(packets['seq'][n])], packets['node_id'][n]: [packets['rtt'][n]]}))
+        else:
+            d_nodes[packets['node_id'][n]] = pd.DataFrame(
+                {'seq': [int(packets['seq'][n])], packets['node_id'][n]: [packets['rtt'][n]]})
 
-	# create the 2 dimensional array
-	nodes = pd.DataFrame([seq for seq in range(1, max_seq + 1)], columns=['seq']).set_index('seq')
-	for node in d_nodes.keys():
-	    nodes = nodes.join(d_nodes[node].set_index('seq'))
+    # create the 2 dimensional array
+    nodes = pd.DataFrame([seq for seq in range(1, max_seq + 1)], columns=['seq']).set_index('seq')
+    for node in d_nodes.keys():
+        nodes = nodes.join(d_nodes[node].set_index('seq'))
 
-	nodes = nodes[~nodes.index.duplicated(keep='first')]
+    nodes = nodes[~nodes.index.duplicated(keep='first')]
 
-	# Each node communicates with the root of the DODAG through a certain number of hops.
-	# The network was configured in order to have three nodes communicating directly with the root.
-	rank_to_hops = sorted([int(rank) for rank in list(node_ip_and_rank['rank'].drop_duplicates())])
+    # Each node communicates with the root of the DODAG through a certain number of hops.
+    # The network was configured in order to have three nodes communicating directly with the root.
+    rank_to_hops = sorted([int(rank) for rank in list(node_ip_and_rank['rank'].drop_duplicates())])
 
-	# remove root (if it exists)
-	if 256 in rank_to_hops:
-	    rank_to_hops.remove(256)
+    # remove root (if it exists)
+    if 256 in rank_to_hops:
+        rank_to_hops.remove(256)
 
-	hops = {}
-	for node in node_ip_and_rank.index:
-	    if not node_ip_and_rank['node_id'][node] in d_nodes.keys():
-	        continue
+    hops = {}
+    for node in node_ip_and_rank.index:
+        if not node_ip_and_rank['node_id'][node] in d_nodes.keys():
+            continue
 
-	    if not node_ip_and_rank['rank'][node] in rank_to_hops:
-	        continue
+        if not node_ip_and_rank['rank'][node] in rank_to_hops:
+            continue
 
-	    hops[node_ip_and_rank['node_id'][node]] = rank_to_hops.index(node_ip_and_rank['rank'][node]) + 1
+        hops[node_ip_and_rank['node_id'][node]] = rank_to_hops.index(node_ip_and_rank['rank'][node]) + 1
 
+    node_dataframe = {}
+    for node in nodes.keys():
+        node_dataframe[node] = nodes[node].to_frame().rename(index=str, columns={node: 'rtt'})
+        node_dataframe[node]['hop'] = hops[node]
+        node_dataframe[node]['seq'] = node_dataframe[node].index
 
-	node_dataframe = {}
-	for node in nodes.keys():
-	    node_dataframe[node] = nodes[node].to_frame().rename(index=str, columns={node: 'rtt'})
-	    node_dataframe[node]['hop'] = hops[node]
-	    node_dataframe[node]['seq'] = node_dataframe[node].index
-
-	return node_dataframe
-'''
+    return node_dataframe
