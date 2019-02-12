@@ -1,6 +1,11 @@
 
 import pandas as pd
 
+
+#Object idea= List of nodes
+#Node has (ip,hop,min_rtt,max_rtt,pkts,responses)
+#pkt is a dataframe with packets
+#hop is from 64-ttl
 class node(object):
     ip = ""
     hop= 0

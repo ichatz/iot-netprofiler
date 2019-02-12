@@ -14,10 +14,7 @@ import sys
 sys.path.append('../')
 from pandas.plotting import scatter_matrix
 from trace_analysis import *
-#Object idea= List of nodes
-#Node has (ip,hop,min_rtt,max_rtt,pkts,responses)
-#pkt is a dataframe with packets
-#hop is from 64-ttl
+from node import *
 
 
 
@@ -74,7 +71,7 @@ def createNodes(dict):
     #dfList(pd.DataFrame(dict))
     for ip in dict.keys():
         pkts=pd.DataFrame(dict[ip]['pkts'])
-        
+
         hop=64-(int(pkts[0:1]["ttl"]))
         pkts = pkts.drop(['ttl'], axis=1)
         pkts=pkts.rename(columns={"pkt":"seq"})
@@ -206,4 +203,3 @@ def getPercentageMissingPackets(node,lenght):
     else: result=0
     #print(maxS/missing)
     return result*100
-
