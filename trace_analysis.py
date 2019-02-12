@@ -350,6 +350,101 @@ def separate_outliers(hop_nodes):
     return std_values, outliers
 
 
+def process_iotlab_node_by_node2(path, tracefile):
+    ips = pd.read_csv(path + 'addr-' + tracefile + '.cap',
+                          sep=';|addr:|/',
+                          na_filter=True,
+                          usecols=[1, 3, 4],
+                          header=None,
+                          names=['prefix', 'node_id', 'addr', 'ip', 'scope'],
+                          engine='python').dropna()
+
+    # extract the ip addresses
+    ips = ips[ips.scope == '64  scope: global'].reset_index(drop=True).drop(['scope'], axis=1)
+
+    # Read the rank of each node
+    rank = pd.read_csv(path + 'dodag-' + tracefile + '.cap',
+                       sep=';|R: | \| OP:',
+                       na_filter=True,
+                       header=None,
+                       usecols=[1, 3],
+                       names=['node_id', 'rank'],
+                       engine='python').dropna()
+
+    # compute the hop of each node
+    rank['rank'] = rank['rank'].convert_objects(convert_numeric=True)
+
+    # Merge all data
+    node_ip_and_rank = pd.merge(ips, rank, how='inner').drop_duplicates()
+
+    # Load the ICMP traces and parse the RTT
+    packets = pd.read_csv(path + 'trace-' + tracefile + '.cap',
+                          sep=';|seq=| hop|time = |ms',
+                          na_filter=True,
+                          header=None,
+                          usecols=[1, 3, 5],
+                          names=['node_id', 'seq', 'rtt'],
+                          engine='python').dropna().drop_duplicates()
+
+    packets = packets.sort_values(by=['node_id', 'seq'], ascending=True, na_position='first')
+    packets = packets[packets['rtt'] > 1]
+
+    max_seq = packets['seq'].max()
+
+    # Each node communicates with the root of the DODAG through a certain number of hops.
+    # The network was configured in order to have three nodes communicating directly with the root.
+    rank_to_hops = sorted([int(rank) for rank in list(node_ip_and_rank['rank'].drop_duplicates())])
+
+    # remove root (if it exists)
+    if 256 in rank_to_hops:
+        rank_to_hops.remove(256)
+
+    # Compute the 2 dimensional array
+    d_packets = {}  # <node_id, DataFrame containing seq and rtt columns>
+    for n in packets.index:
+        if packets['node_id'][n] in d_packets:
+            d_packets[packets['node_id'][n]] = d_packets[packets['node_id'][n]].append(
+                pd.DataFrame({'node_id': packets['node_id'][n], 'seq': [int(packets['seq'][n])], 'rtt': [packets['rtt'][n]]}))
+        else:
+            d_packets[packets['node_id'][n]] = pd.DataFrame(
+                {'node_id': packets['node_id'][n], 'seq': [int(packets['seq'][n])], 'rtt': [packets['rtt'][n]]})
+
+    remove = [] # a list of nodes to be removed
+    # Append the hop column to each dataframe
+    for node in node_ip_and_rank.index:
+        if not node_ip_and_rank['node_id'][node] in d_packets.keys():
+            continue
+
+        if not node_ip_and_rank['rank'][node] in rank_to_hops:
+            remove.append(node_ip_and_rank['node_id'][node])
+            continue
+
+        d_packets[node_ip_and_rank['node_id'][node]]['hop'] = rank_to_hops.index(node_ip_and_rank['rank'][node]) + 1
+        d_packets[node_ip_and_rank['node_id'][node]] = d_packets[node_ip_and_rank['node_id'][node]].loc[d_packets[node_ip_and_rank['node_id'][node]]['seq'] <= 100].reset_index(drop=True)
+        
+        # If the node was unavailable during the first 100 ICMP messages it should be removed
+        if len(d_packets[node_ip_and_rank['node_id'][node]]) == 0 or int(node_ip_and_rank['rank'][node]) == 256:
+          remove.append(node_ip_and_rank['node_id'][node])
+
+    # Remove empty nodes
+    for node in remove:
+      del d_packets[node]
+
+    # Compute a new DataFrame containing node_id and rank
+    nodes = {}
+    for node in d_packets:
+        if not 'node_id' in nodes:
+            nodes['node_id'] = [d_packets[node]['node_id'].iloc[0]]
+        if not 'rank' in nodes:
+            nodes['rank'] = [d_packets[node]['hop'].iloc[0]]
+        else:
+            nodes['node_id'].append(d_packets[node]['node_id'].iloc[0])
+            nodes['rank'].append(d_packets[node]['hop'].iloc[0])
+
+
+    return pd.DataFrame(nodes).sort_values(by=['rank','node_id']), d_packets
+
+
 def process_iotlab_node_by_node(path, tracefile):
     # Read the ip of each node
     ips = pd.read_csv(path + 'addr-' + tracefile + '.cap',
