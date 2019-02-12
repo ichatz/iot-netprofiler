@@ -112,13 +112,3 @@ def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
     st = fig.suptitle(tracemask[:-1], fontsize="x-large")
     plt.savefig(tracemask + 'hist.png')
 
-
-plots = [("cooja2-9nodes/traces/normal", 'grid9_normal_2019-02-11_17:51:17_'),
-         ("cooja2-9nodes/traces/normal", 'grid9_normal_2019-02-11_20:22:01_'),
-         ("cooja2-9nodes/traces/1bh-6", 'grid9_1bh-6_2019-02-11_20:48:08_'),
-         ("cooja2-9nodes/traces/1bh-6", 'grid9_1bh-6_2019-02-11_21:03:19_')]
-
-for row in plots:
-    nodes, packets_node = process_cooja2_traces(row[0], row[1])
-    clean = separate_outliers_by_node(packets_node)
-    plot_histograms_hops_nodes(nodes, clean, 1000, 0.018, row[1])
