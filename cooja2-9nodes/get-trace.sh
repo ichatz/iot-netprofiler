@@ -1,5 +1,5 @@
 #!/bin/bash
-total=100
+total=200
 delay=5
 logfile=grid9_$1_$(date +%F_%T)_
 declare -a nodes=("fd00::212:740a:a:a0a"
@@ -21,6 +21,7 @@ for i in "${nodes[@]}"
     sleep 1
   done
 
-resp=`lynx -dump http://[fd00::212:7401:1:101] > $logfile_routes.log`
+log="$logfile""routes.log"
+resp=`lynx -dump http://[fd00::212:7401:1:101] > $log &`
 echo $resp
 
