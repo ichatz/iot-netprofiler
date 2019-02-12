@@ -126,7 +126,7 @@ def process_iotlab_node_by_node(path, tracefile):
     # Create a list of Node objects
     for node_id in nodes:
         if (node_id in hops):
-            obj_node.append(functions.node(node_id, hops[node_id], nodes[node_id]))
+            obj_node.append(node.node(node_id, hops[node_id], nodes[node_id]))
 
     return obj_node
 
