@@ -1,0 +1,64 @@
+PING fd00::212:7407:7:707(fd00::212:7407:7:707) 56 data bytes
+64 bytes from fd00::212:7407:7:707: icmp_seq=1 ttl=61 time=352 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=6 ttl=61 time=197 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=7 ttl=61 time=168 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=9 ttl=61 time=488 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=10 ttl=61 time=297 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=11 ttl=61 time=264 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=19 ttl=61 time=277 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=21 ttl=61 time=339 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=32 ttl=61 time=580 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=40 ttl=61 time=466 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=41 ttl=61 time=484 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=42 ttl=61 time=302 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=43 ttl=61 time=993 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=44 ttl=61 time=216 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=45 ttl=61 time=218 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=46 ttl=61 time=742 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=47 ttl=61 time=670 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=48 ttl=61 time=343 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=49 ttl=61 time=402 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=58 ttl=61 time=406 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=59 ttl=61 time=1188 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=60 ttl=61 time=1002 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=64 ttl=61 time=787 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=65 ttl=61 time=408 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=66 ttl=61 time=399 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=67 ttl=61 time=419 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=68 ttl=61 time=450 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=69 ttl=61 time=512 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=70 ttl=61 time=547 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=71 ttl=61 time=518 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=72 ttl=61 time=482 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=73 ttl=61 time=662 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=74 ttl=61 time=415 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=75 ttl=61 time=419 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=76 ttl=61 time=444 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=77 ttl=61 time=268 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=78 ttl=61 time=468 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=79 ttl=61 time=427 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=80 ttl=61 time=438 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=81 ttl=61 time=375 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=82 ttl=61 time=510 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=83 ttl=61 time=419 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=84 ttl=61 time=309 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=85 ttl=61 time=199 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=86 ttl=61 time=219 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=87 ttl=61 time=291 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=88 ttl=61 time=237 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=89 ttl=61 time=231 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=90 ttl=61 time=238 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=91 ttl=61 time=248 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=92 ttl=61 time=209 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=93 ttl=61 time=192 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=94 ttl=61 time=213 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=95 ttl=61 time=199 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=96 ttl=61 time=200 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=97 ttl=61 time=185 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=98 ttl=61 time=289 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=99 ttl=61 time=214 ms
+64 bytes from fd00::212:7407:7:707: icmp_seq=100 ttl=61 time=225 ms
+
+--- fd00::212:7407:7:707 ping statistics ---
+100 packets transmitted, 59 received, 41% packet loss, time 500749ms
+rtt min/avg/max/mdev = 168.666/401.426/1188.225/211.297 ms
