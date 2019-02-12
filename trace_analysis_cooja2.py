@@ -78,33 +78,39 @@ def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
         for node in nodes[nodes['rank'] == rank].sort_values(by=['node_id'])['node_id']:
             pos = (rank - 1) + (count - 1) * rank_max + 1
 
-            ax = plt.subplot(nodes_max, rank_max, pos)
+            if len(packets_node[node]['rtt'] > 1):
+                ax = plt.subplot(nodes_max, rank_max, pos)
 
-            label = node.split(':')[4]
 
-            packets_node[node]['rtt'].plot.kde(ax=ax, label='Node ' + label + ' KDE')
-            packets_node[node]['rtt'].plot.hist(density=True, alpha=0.3, bins=50, ax=ax,
-                                                label='Node ' + label + ' Hist')
 
-            if rank == 1:
-                ylabel_exists.add(count)
-                ax.set_ylabel('Frequency')
+                label = node
+                if len(label.split(':')) >= 4:
+                    label = label.split(':')[4]
 
-            elif count not in ylabel_exists:
-                ylabel_exists.add(count)
-                ax.set_ylabel('Frequency')
+        
+                packets_node[node]['rtt'].plot.kde(ax=ax, label='Node ' + label + ' KDE')
+                packets_node[node]['rtt'].plot.hist(density=True, alpha=0.3, bins=50, ax=ax,
+                                                    label='Node ' + label + ' Hist')
 
-            else:
-                ax.set_ylabel('')
+                if rank == 1:
+                    ylabel_exists.add(count)
+                    ax.set_ylabel('Frequency')
 
-            if (count == 1):
-                ax.set_title('Nodes at Hop ' + str(rank))
+                elif count not in ylabel_exists:
+                    ylabel_exists.add(count)
+                    ax.set_ylabel('Frequency')
 
-            ax.set_xlabel('Rount Trip Time (RTT) in milliseconds (ms)')
-            ax.grid(axis='y')
-            ax.set_xlim([0, max_x])
-            ax.set_ylim([0, max_y])
-            ax.legend()
+                else:
+                    ax.set_ylabel('')
+
+                if (count == 1):
+                    ax.set_title('Nodes at Hop ' + str(rank))
+
+                ax.set_xlabel('Rount Trip Time (RTT) in milliseconds (ms)')
+                ax.grid(axis='y')
+                ax.set_xlim([0, max_x])
+                ax.set_ylim([0, max_y])
+                ax.legend()
 
             count += 1
 
