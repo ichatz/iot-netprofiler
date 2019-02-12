@@ -23,7 +23,7 @@ def importIOTData(directory, tracefiles):
     # print(tracefiles)
     for i in range(len(tracefiles)):
         print("Importing " + directory + tracefiles[i])
-        nodes = process_iotlab_node_by_node(directory, tracefiles[i])
+        nodes = process_iotlab_object_node(directory, tracefiles[i])
         data.append(nodes)
 
     return data
@@ -43,7 +43,7 @@ def coojaJsonImporter(dir):
     return dataList
 
 
-def process_iotlab_node_by_node(path, tracefile):
+def process_iotlab_object_node(path, tracefile):
     # Input: path and name of the tracefile that you want to analyze
     # Return: computes a list of Node objects
 
