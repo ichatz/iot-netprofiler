@@ -1,4 +1,5 @@
 import pandas as pd
+import json
 import os
 from node import *
 import matplotlib.pyplot as plt
@@ -158,10 +159,55 @@ def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, path, tracemas
     plt.savefig(path + tracemask + 'hist.png')
 
 
-plots = [("cooja3-9nodes/traces/1bh-5", 'grid9_1bh-5_2019-02-13_15:31_'),
-         ("cooja3-9nodes/traces/1bh-6", 'grid9_1bh-6_2019-02-13_12:59_'),
-         ("cooja3-9nodes/traces/1bh-7", 'grid9_1bh-7_2019-02-13_15:08_'),
-         ("cooja3-9nodes/traces/1bh-9", 'grid9_1bh-9_2019-02-13_15:57_')]
+def produce_stats(traces, node_defaults, do_plots=True):
+    stat = {'pkt_loss': pd.DataFrame(columns=node_defaults.keys()),
+            'outliers_std': pd.DataFrame(columns=node_defaults.keys()),
+            'outliers_iqr': pd.DataFrame(columns=node_defaults.keys()),
+            'mean_complete': pd.DataFrame(columns=node_defaults.keys(), dtype='float64'),
+            'mean_std': pd.DataFrame(columns=node_defaults.keys(), dtype='float64'),
+            'mean_iqr': pd.DataFrame(columns=node_defaults.keys(), dtype='float64'),
+            }
+
+    for row in traces:
+        nodes, packets_node = process_cooja2_traces(row[0], row[1], node_defaults)
+        clean_std = compute_std_outliers_by_node(packets_node)
+        clean_iqr = compute_iqr_outliers_by_node(packets_node)
+
+        if do_plots:
+            plot_histograms_hops_nodes(nodes, packets_node, 1000, 0.02, "cooja3-9nodes/plots-complete/", row[1])
+            plot_histograms_hops_nodes(nodes, clean_std, 1000, 0.02, "cooja3-9nodes/plots-std/", row[1])
+            plot_histograms_hops_nodes(nodes, clean_iqr, 1000, 0.02, "cooja3-9nodes/plots-iqr/", row[1])
+
+        pkt_loss = {}
+        outliers_std = {}
+        outliers_iqr = {}
+        mean_complete = {}
+        mean_std = {}
+        mean_iqr = {}
+
+        for node in packets_node.keys():
+            pkt_loss[node] = len(packets_node[node]) / 200
+            outliers_std[node] = (len(packets_node[node]) - len(clean_std[node])) / len(packets_node[node])
+            outliers_iqr[node] = (len(packets_node[node]) - len(clean_iqr[node])) / len(packets_node[node])
+            mean_complete[node] = packets_node[node]['rtt'].mean()
+            mean_std[node] = clean_std[node]['rtt'].mean()
+            mean_iqr[node] = clean_iqr[node]['rtt'].mean()
+
+        stat['pkt_loss'] = stat['pkt_loss'].append(pkt_loss, ignore_index=True)
+        stat['outliers_std'] = stat['outliers_std'].append(outliers_std, ignore_index=True)
+        stat['outliers_iqr'] = stat['outliers_iqr'].append(outliers_iqr, ignore_index=True)
+        stat['mean_complete'] = stat['mean_complete'].append(mean_complete, ignore_index=True)
+        stat['mean_std'] = stat['mean_std'].append(mean_std, ignore_index=True)
+        stat['mean_iqr'] = stat['mean_iqr'].append(mean_iqr, ignore_index=True)
+
+    return stat
+
+
+traces = [("cooja3-9nodes/traces/1bh-3", 'grid9_1bh-3_2019-02-13_16:28_'),
+          ("cooja3-9nodes/traces/1bh-5", 'grid9_1bh-5_2019-02-13_15:31_'),
+          ("cooja3-9nodes/traces/1bh-6", 'grid9_1bh-6_2019-02-13_12:59_'),
+          ("cooja3-9nodes/traces/1bh-7", 'grid9_1bh-7_2019-02-13_15:08_'),
+          ("cooja3-9nodes/traces/1bh-9", 'grid9_1bh-9_2019-02-13_15:57_')]
 
 node_defaults = {
     "aaaa::212:7403:3:303": 1,
@@ -174,24 +220,9 @@ node_defaults = {
     "aaaa::212:7408:8:808": 4,
     "aaaa::212:740a:a:a0a": 4}
 
-stat_pkt_loss = pd.DataFrame(columns=node_defaults.keys())
+stats = produce_stats(traces, node_defaults, True)
 
-for row in plots:
-    nodes, packets_node = process_cooja2_traces(row[0], row[1], node_defaults)
-    clean_std = compute_std_outliers_by_node(packets_node)
-    clean_iqr = compute_iqr_outliers_by_node(packets_node)
-    plot_histograms_hops_nodes(nodes, packets_node, 1000, 0.02, "cooja3-9nodes/plots-clean/", row[1])
-    plot_histograms_hops_nodes(nodes, clean_std, 1000, 0.02, "cooja3-9nodes/plots-std/", row[1])
-    plot_histograms_hops_nodes(nodes, clean_iqr, 1000, 0.02, "cooja3-9nodes/plots-iqr/", row[1])
-
-    pkt_loss = {}
-    outliers_std = {}
-    outliers_iqr = {}
-    for node in packets_node.keys():
-        pkt_loss[node] = len(packets_node[node]) / 200
-        outliers_std[node] = (len(packets_node[node])- len(clean_std[node])) / len(packets_node[node])
-        outliers_iqr[node] = (len(packets_node[node]) - len(clean_iqr[node])) / len(packets_node[node])
-
-    print(pkt_loss)
-    print(outliers_std)
-    print(outliers_iqr)
+for key in stats.keys():
+    file = open('stats-' + key + '.json','w')
+    file.write(stats[key].to_json(orient='split'))
+    file.close()
