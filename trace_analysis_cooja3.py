@@ -67,7 +67,8 @@ def separate_outliers_by_node(packets_node):
 
             # Mark x(t) as outlier if mean-2*std <= x(t) <? mean+2*std
             # Maintain x(t) otherwise
-            clean_packets_node[n] = packets_node[n][(packets_node[n]['rtt'] <= upper) & (packets_node[n]['rtt'] >= lower)]
+            clean_packets_node[n] = packets_node[n][
+                (packets_node[n]['rtt'] <= upper) & (packets_node[n]['rtt'] >= lower)]
 
     return clean_packets_node
 
@@ -150,7 +151,8 @@ def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, path, tracemas
     plt.savefig(path + tracemask + 'hist.png')
 
 
-plots = [("cooja3-9nodes/traces/1bh-6", 'grid9_1bh-6_2019-02-13_12:59_'),
+plots = [("cooja3-9nodes/traces/1bh-5", 'grid9_1bh-5_2019-02-13_15:31_'),
+         ("cooja3-9nodes/traces/1bh-6", 'grid9_1bh-6_2019-02-13_12:59_'),
          ("cooja3-9nodes/traces/1bh-7", 'grid9_1bh-7_2019-02-13_15:08_')]
 
 node_defaults = {
