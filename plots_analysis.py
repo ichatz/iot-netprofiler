@@ -9,7 +9,9 @@ def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
     # The network was configured in order to have three nodes communicating directly with the root.
     ranks = sorted([int(rank) for rank in list(nodes['rank'].drop_duplicates())])
 
-    rank_max = max(ranks)
+    rank_max = 0
+    if len(ranks) > 0:
+        rank_max = max(ranks)
 
     nodes_max = 0
     for rank in ranks:
