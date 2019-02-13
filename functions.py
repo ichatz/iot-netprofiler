@@ -14,11 +14,8 @@ import sys
 sys.path.append('../')
 from pandas.plotting import scatter_matrix
 from trace_analysis import *
-#Object idea= List of nodes
-#Node has (ip,hop,min_rtt,max_rtt,pkts,responses)
-#pkt is a dataframe with packets
-#hop is from 64-ttl
-
+from node import *
+import sklearn.metrics as sm
 
 
 
@@ -74,7 +71,7 @@ def createNodes(dict):
     #dfList(pd.DataFrame(dict))
     for ip in dict.keys():
         pkts=pd.DataFrame(dict[ip]['pkts'])
-        
+
         hop=64-(int(pkts[0:1]["ttl"]))
         pkts = pkts.drop(['ttl'], axis=1)
         pkts=pkts.rename(columns={"pkt":"seq"})
@@ -207,3 +204,44 @@ def getPercentageMissingPackets(node,lenght):
     #print(maxS/missing)
     return result*100
 
+
+def accuracy_score_corrected(correction,labels):
+    print(np.array(correction))
+    labels_alt=[]
+    for el in labels:
+        if (el==0):
+            labels_alt.append(1)
+        elif el==1:
+            labels_alt.append(0)
+    
+    accuracy=sm.accuracy_score(correction, labels)
+    accuracy_alt=sm.accuracy_score(correction, labels_alt)
+    #print(correction)
+    if (accuracy>accuracy_alt): 
+        print(accuracy)
+        
+    else: 
+        print(accuracy_alt)
+        labels=labels_alt
+    print(np.array(labels))
+    confusionMatrix=sm.confusion_matrix(correction, labels)
+    
+    pprint(confusionMatrix)
+    return labels
+    
+
+def ReplaceMissingPackets(node):
+    #print(node.pkts["pkt"])
+    print("Executed")
+    maxP=-1
+
+    for el in node.pkts["seq"]:
+        if(el>maxP): maxP=int(el)
+    #print(maxP)
+    pkt=[None]*(maxP+1)
+    for i in range(len(node.pkts["seq"])):
+        index=int(node.pkts["seq"][i])
+        #print(index)
+        pkt[index]=node.pkts["rtt"][i]
+        #pkt[)]=node.pkts["pkt"][i]
+    return pkt

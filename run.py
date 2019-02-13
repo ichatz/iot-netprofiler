@@ -13,7 +13,8 @@ from functions import *
 from pandas.plotting import scatter_matrix
 from trace_analysis import *
 from plots import *
-
+from trace_analysis_cooja2 import *
+from node import *
 
 
 def run(data,directory,colors,cases):
@@ -40,7 +41,7 @@ def run(data,directory,colors,cases):
     densityOfDelayByCase(directory,data,(15,90),"Density of Delay by Case",colors,cases)
 
     #RTT Graph
-    RTTGraph(directory,data,(18,150),"RTT Graph",colors,cases)
+    RTTGraph(directory,data,(30,150),"RTT Graph",colors,cases)
 
 
 
@@ -64,9 +65,9 @@ cases=[
 directory=os.getcwd() + "/cooja-16nodes/"
 cases=[
       "Black Hole Network 1",
-        "Black Hole Network 2",
-       "Black Hole Network 3",
-    "Normal Network"
+      "Black Hole Network 2",
+      "Black Hole Network 3",
+      "Normal Network"
       ]
 #data=importCooja(directory)
 #run(data,directory,colors,cases)
@@ -88,6 +89,26 @@ cases=[
     "2019-01JAN-30-3b113b122b145b166b185"
       ]
 
-data = importIOTData(directory,tracefiles)
-directory=os.getcwd() + "/iot-lab-25nodes/"
+#data = importIOTData(directory,tracefiles)
+#directory=os.getcwd() + "/iot-lab-25nodes/"
+#run(data,directory,colors,cases)
+directory=os.getcwd()+"/cooja2-9nodes/"
+plots = [(directory+"traces/normal", 'grid9_normal_2019-02-11_17:51:17_'),
+         (directory+"traces/normal", 'grid9_normal_2019-02-11_20:22:01_'),
+         (directory+"traces/1bh-6", 'grid9_1bh-6_2019-02-11_20:48:08_'),
+         (directory+"traces/1bh-6", 'grid9_1bh-6_2019-02-11_21:03:19_'),
+         (directory+"traces/1bh-3", 'grid9_1bh-3_2019-02-12_14:47:14_')
+        ]
+
+print(directory)
+cases=[
+    "grid9_normal_2019-02-11_17:51:17_",
+    'grid9_normal_2019-02-11_20:22:01_',
+    'grid9_1bh-6_2019-02-11_20:48:08_',
+    'grid9_1bh-6_2019-02-11_21:03:19_',
+    'grid9_1bh-3_2019-02-12_14:47:14_'
+]
+
+data=import_Cooja2(plots)
+
 run(data,directory,colors,cases)
