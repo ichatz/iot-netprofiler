@@ -60,6 +60,42 @@ def separate_outliers_by_node(packets_node):
     return clean_packets_node
 
 
+def compute_outliers_by_node(packets_node):
+    clean_packets_node = {}
+
+    for n in packets_node.keys():
+        # Returns two DataFrames containing standard values and outliers
+        mn = packets_node[n]['rtt'].mean()
+        std = packets_node[n]['rtt'].std()
+        upper = mn + 2 * std
+        lower = mn - 2 * std
+
+        packets_node[n]
+
+        # Mark x(t) as outlier if mean-2*std <= x(t) <? mean+2*std
+        # Maintain x(t) otherwise
+        clean_packets_node[n] = packets_node[n][(packets_node[n]['rtt'] >= upper) | (packets_node[n]['rtt'] <= lower)]
+
+    return clean_packets_node
+
+
+def compute_iqr_outliers_by_node(packets_node):
+    iqr = {}
+
+    for n in packets_node.keys():
+    	# Returns two DataFrames containing standard values and outliers
+        q1 = packets_node[n]['rtt'].quantile(.25)
+        q3 = packets_node[n]['rtt'].quantile(.75)
+        
+        packets_node[n]
+
+        # Mark x(t) as outlier if mean-2*std <= x(t) <? mean+2*std
+        # Maintain x(t) otherwise
+        iqr[n] = packets_node[n][(packets_node[n]['rtt'] < q1) | (packets_node[n]['rtt'] > q3)]
+
+    return iqr
+
+
 
 
 def importCooja(directory):
