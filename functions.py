@@ -15,7 +15,7 @@ sys.path.append('../')
 from pandas.plotting import scatter_matrix
 from trace_analysis import *
 from node import *
-
+import sklearn.metrics as sm
 
 
 
@@ -203,3 +203,45 @@ def getPercentageMissingPackets(node,lenght):
     else: result=0
     #print(maxS/missing)
     return result*100
+
+
+def accuracy_score_corrected(correction,labels):
+    print(np.array(correction))
+    labels_alt=[]
+    for el in labels:
+        if (el==0):
+            labels_alt.append(1)
+        elif el==1:
+            labels_alt.append(0)
+    
+    accuracy=sm.accuracy_score(correction, labels)
+    accuracy_alt=sm.accuracy_score(correction, labels_alt)
+    #print(correction)
+    if (accuracy>accuracy_alt): 
+        print(accuracy)
+        
+    else: 
+        print(accuracy_alt)
+        labels=labels_alt
+    print(np.array(labels))
+    confusionMatrix=sm.confusion_matrix(correction, labels)
+    
+    pprint(confusionMatrix)
+    return labels
+    
+
+def ReplaceMissingPackets(node):
+    #print(node.pkts["pkt"])
+    print("Executed")
+    maxP=-1
+
+    for el in node.pkts["seq"]:
+        if(el>maxP): maxP=int(el)
+    #print(maxP)
+    pkt=[None]*(maxP+1)
+    for i in range(len(node.pkts["seq"])):
+        index=int(node.pkts["seq"][i])
+        #print(index)
+        pkt[index]=node.pkts["rtt"][i]
+        #pkt[)]=node.pkts["pkt"][i]
+    return pkt
