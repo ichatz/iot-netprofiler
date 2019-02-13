@@ -131,10 +131,10 @@ def getOutliers(df):
 
 def get_IQR_Outliers(df):
     df1 = df["rtt"]
-    std = df1.std()
-    mean = df1.mean()
-    a1 = df["rtt"]>mean+(2*std)
-    a2 = df["rtt"]<mean-(2*std)
+    lower = df1.quantile(.25)
+    upper = df1.quantile(.75)
+    a1 = df["rtt"]>upper
+    a2 = df["rtt"]<lower
     return(df[a1 | a2])
 
 def getStdValues(df):

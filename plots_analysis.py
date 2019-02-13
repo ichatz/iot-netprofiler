@@ -21,6 +21,7 @@ def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
 
     fig = plt.figure(figsize=(4 * rank_max, 4 * nodes_max))
 
+
     # plot the histogram of RTT based on the hop
     ylabel_exists = set()
     for rank in ranks:
@@ -28,7 +29,7 @@ def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
         for node in nodes[nodes['rank'] == rank].sort_values(by=['node_id'])['node_id']:
             pos = (rank - 1) + (count - 1) * rank_max + 1
 
-            if len(packets_node[node]['rtt'] > 1):
+            if len(packets_node[node]['rtt']) > 1:
                 ax = plt.subplot(nodes_max, rank_max, pos)
 
 
@@ -67,6 +68,208 @@ def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
     # ax.set_title('Distribution of the Complete Dataset Node ' + str(node) + ' at Hop ' + str(rank))
     st = fig.suptitle(tracemask, fontsize="x-large")
     plt.savefig('plots/' + tracemask + 'hist.png')
+
+
+
+
+def plot_histograms_outliers_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
+    # Plot the outliers at each hop
+
+    # Each node communicates with the root of the DODAG through a certain number of hops.
+    # The network was configured in order to have three nodes communicating directly with the root.
+    ranks = sorted([int(rank) for rank in list(nodes['rank'].drop_duplicates())])
+
+    rank_max = 0
+    if len(ranks) > 0:
+        rank_max = max(ranks)
+
+    nodes_max = 0
+    for rank in ranks:
+        count = len(nodes[nodes['rank'] == rank])
+        if (count > nodes_max):
+            nodes_max = count
+
+    fig = plt.figure(figsize=(4 * rank_max, 4 * nodes_max))
+
+    # plot the histogram of RTT based on the hop
+    ylabel_exists = set()
+    for rank in ranks:
+        count = 1
+        for node in nodes[nodes['rank'] == rank].sort_values(by=['node_id'])['node_id']:
+            pos = (rank - 1) + (count - 1) * rank_max + 1
+
+            if len(packets_node[node]['rtt']) > 1:
+                ax = plt.subplot(nodes_max, rank_max, pos)
+
+
+
+                label = node
+                if len(label.split(':')) >= 4:
+                    label = label.split(':')[4]
+
+        
+                packets_node[node]['rtt'].plot.kde(ax=ax, label='Node ' + label + ' KDE')
+                packets_node[node]['rtt'].plot.hist(density=True, alpha=0.3, bins=50, ax=ax,
+                                                    label='Node ' + label + ' Hist')
+
+                if rank == 1:
+                    ylabel_exists.add(count)
+                    ax.set_ylabel('Frequency')
+
+                elif count not in ylabel_exists:
+                    ylabel_exists.add(count)
+                    ax.set_ylabel('Frequency')
+
+                else:
+                    ax.set_ylabel('')
+
+                if (count == 1):
+                    ax.set_title('Outliers at Hop ' + str(rank))
+
+                ax.set_xlabel('Rount Trip Time (RTT) in milliseconds (ms)')
+                ax.grid(axis='y')
+                ax.set_xlim([0, max_x])
+                ax.set_ylim([0, max_y])
+                ax.legend()
+
+            count += 1
+
+    # ax.set_title('Distribution of the Complete Dataset Node ' + str(node) + ' at Hop ' + str(rank))
+    st = fig.suptitle(tracemask, fontsize="x-large")
+    plt.savefig('plots/' + tracemask + '-out-hist.png')
+
+
+def plot_histograms_iqr_outliers_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
+    # Print the outliers
+
+    # Each node communicates with the root of the DODAG through a certain number of hops.
+    # The network was configured in order to have three nodes communicating directly with the root.
+    ranks = sorted([int(rank) for rank in list(nodes['rank'].drop_duplicates())])
+
+    rank_max = 0
+    if len(ranks) > 0:
+        rank_max = max(ranks)
+
+    nodes_max = 0
+    for rank in ranks:
+        count = len(nodes[nodes['rank'] == rank])
+        if (count > nodes_max):
+            nodes_max = count
+
+    fig = plt.figure(figsize=(4 * rank_max, 4 * nodes_max))
+
+    # plot the histogram of RTT based on the hop
+    ylabel_exists = set()
+    for rank in ranks:
+        count = 1
+        for node in nodes[nodes['rank'] == rank].sort_values(by=['node_id'])['node_id']:
+            pos = (rank - 1) + (count - 1) * rank_max + 1
+
+            if len(packets_node[node]['rtt']) > 1:
+                ax = plt.subplot(nodes_max, rank_max, pos)
+
+
+
+                label = node
+                if len(label.split(':')) >= 4:
+                    label = label.split(':')[4]
+
+        
+                packets_node[node]['rtt'].plot.kde(ax=ax, label='Node ' + label + ' KDE')
+                packets_node[node]['rtt'].plot.hist(density=True, alpha=0.3, bins=50, ax=ax,
+                                                    label='Node ' + label + ' Hist')
+
+                if rank == 1:
+                    ylabel_exists.add(count)
+                    ax.set_ylabel('Frequency')
+
+                elif count not in ylabel_exists:
+                    ylabel_exists.add(count)
+                    ax.set_ylabel('Frequency')
+
+                else:
+                    ax.set_ylabel('')
+
+                if (count == 1):
+                    ax.set_title('IQR Outliers at Hop ' + str(rank))
+
+                ax.set_xlabel('Rount Trip Time (RTT) in milliseconds (ms)')
+                ax.grid(axis='y')
+                ax.set_xlim([0, max_x])
+                ax.set_ylim([0, max_y])
+                ax.legend()
+
+            count += 1
+
+    # ax.set_title('Distribution of the Complete Dataset Node ' + str(node) + ' at Hop ' + str(rank))
+    st = fig.suptitle(tracemask, fontsize="x-large")
+    plt.savefig('plots/' + tracemask + '-out-iqr-hist.png')
+
+
+def plot_tumbling_windows_hops_nodes(nodes, packets_node, max_x, max_y, tracemask, window_size):
+    # Tumbling windows
+
+    # Each node communicates with the root of the DODAG through a certain number of hops.
+    # The network was configured in order to have three nodes communicating directly with the root.
+    ranks = sorted([int(rank) for rank in list(nodes['rank'].drop_duplicates())])
+
+    rank_max = 0
+    if len(ranks) > 0:
+        rank_max = max(ranks)
+
+    nodes_max = 0
+    for rank in ranks:
+        count = len(nodes[nodes['rank'] == rank])
+        if (count > nodes_max):
+            nodes_max = count
+
+    fig = plt.figure(figsize=(4 * rank_max, 4 * nodes_max))
+
+    # plot the histogram of RTT based on the hop
+    ylabel_exists = set()
+    for rank in ranks:
+        count = 1
+        for node in nodes[nodes['rank'] == rank].sort_values(by=['node_id'])['node_id']:
+            pos = (rank - 1) + (count - 1) * rank_max + 1
+
+            if len(packets_node[node]['rtt']) > 1:
+                ax = plt.subplot(nodes_max, rank_max, pos)
+
+
+
+                label = node
+                if len(label.split(':')) >= 4:
+                    label = label.split(':')[4]
+
+                packets_node[node]['rtt'].groupby(packets_node[node]['rtt'].index // window_size * window_size
+                    ).mean().plot(ax=ax, label='Node ' + str(node))
+
+                if rank == 1:
+                    ylabel_exists.add(count)
+                    ax.set_ylabel('Mean RTT in milliseconds (ms)')
+
+                elif count not in ylabel_exists:
+                    ylabel_exists.add(count)
+                    ax.set_ylabel('Mean RTT in milliseconds (ms)')
+
+                else:
+                    ax.set_ylabel('')
+
+                if (count == 1):
+                    ax.set_title('Tumbling Window of Nodes at Hop ' + str(rank))
+
+                ax.set_xlabel('Window')
+                ax.grid(axis='y')
+                ax.set_xlim([0, max_x])
+                ax.set_ylim([0, max_y])
+                #plt.tight_layout()
+                ax.legend()
+
+            count += 1
+
+    # ax.set_title('Distribution of the Complete Dataset Node ' + str(node) + ' at Hop ' + str(rank))
+    st = fig.suptitle(tracemask, fontsize="x-large")
+    plt.savefig('plots/' + tracemask + '-tumbling.png')
 
     
 

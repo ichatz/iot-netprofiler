@@ -1,0 +1,5 @@
+PING aaaa::212:7407:7:707(aaaa::212:7407:7:707) 56 data bytes
+
+--- aaaa::212:7407:7:707 ping statistics ---
+200 packets transmitted, 0 received, 100% packet loss, time 1018851ms
+

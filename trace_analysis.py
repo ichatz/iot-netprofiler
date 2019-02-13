@@ -404,7 +404,7 @@ def process_iotlab_node_by_node2(path, tracefile):
             continue
         
         d_packets[ranks['node_id'][node]]['hop'] = rank_to_hops.index(ranks['rank'][node]) + 1
-        d_packets[ranks['node_id'][node]] = d_packets[ranks['node_id'][node]].loc[d_packets[ranks['node_id'][node]]['seq'] <= 100].reset_index(drop=True)
+        d_packets[ranks['node_id'][node]] = d_packets[ranks['node_id'][node]].loc[d_packets[ranks['node_id'][node]]['seq'] <= 200].reset_index(drop=True)
         
         # If the node was unavailable during the first 100 ICMP messages it should be removed
         if len(d_packets[ranks['node_id'][node]]) == 0:
