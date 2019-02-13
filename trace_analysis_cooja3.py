@@ -204,11 +204,18 @@ def produce_stats(traces, node_defaults, do_plots=True):
 
 
 traces = [("cooja3-9nodes/traces/normal", 'grid9_normal_2019-02-13_17:05_'),
+          ("cooja3-9nodes/traces/normal", 'grid9_normal_2019-02-13_18:51_'),
+          ("cooja3-9nodes/traces/normal", 'grid9_normal_2019-02-13_22:23_'),
           ("cooja3-9nodes/traces/1bh-3", 'grid9_1bh-3_2019-02-13_16:28_'),
+          ("cooja3-9nodes/traces/1bh-3", 'grid9_1bh-3_2019-02-13_22:05_'),
           ("cooja3-9nodes/traces/1bh-5", 'grid9_1bh-5_2019-02-13_15:31_'),
+          ("cooja3-9nodes/traces/1bh-5", 'grid9_1bh-5_2019-02-13_21:44_'),
           ("cooja3-9nodes/traces/1bh-6", 'grid9_1bh-6_2019-02-13_12:59_'),
+          ("cooja3-9nodes/traces/1bh-6", 'grid9_1bh-6_2019-02-13_19:15_'),
           ("cooja3-9nodes/traces/1bh-7", 'grid9_1bh-7_2019-02-13_15:08_'),
-          ("cooja3-9nodes/traces/1bh-9", 'grid9_1bh-9_2019-02-13_15:57_')]
+          ("cooja3-9nodes/traces/1bh-7", 'grid9_1bh-7_2019-02-13_20:02_'),
+          ("cooja3-9nodes/traces/1bh-9", 'grid9_1bh-9_2019-02-13_15:57_'),
+          ("cooja3-9nodes/traces/1bh-9", 'grid9_1bh-9_2019-02-13_19:35_')]
 
 node_defaults = {
     "aaaa::212:7403:3:303": 1,

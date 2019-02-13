@@ -1,7 +1,7 @@
 #!/bin/bash
 total=200
 delay=5
-logfile=grid9_$1_$(date +%F_%H:%M)_
+logfile=rnd_$1_$(date +%F_%H:%M)_
 declare -a nodes=("aaaa::212:7402:2:202"
 		"aaaa::212:7403:3:303"
 		"aaaa::212:7404:4:404"
