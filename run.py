@@ -21,12 +21,12 @@ def run(data,directory,colors,cases):
     hops = hopPreparation(data)
 
     #Distribution of the delay in correlation with the Cases
-    #dataHop=hopPreparation(data)
+    dataHop=hopPreparation(data)
     #Distribution of the delay in correlation with the Hops
     printDensityByCase(directory,data,hops,(15,20),"densitybyCase",colors,cases)
 
     #Distribution by Hop
-    #printDensityByHop(directory,data,(15,20),"densitybyHop",colors,cases)
+    printDensityByHop(directory,data,hops,(15,20),"densitybyHop",colors,cases)
 
     #Prints on a file the big matrix (asked by professor)
     printBigPlot(directory,data,(90,20),"Big Plot",colors,cases)
@@ -48,7 +48,7 @@ def run(data,directory,colors,cases):
 
 
 
-colors = [ 'orange','dodgerblue', 'green','violet',"red","yellow","pink"]
+colors = [ 'orange','dodgerblue', 'green','violet',"red","brown","pink"]
 
 directory=os.getcwd() +"/cooja-9nodes/"
 cases=[
@@ -109,6 +109,32 @@ cases=[
     'grid9_1bh-3_2019-02-12_14:47:14_'
 ]
 
+#data=import_Cooja2(plots)
+
+#run(data,directory,colors,cases)
+directory=os.getcwd()+"/cooja3-9nodes/"
+plots = [
+        (directory+"traces/1bh-3", 'grid9_1bh-3_2019-02-13_16:28_'),
+         (directory+"traces/1bh-5", 'grid9_1bh-5_2019-02-13_15:31_'),
+        #(directory+"traces/1bh-6", 'grid9_1bh-6_2019-02-13_12:59_'),
+         #(directory+"traces/1bh-7", 'grid9_1bh-7_2019-02-13_15:08_'),
+         #(directory+"traces/1bh-9", 'grid9_1bh-9_2019-02-13_15:57_'),
+
+        # (directory+"traces/normal", 'grid9_normal_2019-02-13_17:05_')
+        ]
+
+print(directory)
+cases=[
+    'grid9_1bh-3_2019-02-13_16:28_',
+    'grid9_1bh-5_2019-02-13_15:31_',
+     'grid9_1bh-6_2019-02-13_12:59_',
+     'grid9_1bh-7_2019-02-13_15:08_',
+      'grid9_1bh-9_2019-02-13_15:57_',
+      'grid9_normal_2019-02-13_17:05_'
+]
 data=import_Cooja2(plots)
+# for i in range(len(data)):
+#     for j in range(len(data[i])):
+#         print(data[i][j].hop)
 
 run(data,directory,colors,cases)
