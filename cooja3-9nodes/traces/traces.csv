@@ -1,18 +1,18 @@
-	directory	case	case_accuracy
-0	traces/1bh-3	grid9_1bh-3_2019-02-13_16:28_	BH
-1	traces/1bh-3	grid9_1bh-3_2019-02-13_22:05_	BH
-2	traces/1bh-5	grid9_1bh-5_2019-02-13_15:31_	BH
-3	traces/1bh-5	grid9_1bh-5_2019-02-13_21:44_	BH
-4	traces/1bh-6	grid9_1bh-6_2019-02-13_12:59_	BH
-5	traces/1bh-6	grid9_1bh-6_2019-02-13_19:15_	BH
-6	traces/1bh-7	grid9_1bh-7_2019-02-13_15:08_	BH
-7	traces/1bh-7	grid9_1bh-7_2019-02-13_20:02_	BH
-8	traces/1bh-9	grid9_1bh-9_2019-02-13_15:57_	BH
-9	traces/1bh-9	grid9_1bh-9_2019-02-13_19:35_	BH
-10	traces/normal	grid9_normal_2019-02-13_17:05_	normal
-11	traces/normal	grid9_normal_2019-02-13_18:51_	normal
-12	traces/normal	grid9_normal_2019-02-13_22:23_	normal
-13	traces/rnd-1	rnd_1bh-2_2019-02-14_15:38_	BH
-14	traces/rnd-1	rnd_1bh-7_2019-02-14_13:57_	BH
-15	traces/rnd-1	rnd_1bh-9_2019-02-14_15:15_	BH
-16	traces/rnd-1	rnd_normal_2019-02-14_13:37_	normal
+directory,case,case_accuracy
+traces/1bh-3,grid9_1bh-3_2019-02-13_16:28_,BH
+traces/1bh-3,grid9_1bh-3_2019-02-13_22:05_,BH
+traces/1bh-5,grid9_1bh-5_2019-02-13_15:31_,BH
+traces/1bh-5,grid9_1bh-5_2019-02-13_21:44_,BH
+traces/1bh-6,grid9_1bh-6_2019-02-13_12:59_,BH
+traces/1bh-6,grid9_1bh-6_2019-02-13_19:15_,BH
+traces/1bh-7,grid9_1bh-7_2019-02-13_15:08_,BH
+traces/1bh-7,grid9_1bh-7_2019-02-13_20:02_,BH
+traces/1bh-9,grid9_1bh-9_2019-02-13_15:57_,BH
+traces/1bh-9,grid9_1bh-9_2019-02-13_19:35_,BH
+traces/normal,grid9_normal_2019-02-13_17:05_,normal
+traces/normal,grid9_normal_2019-02-13_18:51_,normal
+traces/normal,grid9_normal_2019-02-13_22:23_,normal
+traces/rnd-1,rnd_1bh-2_2019-02-14_15:38_,BH
+traces/rnd-1,rnd_1bh-7_2019-02-14_13:57_,BH
+traces/rnd-1,rnd_1bh-9_2019-02-14_15:15_,BH
+traces/rnd-1,rnd_normal_2019-02-14_13:37_,normal
