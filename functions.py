@@ -208,16 +208,22 @@ def getPercentageMissingPackets(node,lenght):
 def accuracy_score_corrected(correction,labels):
     print(np.array(correction))
     labels_alt=[]
+    sum_labels=0
+    sum_labels_alt=0
     for el in labels:
         if (el==0):
             labels_alt.append(1)
+            sum_labels_alt+=1
         elif el==1:
             labels_alt.append(0)
+            sum_labels+=1
 
     accuracy=sm.accuracy_score(correction, labels)
     accuracy_alt=sm.accuracy_score(correction, labels_alt)
     #print(correction)
-    if (accuracy>accuracy_alt):
+
+
+    if (sum_labels>sum_labels_alt):
         print(accuracy)
 
     else:
@@ -228,6 +234,7 @@ def accuracy_score_corrected(correction,labels):
 
     pprint(confusionMatrix)
     return labels
+
 
 
 def ReplaceMissingPackets(node):
