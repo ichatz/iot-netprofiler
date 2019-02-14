@@ -186,13 +186,30 @@ def densityOfDelayByCase(directory,data,figsize,namefile,colors,cases):
 #RTT Graph
 def RTTGraph(directory,data,figsize,namefile,colors,cases):
     print("Printing RTT Graph for "+directory)
-    fig, axs= plt.subplots(len(data[0]),1, figsize=figsize,sharey=True, )
+    # fig, axs= plt.subplots(len(data[0]),1, figsize=figsize,sharey=True, )
+    # for i in range(len(data)):
+    #     for j in range(len(data[i])):
+    #         axs[j].plot(data[i][j].pkts["seq"],data[i][j].pkts["rtt"],label=cases[i],color=colors[i]   )
+    #         axs[j].set_title("Node "+ str(data[i][j].ip))
+    #         axs[j].set_xlabel("Packet Number")
+    #         axs[j].set_ylabel("Time (ms)")
+    #         axs[j].legend()
+    # plt.tight_layout()
+    # saveFileFigures(fig,directory,namefile)
+    fig, axs= plt.subplots(len(data),len(data[0]), figsize=figsize,sharey=True, )
+
     for i in range(len(data)):
         for j in range(len(data[i])):
-            axs[j].plot(data[i][j].pkts["seq"],data[i][j].pkts["rtt"],label=cases[i],color=colors[i]   )
+        #print(i,j)
+            ax=axs[i][j]
+            d=data[i][j].pkts["rtt"]
+            axs[j].set_ylabel("Time (ms)")
             axs[j].set_title("Node "+ str(data[i][j].ip))
             axs[j].set_xlabel("Packet Number")
-            axs[j].set_ylabel("Time (ms)")
-            axs[j].legend()
+            if not d.empty  | len(d)<2 :
+                 ax.plot(data[i][j].pkts["seq"],data[i][j].pkts["rtt"],label=cases[i],color=colors[i]   )
+
+                 ax.legend()
+            #ax.set_xlim([-500, 8000])
     plt.tight_layout()
     saveFileFigures(fig,directory,namefile)
