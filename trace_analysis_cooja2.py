@@ -13,25 +13,7 @@ import random
 random.seed(6666)
 #Import for Kmeans
 
-def import_Cooja2(plots):
-    data=[]
-    node_defaults = {
-        "aaaa::212:7403:3:303": 1,
-        "aaaa::212:7402:2:202": 2,
-        "aaaa::212:7404:4:404": 2,
-        "aaaa::212:7406:6:606": 2,
-        "aaaa::212:7405:5:505": 3,
-        "aaaa::212:7407:7:707": 3,
-        "aaaa::212:7409:9:909": 3,
-        "aaaa::212:7408:8:808": 4,
-        "aaaa::212:740a:a:a0a": 4}
-    for row in plots:
 
-        #print("Importing ./"+row[0]+"/"+row[1])
-        nodeList=import_nodes_Cooja_2(row[0],row[1],node_defaults)
-        data.append(nodeList)
-
-    return data
 def import_nodes_Cooja_2(directory,tracemask,node_defaults):
     #print(directory)
     #print(tracemask)
@@ -101,13 +83,46 @@ def import_nodes_Cooja_2(directory,tracemask,node_defaults):
     return nodeList
 
 
-def analyze_network(directory,plots,pings,window):
+def import_Cooja2(df,directory):
+    data=[]
+    node_defaults = {
+        "aaaa::212:7403:3:303": 1,
+        "aaaa::212:7402:2:202": 2,
+        "aaaa::212:7404:4:404": 2,
+        "aaaa::212:7406:6:606": 2,
+        "aaaa::212:7405:5:505": 3,
+        "aaaa::212:7407:7:707": 3,
+        "aaaa::212:7409:9:909": 3,
+        "aaaa::212:7408:8:808": 4,
+        "aaaa::212:740a:a:a0a": 4}
+    #for row in plots:
+
+        #print("Importing ./"+row[0]+"/"+row[1])
+    print(directory+df["directory"].values)
+
+    for i in range(len(df["directory"].values)):
+
+
+
+
+        nodeList=import_nodes_Cooja_2(directory+df["directory"].values[i],df["case"].values[i],node_defaults)
+        data.append(nodeList)
+    print(len(data))
+    print(len(data[0]))
+    return data
+
+def analyze_network(directory,df,pings,window):
     cases=[]
-    casesAccuracy=[]
-    for row in plots:
-        cases.append(row[1])
-        casesAccuracy.append(row[2])
-        data=import_Cooja2(plots)
+    casesAccuracy=df["case_accuracy"].values
+#     for row in plots:
+#         cases.append(row[1])
+#         casesAccuracy.append(row[2])
+#         data=import_Cooja2(plots)
+    cases=df["case"].values
+    folder=df["directory"].values+directory
+
+    data=import_Cooja2(df,directory)
+
     #pings=getPings(data)
     #All data collection is in variable node that is a list of list of nodes
     #3 nets input x 9 nodes by net
@@ -262,6 +277,3 @@ def analyze_network(directory,plots,pings,window):
     results=pd.DataFrame(net_results)
     results.to_csv("results_network_kmeans.csv", sep='\t', encoding='utf-8')
     print(results)
-
-
-#End functions from cooja2 -> nodes for kmeans
