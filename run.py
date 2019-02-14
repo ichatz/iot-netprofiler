@@ -154,4 +154,31 @@ data=import_Cooja2(plots)
 #     for j in range(len(data[i])):
 #         print(data[i][j].hop)
 
-run(data,directory,colors,cases)
+#run(data,directory,colors,cases)
+
+
+directory=os.getcwd()+"/cooja3-9nodes/"
+#directory="../cooja3-9nodes/"
+plots = [
+        #2 BH3
+        (directory+"traces/1bh-3", 'grid9_1bh-3_2019-02-13_16:28_',"BH"),
+        (directory+"traces/1bh-3", 'grid9_1bh-3_2019-02-13_22:05_',"BH"),
+        #2 BH5
+         (directory+"traces/1bh-5", 'grid9_1bh-5_2019-02-13_15:31_',"BH"),
+          (directory+"traces/1bh-5", 'grid9_1bh-5_2019-02-13_21:44_',"BH"),
+        #2 BH 6
+        (directory+"traces/1bh-6", 'grid9_1bh-6_2019-02-13_12:59_',"BH"),
+        (directory+"traces/1bh-6", 'grid9_1bh-6_2019-02-13_19:15_',"BH"),
+        #2 BH 7
+         (directory+"traces/1bh-7", 'grid9_1bh-7_2019-02-13_15:08_',"BH"),
+         (directory+"traces/1bh-7", 'grid9_1bh-7_2019-02-13_20:02_',"BH"),
+         #2 bh 9
+         (directory+"traces/1bh-9", 'grid9_1bh-9_2019-02-13_15:57_',"BH"),
+         (directory+"traces/1bh-9", 'grid9_1bh-9_2019-02-13_19:35_',"BH"),
+         #3 normal
+         (directory+"traces/normal", 'grid9_normal_2019-02-13_17:05_',"normal"),
+         (directory+"traces/normal",  "grid9_normal_2019-02-13_18:51_","normal"),
+         (directory+"traces/normal",  "grid9_normal_2019-02-13_22:23_","normal"),
+        ]
+
+analyze_network(directory,plots,200,25)
