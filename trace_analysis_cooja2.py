@@ -173,7 +173,7 @@ def analyze_network(directory,plots,pings,window):
                 if(mP>30):
                     PL=1
                     PL=mP
-                d["packet loss"].append(PL)
+                d["packet loss"].append(mP)
 
 
 
@@ -192,8 +192,10 @@ def analyze_network(directory,plots,pings,window):
         #"type"
     ],axis=1)
     dataK=dataK.fillna(0)
+
+    #print(dataK)
     correction=[]
-    correction_alt=[] #fr 3 cluster 0:normal net 1:bh net 2:bh
+    correction_alt=[]
     col=np.array(dataK["type"])
     dataK=dataK.drop(["type"],axis=1)
     #Creating simple array to correct unsupervised learning
@@ -205,17 +207,12 @@ def analyze_network(directory,plots,pings,window):
             correction_alt.append(0)
 
         else:
-            #print(el=="BH2" and i==BlackHole[2])
+
             correction.append(0)
             correction_alt.append(1)
 
 
     dataC=stats["label"]
-
-    #Y = data[['var']]
-
-    #X = data[['std']]
-
     kmeans = KMeans(n_clusters=2)
     kmeans.fit(dataK)
     labels = kmeans.predict(dataK)

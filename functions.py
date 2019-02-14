@@ -224,15 +224,16 @@ def accuracy_score_corrected(correction,labels):
 
 
     if (sum_labels>sum_labels_alt):
-        print(accuracy)
+        #print(accuracy)
+        None
 
     else:
-        print(accuracy_alt)
+        #print(accuracy_alt)
         labels=labels_alt
-    print(np.array(labels))
+    #print(np.array(labels))
     confusionMatrix=sm.confusion_matrix(correction, labels)
 
-    pprint(confusionMatrix)
+    #pprint(confusionMatrix)
     return labels
 
 

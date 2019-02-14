@@ -181,4 +181,4 @@ plots = [
          (directory+"traces/normal",  "grid9_normal_2019-02-13_22:23_","normal"),
         ]
 
-analyze_network(directory,plots,100,100)
+analyze_network(directory,plots,200,25)
