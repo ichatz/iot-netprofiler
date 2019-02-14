@@ -159,7 +159,7 @@ def getPings(data):
 #Prepare the hop data
 def hopPreparation(data):
     hoplist=[]
-    df_a = pd.DataFrame( columns = ['pkt'])
+    df_a = pd.DataFrame( )
     dataHop=[]
 
     listoflists = []
@@ -213,22 +213,22 @@ def accuracy_score_corrected(correction,labels):
             labels_alt.append(1)
         elif el==1:
             labels_alt.append(0)
-    
+
     accuracy=sm.accuracy_score(correction, labels)
     accuracy_alt=sm.accuracy_score(correction, labels_alt)
     #print(correction)
-    if (accuracy>accuracy_alt): 
+    if (accuracy>accuracy_alt):
         print(accuracy)
-        
-    else: 
+
+    else:
         print(accuracy_alt)
         labels=labels_alt
     print(np.array(labels))
     confusionMatrix=sm.confusion_matrix(correction, labels)
-    
+
     pprint(confusionMatrix)
     return labels
-    
+
 
 def ReplaceMissingPackets(node):
     #print(node.pkts["pkt"])
