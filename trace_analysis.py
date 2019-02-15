@@ -32,6 +32,8 @@ def process_cooja2_traces(path, tracemask):
                               names=['node_id', 'seq', 'hop', 'rtt'],
                               engine='python').dropna().drop_duplicates()
 
+        if len(packets) == 0:
+            continue
         nodes.loc[len(nodes)] = [packets['node_id'][0], 64 - packets['hop'][0]]
 
         packets = packets.sort_values(by=['node_id', 'seq'], ascending=True, na_position='first')

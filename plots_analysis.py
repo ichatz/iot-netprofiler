@@ -67,7 +67,11 @@ def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
 
     # ax.set_title('Distribution of the Complete Dataset Node ' + str(node) + ' at Hop ' + str(rank))
     st = fig.suptitle(tracemask, fontsize="x-large")
-    plt.savefig('plots/' + tracemask + 'hist.png')
+    try:
+        plt.savefig('plots/' + tracemask + 'hist.png')
+    except:
+        print("Invalid IHDR data. Cannot save the image " + tracemask + 'hist.png')  
+        
 
 
 
@@ -136,7 +140,10 @@ def plot_histograms_outliers_hops_nodes(nodes, packets_node, max_x, max_y, trace
 
     # ax.set_title('Distribution of the Complete Dataset Node ' + str(node) + ' at Hop ' + str(rank))
     st = fig.suptitle(tracemask, fontsize="x-large")
-    plt.savefig('plots/' + tracemask + '-out-hist.png')
+    try:
+        plt.savefig('plots/' + tracemask + '-out-hist.png')
+    except:
+        print("Invalid IHDR data. Cannot save the image " + tracemask + '-out-hist.png')  
 
 
 def plot_histograms_iqr_outliers_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
@@ -203,7 +210,10 @@ def plot_histograms_iqr_outliers_hops_nodes(nodes, packets_node, max_x, max_y, t
 
     # ax.set_title('Distribution of the Complete Dataset Node ' + str(node) + ' at Hop ' + str(rank))
     st = fig.suptitle(tracemask, fontsize="x-large")
-    plt.savefig('plots/' + tracemask + '-out-iqr-hist.png')
+    try:
+        plt.savefig('plots/' + tracemask + '-out-iqr-hist.png')
+    except:
+        print("Invalid IHDR data. Cannot save the image " + tracemask + '-out-iqr-hist.png')  
 
 
 def plot_tumbling_windows_hops_nodes(nodes, packets_node, max_x, max_y, tracemask, window_size):
@@ -269,8 +279,10 @@ def plot_tumbling_windows_hops_nodes(nodes, packets_node, max_x, max_y, tracemas
 
     # ax.set_title('Distribution of the Complete Dataset Node ' + str(node) + ' at Hop ' + str(rank))
     st = fig.suptitle(tracemask, fontsize="x-large")
-    plt.savefig('plots/' + tracemask + '-tumbling.png')
-
+    try:
+        plt.savefig('plots/' + tracemask + '-tumbling.png')
+    except:
+        print("Invalid IHDR data. Cannot save the image " + tracemask + '-tumbling.png')
     
 
 def produce_iotlab_topology(path, tracefile):
