@@ -38,7 +38,7 @@ def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
                 if len(label.split(':')) >= 4:
                     label = label.split(':')[4]
 
-        
+
                 packets_node[node]['rtt'].plot.kde(ax=ax, label='Node ' + label + ' KDE')
                 packets_node[node]['rtt'].plot.hist(density=True, alpha=0.3, bins=50, ax=ax,
                                                     label='Node ' + label + ' Hist')
@@ -70,8 +70,8 @@ def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
     try:
         plt.savefig('plots/' + tracemask + 'hist.png')
     except:
-        print("Invalid IHDR data. Cannot save the image " + tracemask + 'hist.png')  
-        
+        print("Invalid IHDR data. Cannot save the image " + tracemask + 'hist.png')
+
 
 
 
@@ -111,7 +111,7 @@ def plot_histograms_outliers_hops_nodes(nodes, packets_node, max_x, max_y, trace
                 if len(label.split(':')) >= 4:
                     label = label.split(':')[4]
 
-        
+
                 packets_node[node]['rtt'].plot.kde(ax=ax, label='Node ' + label + ' KDE')
                 packets_node[node]['rtt'].plot.hist(density=True, alpha=0.3, bins=50, ax=ax,
                                                     label='Node ' + label + ' Hist')
@@ -143,7 +143,7 @@ def plot_histograms_outliers_hops_nodes(nodes, packets_node, max_x, max_y, trace
     try:
         plt.savefig('plots/' + tracemask + '-out-hist.png')
     except:
-        print("Invalid IHDR data. Cannot save the image " + tracemask + '-out-hist.png')  
+        print("Invalid IHDR data. Cannot save the image " + tracemask + '-out-hist.png')
 
 
 def plot_histograms_iqr_outliers_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
@@ -181,7 +181,7 @@ def plot_histograms_iqr_outliers_hops_nodes(nodes, packets_node, max_x, max_y, t
                 if len(label.split(':')) >= 4:
                     label = label.split(':')[4]
 
-        
+
                 packets_node[node]['rtt'].plot.kde(ax=ax, label='Node ' + label + ' KDE')
                 packets_node[node]['rtt'].plot.hist(density=True, alpha=0.3, bins=50, ax=ax,
                                                     label='Node ' + label + ' Hist')
@@ -213,7 +213,7 @@ def plot_histograms_iqr_outliers_hops_nodes(nodes, packets_node, max_x, max_y, t
     try:
         plt.savefig('plots/' + tracemask + '-out-iqr-hist.png')
     except:
-        print("Invalid IHDR data. Cannot save the image " + tracemask + '-out-iqr-hist.png')  
+        print("Invalid IHDR data. Cannot save the image " + tracemask + '-out-iqr-hist.png')
 
 
 def plot_tumbling_windows_hops_nodes(nodes, packets_node, max_x, max_y, tracemask, window_size):
@@ -283,7 +283,7 @@ def plot_tumbling_windows_hops_nodes(nodes, packets_node, max_x, max_y, tracemas
         plt.savefig('plots/' + tracemask + '-tumbling.png')
     except:
         print("Invalid IHDR data. Cannot save the image " + tracemask + '-tumbling.png')
-    
+
 
 def produce_iotlab_topology(path, tracefile):
     # Load node properties to retrieve x, y location
@@ -431,7 +431,7 @@ def printBigPlot(directory,data,figsize,namefile,colors,cases):
     saveFileFigures(fig,directory,namefile)
 
 #Print on a file density by Hop (asked by professor)
-def printDensityByHop(directory,data,hops,figsize,namefile,colors,cases):
+def printDensityByHop(directory,dataHop,hops,figsize,namefile,colors,cases):
 
     print("Printing Density by Hop for "+directory)
     #dataHop=hopPreparation(data)
@@ -440,7 +440,7 @@ def printDensityByHop(directory,data,hops,figsize,namefile,colors,cases):
     for i in range(len(dataHop)):
         for j in range(len(dataHop[i])):
             #print(i,j)
-            d=dataHop[i][j]['rtt']
+            d=dataHop[i][j].pkts['rtt']
             axs[j].set_xlabel("Time (ms)")
             axs[j].set_title("Hop "+ str(j+1))
             if not d.empty | len(d)<2 :
@@ -472,20 +472,26 @@ def printDensityByCase(directory,data,hops,figsize,namefile,colors,cases):
     fig, axs= plt.subplots(len(dataHopT[0]),1, figsize=(15,20),sharey=True, )
     for i in range(len(dataHopT)):
         for j in range(len(dataHopT[0])):
-            d=dataHopT[i][j]["rtt"]
+            d=dataHopT[i][j]
+
             axs[j].set_title(""+ cases[i])
             axs[j].set_xlabel("Time (ms)")
             axs[j].set_ylabel("Density")
             if not d.empty | len(d)<2 :
-                d.plot.kde(
-                    ax=axs[j],
-                    label="Hop "+str(i),
-                    color=colors[i]
-                )
+                #print(dataHopT[i][j])
+                #print(colors[i])
+                d=d["rtt"]
+                try:
+                    d.plot.kde(
+                        ax=axs[j],
+                        label="Hop "+str(i),
+                        color=colors[i]
+                    )
 
-                d.hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
+                    d.hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
 
-                axs[j].legend()
+                    axs[j].legend()
+                except:pass
 
     plt.tight_layout()
     #axs[j].set_xlim([-40, 6000])
@@ -551,15 +557,17 @@ def densityOfDelayByCase(directory,data,figsize,namefile,colors,cases):
             axs[j].set_ylabel("Density")
             if not d.empty | len(d)<2 :
 
+                try:
+                    d.plot.kde(
+                        ax=axs[j],
+                        label=cases[i],color=colors[i]
+                    )
 
-                d.plot.kde(
-                    ax=axs[j],
-                    label=cases[i],color=colors[i]
-                )
+                    d.hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
 
-                d.hist(density=True,alpha=0.3, ax=axs[j],color=colors[i])
-
-                axs[j].legend()
+                    axs[j].legend()
+                except:
+                    pass
     plt.tight_layout()
     saveFileFigures(fig,directory,namefile)
 
@@ -567,13 +575,32 @@ def densityOfDelayByCase(directory,data,figsize,namefile,colors,cases):
 #RTT Graph
 def RTTGraph(directory,data,figsize,namefile,colors,cases):
     print("Printing RTT Graph for "+directory)
-    fig, axs= plt.subplots(len(data[0]),1, figsize=figsize,sharey=True, )
+    # fig, axs= plt.subplots(len(data[0]),1, figsize=figsize,sharey=True, )
+    # for i in range(len(data)):
+    #     for j in range(len(data[i])):
+    #         axs[j].plot(data[i][j].pkts["seq"],data[i][j].pkts["rtt"],label=cases[i],color=colors[i]   )
+    #         axs[j].set_title("Node "+ str(data[i][j].ip))
+    #         axs[j].set_xlabel("Packet Number")
+    #         axs[j].set_ylabel("Time (ms)")
+    #         axs[j].legend()
+    # plt.tight_layout()
+    # saveFileFigures(fig,directory,namefile)
+    fig, axs= plt.subplots(len(data),len(data[0]), figsize=figsize,sharey=True, )
+
     for i in range(len(data)):
         for j in range(len(data[i])):
-            axs[j].plot(data[i][j].pkts["seq"],data[i][j].pkts["rtt"],label=cases[i],color=colors[i]   )
-            axs[j].set_title("Node "+ str(data[i][j].ip))
-            axs[j].set_xlabel("Packet Number")
-            axs[j].set_ylabel("Time (ms)")
-            axs[j].legend()
+        #print(i,j)
+            ax=axs[i][j]
+            d=data[i][j].pkts["rtt"]
+            ax.set_ylabel("Time (ms)")
+            ax.set_title("Node "+ str(data[i][j].ip))
+            ax.set_xlabel("Packet Number")
+            if not d.empty  | len(d)<2 :
+                 ax.plot(data[i][j].pkts["seq"],data[i][j].pkts["rtt"],label=cases[i]
+                 #,color=colors[i]
+                   )
+
+                 ax.legend()
+            #ax.set_xlim([-500, 8000])
     plt.tight_layout()
     saveFileFigures(fig,directory,namefile)
