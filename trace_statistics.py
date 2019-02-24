@@ -4,6 +4,48 @@ import os
 import trace_analysis
 
 
+
+def compute_labeled_statistics(nodes, packets_node, label):
+    # Input: a Dataframe nodes = node_id, rank + packets_node = {node_id: node_id, seq, hop, rtt}
+    #        and label that indicate the class of the experiment
+    # Output: compute a dataframe containing node_id, count, mean, var, std, hop, min, max, loss, label
+    
+    stats = None
+    for node in packets_node:
+        count = packets_node[node]['rtt'].count()
+        mean = packets_node[node]['rtt'].mean()
+        var = packets_node[node]['rtt'].var()
+        std = packets_node[node]['rtt'].std()
+        hop = int(nodes[nodes['node_id'] == node]['rank'])
+        min_val = packets_node[node]['rtt'].min()
+        max_val = packets_node[node]['rtt'].max()
+        loss = float(count)/200
+        if stats is None:
+            stats = pd.DataFrame({'node_id': [node],
+                                   'count': [count],
+                                   'mean': [mean],
+                                   'var': [var],
+                                   'std': [std],
+                                   'hop': [hop],
+                                   'min': [min_val],
+                                   'max': [max_val],
+                                   'loss': [loss],
+                                   'label': [label]})
+        else:
+            stats = pd.concat([stats, pd.DataFrame({'node_id': [node],
+                                   'count': [count],
+                                   'mean': [mean],
+                                   'var': [var],
+                                   'std': [std],
+                                   'hop': [hop],
+                                   'min': [min_val],
+                                   'max': [max_val],
+                                   'loss': [loss],
+                                   'label': [label]})])
+    
+    return stats
+
+
 def tumbling_statistics_per_node(path, tracefile, window_size=10):
 	# Compute a dictionary containing all the statistics from each node of the dataset
 
