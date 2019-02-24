@@ -2,7 +2,7 @@ from functions import *
 import pandas as pd
 import numpy as np
 import os
-
+from os import listdir
 
 def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
     # Each node communicates with the root of the DODAG through a certain number of hops.
@@ -68,6 +68,8 @@ def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
     # ax.set_title('Distribution of the Complete Dataset Node ' + str(node) + ' at Hop ' + str(rank))
     st = fig.suptitle(tracemask, fontsize="x-large")
     try:
+        if 'plots' not in listdir(os.getcwd()):
+            os.makedirs('plots')
         plt.savefig('plots/' + tracemask + 'hist.png')
     except:
         print("Invalid IHDR data. Cannot save the image " + tracemask + 'hist.png')
@@ -141,6 +143,8 @@ def plot_histograms_outliers_hops_nodes(nodes, packets_node, max_x, max_y, trace
     # ax.set_title('Distribution of the Complete Dataset Node ' + str(node) + ' at Hop ' + str(rank))
     st = fig.suptitle(tracemask, fontsize="x-large")
     try:
+        if 'plots' not in listdir(os.getcwd()):
+            os.makedirs('plots')
         plt.savefig('plots/' + tracemask + '-out-hist.png')
     except:
         print("Invalid IHDR data. Cannot save the image " + tracemask + '-out-hist.png')
@@ -211,6 +215,8 @@ def plot_histograms_iqr_outliers_hops_nodes(nodes, packets_node, max_x, max_y, t
     # ax.set_title('Distribution of the Complete Dataset Node ' + str(node) + ' at Hop ' + str(rank))
     st = fig.suptitle(tracemask, fontsize="x-large")
     try:
+        if 'plots' not in listdir(os.getcwd()):
+            os.makedirs('plots')
         plt.savefig('plots/' + tracemask + '-out-iqr-hist.png')
     except:
         print("Invalid IHDR data. Cannot save the image " + tracemask + '-out-iqr-hist.png')
@@ -280,6 +286,8 @@ def plot_tumbling_windows_hops_nodes(nodes, packets_node, max_x, max_y, tracemas
     # ax.set_title('Distribution of the Complete Dataset Node ' + str(node) + ' at Hop ' + str(rank))
     st = fig.suptitle(tracemask, fontsize="x-large")
     try:
+        if 'plots' not in listdir(os.getcwd()):
+            os.makedirs('plots')
         plt.savefig('plots/' + tracemask + '-tumbling.png')
     except:
         print("Invalid IHDR data. Cannot save the image " + tracemask + '-tumbling.png')
