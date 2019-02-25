@@ -13,7 +13,7 @@ from sklearn.neighbors import KNeighborsClassifier
 ##### kNN Analysis #########
 def knn_test_number_of_neighbors(X_train, X_test, y_train, y_test):
     #Setup arrays to store training and test accuracies
-    neighbors = np.arange(1,11)
+    neighbors = np.arange(1,30)
     train_accuracy =np.empty(len(neighbors))
     test_accuracy = np.empty(len(neighbors))
 
