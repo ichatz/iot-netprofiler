@@ -6,11 +6,39 @@ import os
 from node import *
 import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsClassifier
+import seaborn as sns
+from sklearn.ensemble import RandomForestClassifier
 
 
 
 
-##### kNN Analysis #########
+#######################################
+##### Classification Analysis #########
+#######################################
+
+def random_forests_features_selection(X_train, X_test, y_train, y_test, features):    
+    # Select most important features
+
+    #Create a Gaussian Classifier
+    rf_clf = RandomForestClassifier(n_estimators=100)
+
+    #Train the model using the training sets y_pred=clf.predict(X_test)
+    rf_clf.fit(X_train,y_train)
+    y_pred = rf_clf.predict(X_test)
+
+    # Feature selection
+    feature_imp = pd.Series(rf_clf.feature_importances_,index=features.columns).sort_values(ascending=False)
+
+    # Plots features with their importance score    
+    sns.barplot(x=feature_imp, y=feature_imp.index)    
+    # Add labels to your graph    
+    plt.xlabel('Feature Importance Score')    
+    plt.ylabel('Features')    
+    plt.title("Visualizing Important Features")    
+    plt.legend()    
+    plt.show()
+
+
 def knn_test_number_of_neighbors(X_train, X_test, y_train, y_test):
     #Setup arrays to store training and test accuracies
     neighbors = np.arange(1,30)
@@ -42,8 +70,10 @@ def knn_test_number_of_neighbors(X_train, X_test, y_train, y_test):
 
 
 
+#######################################
+###### Exploratory Analysis ###########
+#######################################
 
-##### Exploratory Analysis #########
 def process_cooja2_traces(path, tracemask):
     files = []
 
