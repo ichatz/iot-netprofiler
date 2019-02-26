@@ -24,7 +24,7 @@
       se.sics.cooja.mspmote.SkyMoteType
       <identifier>sky1</identifier>
       <description>Router</description>
-      <firmware EXPORT="copy">[CONFIG_DIR]/../../../Downloads/CSCML/border-router.sky</firmware>
+      <firmware EXPORT="copy">[CONFIG_DIR]/../firmware/border-router.sky</firmware>
       <moteinterface>se.sics.cooja.interfaces.Position</moteinterface>
       <moteinterface>se.sics.cooja.interfaces.RimeAddress</moteinterface>
       <moteinterface>se.sics.cooja.interfaces.IPAddress</moteinterface>
@@ -45,7 +45,7 @@
       se.sics.cooja.mspmote.SkyMoteType
       <identifier>sky2</identifier>
       <description>Normal</description>
-      <firmware EXPORT="copy">[CONFIG_DIR]/../../../Downloads/CSCML/sky-websense-WH.sky</firmware>
+      <firmware EXPORT="copy">[CONFIG_DIR]/../firmware/sky-websense-WH.sky</firmware>
       <moteinterface>se.sics.cooja.interfaces.Position</moteinterface>
       <moteinterface>se.sics.cooja.interfaces.RimeAddress</moteinterface>
       <moteinterface>se.sics.cooja.interfaces.IPAddress</moteinterface>
