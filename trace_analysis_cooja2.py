@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 from node import *
 from functions import *
-from plots import *
+
 from plots_analysis import *
 from sklearn.metrics import confusion_matrix
 from sklearn.cluster import KMeans
@@ -94,11 +94,12 @@ def import_Cooja2(df,directory):
         "aaaa::212:7407:7:707": 3,
         "aaaa::212:7409:9:909": 3,
         "aaaa::212:7408:8:808": 4,
-        "aaaa::212:740a:a:a0a": 4}
+        "aaaa::212:740a:a:a0a": 4,
+        "aaaa::212:740b:b:b0b": 4}
     #for row in plots:
 
         #print("Importing ./"+row[0]+"/"+row[1])
-    print(directory+df["directory"].values)
+    #print(directory+df["directory"].values)
 
     for i in range(len(df["directory"].values)):
 
@@ -107,8 +108,8 @@ def import_Cooja2(df,directory):
 
         nodeList=import_nodes_Cooja_2(directory+df["directory"].values[i],df["case"].values[i],node_defaults)
         data.append(nodeList)
-    print(len(data))
-    print(len(data[0]))
+    #print(len(data))
+    #print(len(data[0]))
     return data
 
 def analyze_network(directory,df,pings,window):
@@ -276,4 +277,107 @@ def analyze_network(directory,df,pings,window):
 
     results=pd.DataFrame(net_results)
     results.to_csv("results_network_kmeans.csv", sep='\t', encoding='utf-8')
-    print(results)
+    #print(results)
+    return results
+
+def get_traces_csv(directory):
+    directory1=directory
+    directory+="traces/"
+    #print(directory)
+    files=[]
+    path=[]
+    case_accuracy=[]
+    case_accuracy2=[]
+    #directory="./traces"
+    #directory=os.getcwd()+"/traces/"
+    d={}
+    try:
+
+        for subdirectory in os.listdir(directory):
+            #print(os.path.isdir(subdirectory))
+            #print(subdirectory)
+
+            subdirectory2=directory+"/"+subdirectory
+
+            if(os.path.isdir(subdirectory2)):
+
+                for file in os.listdir(subdirectory2):
+
+                    if("routes" in file):
+                        #print(subdirectory+"/"+file)
+                        path.append("traces/"+subdirectory[:])
+                        #print(file)
+                        files.append(file[:-10])
+                        #print(file)
+                        if("normal" in file  ):
+                            case_accuracy.append("normal")
+                            case_accuracy2.append("normal")
+                        elif("bh" in file ):
+                            case_accuracy.append("BH")
+                            case_accuracy2.append("BH")
+                        elif("gh" in file ):
+                            case_accuracy.append("BH")
+                            case_accuracy2.append("GH")
+                        continue
+        d={
+            "directory":path,
+            "case":files,
+            "case_accuracy":case_accuracy,
+            "case_accuracy2":case_accuracy2
+
+
+            }
+    except:
+        pass
+
+
+
+
+    traces=pd.DataFrame(d)
+    #print(directory)
+    traces.to_csv(directory1+"traces.csv", sep='\t', encoding='utf-8')
+    return traces
+
+
+def run(directory,df):
+    colors = [
+    'orange','dodgerblue',
+     'forestgreen','violet',
+     "red","brown",
+     "pink","aqua",
+     "darkslategrey","darkred",
+     "darkblue","darkorchid",
+     "salmon","chocolate"
+
+     ]
+    casesAccuracy=df["case_accuracy"].values
+
+    cases=df["case"].values
+    folder=df["directory"].values+directory
+
+    data=import_Cooja2(df,directory)
+
+    #hops = hopPreparation(data)
+
+    #Distribution of the delay in correlation with the Cases
+    #dataHop=hopPreparation(data)
+    #Distribution of the delay in correlation with the Hops
+    #printDensityByCase(directory,data,hops,(15,90),"densitybyCase",colors,cases)
+
+    #Distribution by Hop
+    #printDensityByHop(directory,data,hops,(30,90),"densitybyHop",colors,cases)
+
+    #Prints on a file the big matrix (asked by professor)
+    #printBigPlot(directory,data,(90,90),"Big Plot",colors,cases)
+
+    #Print Density of delay without outliers in every node by Case
+    #densityOfDelayByCaseNoOutliers(directory,data,(15,90),"Density of delay by Case no outliers",colors,cases)
+
+    #Density of outliers in every node by Case
+    #densityOutliersByCase(directory,data,(90,90),"Density Outliers of Delay by Case",colors,cases)
+
+    #Distibution of the delay divided by Node in the differents Cases
+    #densityOfDelayByCase(directory,data,(15,90),"Density of Delay by Case",colors,cases)
+
+    #RTT Graph
+    RTTGraph(directory,data,(30,90),"RTT Graph",colors,cases)

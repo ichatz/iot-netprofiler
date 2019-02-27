@@ -35,20 +35,6 @@ class node(object):
         node= node(ip,hop,pkts)
         return node
 
-'''
-class packet(object):
-    rtt=np.NaN
-    pkt=np.NaN
-    ttl=np.NaN
-    def __init__(self,rtt,pkt,ttl):
-        self.rtt=rtt
-        self.pkt=pkt
-        self.ttl=ttl
-
-
-    def make_packet(rtt,pkt,ttl):
-        package=package(rtt,pkt,ttl)
-'''
 
 def coojaJsonImporter(dir):
 
