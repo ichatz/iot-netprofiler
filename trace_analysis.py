@@ -10,13 +10,13 @@ import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
 
 
-
+ 
 
 #######################################
 ##### Classification Analysis #########
 #######################################
 
-def random_forests_features_selection(X_train, X_test, y_train, y_test, features):    
+def random_forests_features_selection(X_train, X_test, y_train, y_test, features):
     # Select most important features
 
     #Create a Gaussian Classifier
@@ -29,13 +29,13 @@ def random_forests_features_selection(X_train, X_test, y_train, y_test, features
     # Feature selection
     feature_imp = pd.Series(rf_clf.feature_importances_,index=features.columns).sort_values(ascending=False)
 
-    # Plots features with their importance score    
-    sns.barplot(x=feature_imp, y=feature_imp.index)    
-    # Add labels to your graph    
-    plt.xlabel('Feature Importance Score')    
-    plt.ylabel('Features')    
-    plt.title("Visualizing Important Features")    
-    plt.legend()    
+    # Plots features with their importance score
+    sns.barplot(x=feature_imp, y=feature_imp.index)
+    # Add labels to your graph
+    plt.xlabel('Feature Importance Score')
+    plt.ylabel('Features')
+    plt.title("Visualizing Important Features")
+    plt.legend()
     plt.show()
 
 
@@ -156,7 +156,7 @@ def compute_iqr_outliers_by_node(packets_node):
     	# Returns two DataFrames containing standard values and outliers
         q1 = packets_node[n]['rtt'].quantile(.25)
         q3 = packets_node[n]['rtt'].quantile(.75)
-        
+
         packets_node[n]
 
         # Mark x(t) as outlier if mean-2*std <= x(t) <? mean+2*std
@@ -472,10 +472,10 @@ def process_iotlab_node_by_node2(path, tracefile):
         if ranks['node_id'][node] not in d_packets:
             remove.append(ranks['node_id'][node])
             continue
-        
+
         d_packets[ranks['node_id'][node]]['hop'] = rank_to_hops.index(ranks['rank'][node]) + 1
         d_packets[ranks['node_id'][node]] = d_packets[ranks['node_id'][node]].loc[d_packets[ranks['node_id'][node]]['seq'] <= 200].reset_index(drop=True)
-        
+
         # If the node was unavailable during the first 100 ICMP messages it should be removed
         if len(d_packets[ranks['node_id'][node]]) == 0:
             remove.append(ranks['node_id'][node])
@@ -484,7 +484,7 @@ def process_iotlab_node_by_node2(path, tracefile):
     for node in set(remove):
         if node in d_packets:
             del d_packets[node]
-            
+
 
     # Compute a new DataFrame containing node_id and rank
     nodes = {}
@@ -709,5 +709,3 @@ def processed_data_for_kmeans(path, tracefile):
         node_dataframe[node]['seq'] = node_dataframe[node].index
 
     return node_dataframe
-
-
