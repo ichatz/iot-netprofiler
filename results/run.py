@@ -1,23 +1,8 @@
 #Modules to install via pip pandas,ipynb
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import json
-from pprint import pprint
-import os
-import import_ipynb
 import sys
 
-sys.path.append('../')
-from functions import *
-from pandas.plotting import scatter_matrix
-from trace_analysis import *
+sys.path.append('../lib/')
 from plots_analysis import *
-from trace_analysis_cooja2 import *
-from node import *
-
-
-
 
 #https://stackoverflow.com/questions/22408237/named-colors-in-matplotlib
 
