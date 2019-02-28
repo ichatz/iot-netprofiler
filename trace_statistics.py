@@ -4,6 +4,49 @@ import os
 import trace_analysis
 
 
+def compute_window_labeled_statistics(nodes, packets_node, label, window_size):
+    # Input: a Dataframe nodes = node_id, rank + packets_node = {node_id: node_id, seq, hop, rtt}
+    #        and label that indicate the class of the experiment, window_size 
+    # Output: compute a dataframe containing node_id, count, mean, var, std, hop, min, max, loss, label for each window
+    
+    win_stats = None
+    for node in packets_node:
+        count = packets_node[node]['rtt'].groupby(packets_node[node]['rtt'].index // window_size * window_size).count()
+        mean = packets_node[node]['rtt'].groupby(packets_node[node]['rtt'].index // window_size * window_size).mean()
+        var = packets_node[node]['rtt'].groupby(packets_node[node]['rtt'].index // window_size * window_size).var()
+        std = packets_node[node]['rtt'].groupby(packets_node[node]['rtt'].index // window_size * window_size).std()
+        hop = int(nodes[nodes['node_id'] == node]['rank'])
+        min_val = packets_node[node]['rtt'].groupby(packets_node[node]['rtt'].index // window_size * window_size).min()
+        max_val = packets_node[node]['rtt'].groupby(packets_node[node]['rtt'].index // window_size * window_size).max()
+        loss = count.copy().apply(lambda x: 1 - float(x)/window_size)
+
+        
+        for index in count.index:
+            if win_stats is None:
+                win_stats = pd.DataFrame({'node_id': [node],
+                                       'count': [count.loc[index]],
+                                       'mean': [mean.loc[index]],
+                                       'var': [var.loc[index]],
+                                       'std': [std.loc[index]],
+                                       'hop': [hop],
+                                       'min': [min_val.loc[index]],
+                                       'max': [max_val.loc[index]],
+                                       'loss': [loss.loc[index]],
+                                       'label': [label]})
+            else:
+                win_stats = pd.concat([win_stats, pd.DataFrame({'node_id': [node],
+                                       'count': [count.loc[index]],
+                                       'mean': [mean.loc[index]],
+                                       'var': [var.loc[index]],
+                                       'std': [std.loc[index]],
+                                       'hop': [hop],
+                                       'min': [min_val.loc[index]],
+                                       'max': [max_val.loc[index]],
+                                       'loss': [loss.loc[index]],
+                                       'label': [label]})])
+
+    return win_stats
+
 
 def compute_labeled_statistics(nodes, packets_node, label):
     # Input: a Dataframe nodes = node_id, rank + packets_node = {node_id: node_id, seq, hop, rtt}
@@ -19,7 +62,7 @@ def compute_labeled_statistics(nodes, packets_node, label):
         hop = int(nodes[nodes['node_id'] == node]['rank'])
         min_val = packets_node[node]['rtt'].min()
         max_val = packets_node[node]['rtt'].max()
-        loss = float(count)/200
+        loss = 1 - float(count)/200
         if stats is None:
             stats = pd.DataFrame({'node_id': [node],
                                    'count': [count],
