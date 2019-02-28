@@ -1,22 +1,16 @@
-import os
-import pandas as pd
-import numpy as np
-import json
 #Modules to install via pip pandas,ipynb
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import json
-from pprint import pprint
-import os
-import import_ipynb
 import sys
 sys.path.append('../')
-from pandas.plotting import scatter_matrix
-from trace_analysis import *
-from node import *
-import sklearn.metrics as sm
 
+#Modules to install via pip pandas,ipynb
+import sys
+
+sys.path.append('../')
+
+from plots_analysis import *
+from sklearn.cluster import KMeans
+# scipy
+import sklearn.metrics as sm
 
 
 class node(object):

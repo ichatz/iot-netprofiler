@@ -1,7 +1,19 @@
 #Modules to install via pip pandas,ipynb
+
+
+#Modules to install via pip pandas,ipynb
 import sys
 
+sys.path.append('../')
+
+from plots_analysis import *
+# scipy
+
+import random
+random.seed(6666)
+
 sys.path.append('../lib/')
+
 from plots_analysis import *
 
 #https://stackoverflow.com/questions/22408237/named-colors-in-matplotlib
