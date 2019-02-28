@@ -15,6 +15,7 @@ random.seed(6666)
 sys.path.append('../lib/')
 
 from plots_analysis import *
+from lib.functions import *
 
 #https://stackoverflow.com/questions/22408237/named-colors-in-matplotlib
 
@@ -80,5 +81,13 @@ df=get_traces_csv(directory)
 
 directory=os.getcwd()+"/cooja3-9nodes/"
 df=get_traces_csv(directory)
-results_kmeans=analyze_network(directory,df,200,50)
-print(results_kmeans)
+
+
+results_kmeans,results_kmeans_network=analyze_network(directory,df,200,50)
+
+
+#stats_kmeans.to_csv(directory+"results_kmeans.csv", sep=',', encoding='utf-8')
+#results_kmeans.to_csv(directory+"results_network_kmeans.csv", sep=',', encoding='utf-8')
+
+
+print(stats)

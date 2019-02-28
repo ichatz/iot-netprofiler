@@ -1,6 +1,39 @@
 #Modules to install via pip pandas,ipynb
+import os
 import sys
 sys.path.append('../')
+
+import os
+import pandas as pd
+import numpy as np
+import json
+#Modules to install via pip pandas,ipynb
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import json
+from pprint import pprint
+import os
+import import_ipynb
+import sys
+sys.path.append('../')
+from pandas.plotting import scatter_matrix
+from trace_analysis import *
+from node import *
+import sklearn.metrics as sm
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+from node import *
+
+
+from plots_analysis import *
+from sklearn.metrics import confusion_matrix
+from sklearn.cluster import KMeans
+import sklearn.metrics as sm
+from sklearn.decomposition import PCA
+import random
+
 
 #Modules to install via pip pandas,ipynb
 import sys
@@ -9,6 +42,7 @@ sys.path.append('../')
 
 from plots_analysis import *
 from sklearn.cluster import KMeans
+import pandas as pd
 # scipy
 import sklearn.metrics as sm
 
@@ -479,7 +513,7 @@ def analyze_network(directory,df,pings,window):
 
 
           ]]
-    stats_csv.to_csv("results_kmeans.csv", sep='\t', encoding='utf-8')
+    #stats_csv.to_csv("results_kmeans.csv", sep='\t', encoding='utf-8')
     stats.head()
     net_results={
        "case":[],
@@ -497,11 +531,12 @@ def analyze_network(directory,df,pings,window):
 
 
     results=pd.DataFrame(net_results)
-    results.to_csv("results_network_kmeans.csv", sep='\t', encoding='utf-8')
+    #results.to_csv("results_network_kmeans.csv", sep='\t', encoding='utf-8')
     #print(results)
-    return results
+    return results,stats
 
 def get_traces_csv(directory):
+    print("Reading Traces from "+directory)
     directory1=directory
     directory+="traces/"
     #print(directory)
