@@ -43,7 +43,11 @@ def compute_window_labeled_statistics(nodes, packets_node, label, window_size):
                                        'min': [min_val.loc[index]],
                                        'max': [max_val.loc[index]],
                                        'loss': [loss.loc[index]],
+                                 
                                        'label': [label]})])
+    # Drop duplicates
+    if win_stats is not None:
+    	win_stats = win_stats.dropna()
 
     return win_stats
 
