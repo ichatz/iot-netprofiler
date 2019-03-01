@@ -220,7 +220,7 @@ def getPercentageMissingPackets(node,lenght):
 
 
 def accuracy_score_corrected(correction,labels):
-    print(np.array(correction))
+    #print(np.array(correction))
     labels_alt=[]
     sum_labels=0
     sum_labels_alt=0
@@ -450,6 +450,10 @@ def analyze_network(directory,df,pings,window):
 
     stats=pd.DataFrame(d)
 
+
+
+
+
     dataK=stats.drop([
         "label",
         "mean",
@@ -518,7 +522,10 @@ def analyze_network(directory,df,pings,window):
     net_results={
        "case":[],
         "predicted":[],
-        "real":[]
+        "real":[],
+        "pings":[],
+        "window":[],
+
     }
     #print(stats["predicted number"])
     for case in range(len(cases)):
@@ -526,7 +533,14 @@ def analyze_network(directory,df,pings,window):
         mean_predicted=str(subset["predicted number"].mean()*100)+"% normal"
         net_results["case"].append(cases[case])
         net_results["predicted"].append(mean_predicted)
-        net_results["real"].append(casesAccuracy[case])
+        net_results["pings"].append(pings)
+        net_results["window"].append(window)
+
+
+
+        c="normal"
+        if(casesAccuracy[case]=="BH"):c="abnormal"
+        net_results["real"].append(c)
 
 
 
