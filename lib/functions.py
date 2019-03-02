@@ -547,7 +547,7 @@ def analyze_network(directory,df,pings,window):
 
 
         p="normal"
-        if(float(mean_predicted)<95): p="abnormal"
+        if(float(mean_predicted)<87.5): p="abnormal"
 
         net_results["predicted"].append(p)
 
@@ -620,7 +620,7 @@ def get_traces_csv(directory):
 
     traces=pd.DataFrame(d)
     #print(directory)
-    traces.to_csv(directory1+"traces.csv", sep='\t', encoding='utf-8')
+    traces.to_csv(directory+"traces.csv", sep=',', encoding='utf-8')
     return traces
 
 
