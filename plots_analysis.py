@@ -1,8 +1,127 @@
+#    This module implements data visualization
+from functions import *
 
 from lib.functions import *
 import pandas as pd
 import os
 from os import listdir
+# KNN
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.metrics import classification_report
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import cross_val_score
+# SVM
+from sklearn import svm
+#Import Random Forest Model
+from sklearn.ensemble import RandomForestClassifier
+
+
+
+
+
+#######################################
+##### Classification Analysis #########
+#######################################
+
+def random_forests_features_selection(trace_stats):
+    # Plot the most relevant features
+    max_rows = len(trace_stats)/2
+    max_cols = 2
+    pos = 1
+    fig = plt.figure(figsize=(6*max_rows , 4*max_cols))
+    fig.subplots_adjust(hspace=0.4, wspace=0.4)
+
+    # Select trace
+    for trace_size in trace_stats:
+        ax = plt.subplot(max_rows, max_cols, pos)
+        trace = trace_stats[trace_size]
+
+        # separate features from target values
+        features = trace.drop(columns=['node_id', 'experiment', 'label'])
+        target = trace['label'].values
+
+        # split dataset into train and test data
+        X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.3, random_state=1)
+
+        #Create a Gaussian Classifier
+        rf_clf = RandomForestClassifier(n_estimators=100)
+
+        #Train the model using the training sets y_pred=clf.predict(X_test)
+        rf_clf.fit(X_train,y_train)
+        y_pred = rf_clf.predict(X_test)
+
+        # Feature selection
+        feature_imp = pd.Series(rf_clf.feature_importances_,index=features.columns).sort_values(ascending=False)
+
+        # Plots features with their importance score
+        feature_imp.plot.barh(ax=ax)
+        #plt.yticks(feature_imp.index, objects)
+        pos += 1
+
+	    # Add labels to your graph
+        plt.xlabel('Feature Importance Score')
+        plt.ylabel('Features')
+        plt.title("Window Size {}".format(trace_size))
+
+    st = fig.suptitle('Features\' Importance', fontsize="x-large")
+    plt.show()
+
+
+def knn_test_number_of_neighbors(trace_stats, max_neighbors):
+    # Test the accuracy of KNN for different number of neighbors
+    max_rows = len(trace_stats)/2
+    max_cols = 2
+    pos = 1
+    fig = plt.figure(figsize=(6*max_rows , 4*max_cols))
+    fig.subplots_adjust(hspace=0.4, wspace=0.4)
+
+    # Select trace
+    for trace_size in trace_stats:
+        ax = plt.subplot(max_rows, max_cols, pos)
+        trace = trace_stats[trace_size]
+
+        # separate features from target values
+        features = trace.drop(columns=['node_id', 'experiment', 'label'])
+        target = trace['label'].values
+
+        # split dataset into train and test data
+        X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.3, random_state=1)
+
+	    #Setup arrays to store training and test accuracies
+        neighbors = np.arange(1, max_neighbors)
+        train_accuracy = np.empty(len(neighbors))
+        test_accuracy = np.empty(len(neighbors))
+
+        for i, k in enumerate(neighbors):
+            #Setup a knn classifier with k neighbors
+            knn = KNeighborsClassifier(n_neighbors=k)
+
+            #Fit the model
+            knn.fit(X_train, y_train)
+
+            #Compute accuracy on the training set
+            train_accuracy[i] = knn.score(X_train, y_train)
+
+            #Compute accuracy on the test set
+            test_accuracy[i] = knn.score(X_test, y_test)
+
+        #Generate plot
+        plt.title('Window Size {}'.format(trace_size))
+        pd.DataFrame({'accuracy':test_accuracy}).plot(label='Testing Accuracy', ax=ax)
+        pd.DataFrame({'accuracy':train_accuracy}).plot(label='Training accuracy', ax=ax)
+        plt.xlabel('Number of neighbors')
+        plt.ylabel('Accuracy')
+        pos += 1
+
+    st = fig.suptitle('KNN Varying number of neighbors', fontsize="x-large")
+    plt.show()
+
+
+#######################################
+####### Exploratory Analysis ##########
+#######################################
 
 def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, tracemask):
     # Each node communicates with the root of the DODAG through a certain number of hops.
