@@ -41,21 +41,21 @@ df=pd.read_csv(directory+"/traces/traces.csv", sep=',', encoding='utf-8')
 results_total=pd.DataFrame()
 
 
-results_kmeans_network,results_kmeans_node=analyze_network(directory,df,200,25)
+#results_kmeans_network,results_kmeans_node=analyze_network(directory,df,100,25)
+#results_total=results_total.append(results_kmeans_network,ignore_index = True)
+#results_kmeans_network,results_kmeans_node=analyze_network(directory,df,100,50)
+#results_total=results_total.append(results_kmeans_network,ignore_index = True)
+results_kmeans_network,results_kmeans_node=analyze_network(directory,df,100,100)
 results_total=results_total.append(results_kmeans_network,ignore_index = True)
-results_kmeans_network,results_kmeans_node=analyze_network(directory,df,200,50)
-results_total=results_total.append(results_kmeans_network,ignore_index = True)
-results_kmeans_network,results_kmeans_node=analyze_network(directory,df,200,100)
-results_total=results_total.append(results_kmeans_network,ignore_index = True)
-results_kmeans_network,results_kmeans_node=analyze_network(directory,df,200,200)
-results_total=results_total.append(results_kmeans_network,ignore_index = True)
+#results_kmeans_network,results_kmeans_node=analyze_network(directory,df,,200)
+#results_total=results_total.append(results_kmeans_network,ignore_index = True)
 
 
 results_total.sort_values('case')
 print(results_total)
 
-#results_total.to_csv(directory+"results_network.csv", sep=',', encoding='utf-8')
-#results_kmeans_node.to_csv(directory+"results_nodes.csv", sep=',', encoding='utf-8')
+results_total.to_csv(directory+"results_network.csv", sep=',', encoding='utf-8')
+results_kmeans_node.to_csv(directory+"results_nodes.csv", sep=',', encoding='utf-8')
 
 ##################################
 # directory=os.getcwd()+"/cooja3-9nodes/"
