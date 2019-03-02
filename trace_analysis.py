@@ -4,69 +4,6 @@ import json
 import networkx as nx
 import os
 from node import *
-import matplotlib.pyplot as plt
-from sklearn.neighbors import KNeighborsClassifier
-import seaborn as sns
-from sklearn.ensemble import RandomForestClassifier
-
-
-
-
-#######################################
-##### Classification Analysis #########
-#######################################
-
-def random_forests_features_selection(X_train, X_test, y_train, y_test, features):    
-    # Select most important features
-
-    #Create a Gaussian Classifier
-    rf_clf = RandomForestClassifier(n_estimators=100)
-
-    #Train the model using the training sets y_pred=clf.predict(X_test)
-    rf_clf.fit(X_train,y_train)
-    y_pred = rf_clf.predict(X_test)
-
-    # Feature selection
-    feature_imp = pd.Series(rf_clf.feature_importances_,index=features.columns).sort_values(ascending=False)
-
-    # Plots features with their importance score    
-    sns.barplot(x=feature_imp, y=feature_imp.index)    
-    # Add labels to your graph    
-    plt.xlabel('Feature Importance Score')    
-    plt.ylabel('Features')    
-    plt.title("Visualizing Important Features")    
-    plt.legend()    
-    plt.show()
-
-
-def knn_test_number_of_neighbors(X_train, X_test, y_train, y_test):
-    #Setup arrays to store training and test accuracies
-    neighbors = np.arange(1,30)
-    train_accuracy =np.empty(len(neighbors))
-    test_accuracy = np.empty(len(neighbors))
-
-    for i,k in enumerate(neighbors):
-        #Setup a knn classifier with k neighbors
-        knn = KNeighborsClassifier(n_neighbors=k)
-
-        #Fit the model
-        knn.fit(X_train, y_train)
-
-        #Compute accuracy on the training set
-        train_accuracy[i] = knn.score(X_train, y_train)
-
-        #Compute accuracy on the test set
-        test_accuracy[i] = knn.score(X_test, y_test)
-
-    #Generate plot
-    plt.title('kNN Varying number of neighbors')
-    plt.plot(neighbors, test_accuracy, label='Testing Accuracy')
-    plt.plot(neighbors, train_accuracy, label='Training accuracy')
-    plt.legend()
-    plt.xlabel('Number of neighbors')
-    plt.ylabel('Accuracy')
-    plt.show()
-
 
 
 
