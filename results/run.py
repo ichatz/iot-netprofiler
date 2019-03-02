@@ -52,7 +52,7 @@ results_total=results_total.append(results_kmeans_network,ignore_index = True)
 results_total.sort_values('case')
 print(results_total)
 
-results_total.to_csv(directory+"results_total.csv", sep='\t', encoding='utf-8',index_col = None)
+results_total.to_csv(directory+"results_total.csv", sep='\t', encoding='utf-8')
 #results_kmeans.to_csv(directory+"results_network_kmeans.csv", sep=',', encoding='utf-8')
 
 ##################################
@@ -79,6 +79,6 @@ results_total=results_total.append(results_kmeans_network,ignore_index = True)
 results_total.sort_values('case')
 print(results_total)
 
-results_total.to_csv(directory+"results_total.csv", sep='\t', encoding='utf-8',index_col = None)
+results_total.to_csv(directory+"results_total.csv", sep='\t', encoding='utf-8')
 
 
