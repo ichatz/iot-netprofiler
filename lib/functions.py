@@ -350,7 +350,15 @@ def import_Cooja2(df,directory):
         "aaaa::212:7409:9:909": 3,
         "aaaa::212:7408:8:808": 4,
         "aaaa::212:740a:a:a0a": 4,
-        "aaaa::212:740b:b:b0b": 4}
+        "aaaa::212:740b:b:b0b": 10,
+    "aaaa::212:740f:f:f0f":10,
+        "aa::212:7411:11:1111":10,
+"aaaa::212:740d:d:d0d":10,
+
+
+
+
+    }
     #for row in plots:
 
         #print("Importing ./"+row[0]+"/"+row[1])
@@ -521,6 +529,7 @@ def analyze_network(directory,df,pings,window):
     stats.head()
     net_results={
        "case":[],
+        "normal_behaving_nodes_percentage":[],
         "predicted":[],
         "real":[],
         "pings":[],
@@ -530,11 +539,17 @@ def analyze_network(directory,df,pings,window):
     #print(stats["predicted number"])
     for case in range(len(cases)):
         subset=stats[stats["label"]==cases[case]]
-        mean_predicted=str(subset["predicted number"].mean()*100)+"% normal"
+        mean_predicted=str(subset["predicted number"].mean()*100)#+"% normal"
         net_results["case"].append(cases[case])
-        net_results["predicted"].append(mean_predicted)
+        net_results["normal_behaving_nodes_percentage"].append(mean_predicted)
         net_results["pings"].append(pings)
         net_results["window"].append(window)
+
+
+        p="normal"
+        if(float(mean_predicted)<95): p="abnormal"
+
+        net_results["predicted"].append(p)
 
 
 
