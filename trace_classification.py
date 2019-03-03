@@ -9,9 +9,13 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import cross_val_score
 # SVM
 from sklearn import svm
-#Import Random Forest Model
+# Import Random Forest Model
 from sklearn.ensemble import RandomForestClassifier
 import time
+# Ensalble 
+from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.svm import LinearSVC
 
 
 
@@ -313,3 +317,108 @@ def support_vector_machines_cross_validation(trace_stats, features_to_drop, kern
 	                                             'Mean Accuracy': [np.mean(cv_scores)]})])
 
 	return cv_results
+
+
+
+
+def ensalble_svm_classification(trace_stats, features_to_drop, n_estimators = 10, test_size=0.3):
+	# INPUT: 
+	######## trace_stats a dictionary containing (window_size, statistics per node) pairs 
+	######## features_to_drop a list of features to drop
+	######## n_estimators number of estimator to use for the ensable
+	######## test_size the size of test set
+
+	# OUTPUT: return a dataframe containing accuracy, precision, recall and f1-score for each window size
+	
+	results = None
+	for trace_size in trace_stats:
+	    print('Computing trace {}'.format(trace_size))
+	    trace = trace_stats[trace_size]
+
+	    # separate features from target values
+	    features = trace.drop(columns=features_to_drop)
+	    target = trace['label'].values
+    
+	    # split dataset into train and test data
+	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
+         
+	    # Create a SVM Classifier
+	    t0 = time.time()
+	    ovr_clf = OneVsRestClassifier(BaggingClassifier(LinearSVC(random_state=9, max_iter=10000, C=1.2), max_samples=1.0/n_estimators, 
+	                                                    n_estimators=n_estimators))
+	    
+	    #Train the model using the training sets
+	    ovr_clf.fit(X_train, y_train)
+	    end = time.time()
+
+	    #Predict the response for test dataset
+	    y_pred = ovr_clf.predict(X_test)
+	
+	    # Add results to a Dataframe
+	    if results is None:
+	        results = pd.DataFrame({'Model': ['OneVsRestClassifier (SVM)'], 
+	                                'Window Size': [trace_size], 
+	                                'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
+	                                'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
+	                                'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
+	                                'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
+	                                'Time (ms)': [time.time() - t0]})
+	    else:
+	        results = pd.concat([results,pd.DataFrame({'Model': ['OneVsRestClassifier (SVM)'], 
+	                                                         'Window Size': [trace_size], 
+	                                                         'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
+	                                                         'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
+	                                                         'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
+	                                                         'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
+	                                                         'Time (ms)': [time.time() - t0]})])
+
+
+
+	return results
+
+
+
+
+
+
+def ensalble_svm_cross_validation(trace_stats, features_to_drop, n_estimators = 10, test_size=0.3, cross_val=5):
+	# INPUT: 
+	######## trace_stats a dictionary containing (window_size, statistics per node) pairs 
+	######## features_to_drop a list of features to drop
+	######## n_estimators number of estimators
+	######## test_size the size of the test set
+	######## cross_val the size of cross validation 
+
+	# OUTPUT: return a dataframe containing the mean accuracy
+
+	cv_results = None
+
+	# Select the set of features and labels that we use to fit the algorithm
+	for trace_size in trace_stats:
+	    print('Computing trace {}'.format(trace_size))
+	    trace = trace_stats[trace_size]
+	    # separate features from target values
+	    features = trace.drop(columns=features_to_drop)
+	    target = trace['label'].values
+	    
+	    # split dataset into train and test data
+	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
+	    
+	    # create SVM Classifier
+	    ovr_clf = OneVsRestClassifier(BaggingClassifier(LinearSVC(random_state=9, max_iter=10000, C=1.2), max_samples=1.0/n_estimators, 
+	                                                    n_estimators=n_estimators))
+	    
+	    # train model with cv of 5
+	    cv_scores = cross_val_score(ovr_clf, features, target, cv = cross_val)
+	    
+	    if cv_results is None:
+	        cv_results = pd.DataFrame({'Model': ['OneVsRestClassifier (SVM)'], 
+	                                   'Window Size': [trace_size], 
+	                                   'Mean Accuracy': [np.mean(cv_scores)]})
+	    else:
+	        cv_results = pd.concat([cv_results, pd.DataFrame({'Model': ['OneVsRestClassifier (SVM)'], 
+	                                             'Window Size': [trace_size], 
+	                                             'Mean Accuracy': [np.mean(cv_scores)]})])
+
+	return cv_results
+
