@@ -376,7 +376,7 @@ def import_Cooja2(df,directory):
     return data
 
 
-def analyze_network(directory, df, pings, window,features_to_drop):
+def analyze_network(directory, df, pings, window, features_to_drop):
     cases = []
     casesAccuracy = df["case_accuracy"].values
     casesAccuracy2 = df["case_accuracy2"].values
@@ -523,6 +523,8 @@ def analyze_network(directory, df, pings, window,features_to_drop):
 
     }
     # print(stats["predicted number"])
+    correction = []
+    labels = []
     for case in range(len(cases)):
         subset = stats[stats["label"] == cases[case]]
         mean_predicted = str(subset["predicted number"].mean() * 100)  # +"% normal"
@@ -531,121 +533,160 @@ def analyze_network(directory, df, pings, window,features_to_drop):
         net_results["pings"].append(pings)
         net_results["window"].append(window)
 
-        p = "normal"
-        if (float(mean_predicted) < 85): p = "abnormal"
+        if (float(mean_predicted) < 85):
+            p = "abnormal"
+            labels.append(0)
+        else:
+            p = "normal"
+            labels.append(1)
+
+        if (casesAccuracy[case] == "BH"):
+            c = "abnormal"
+            correction.append(0)
+        elif (casesAccuracy[case] == "normal"):
+            c = "normal"
+            correction.append(1)
 
         net_results["predicted"].append(p)
-
-        c = "normal"
-        if (casesAccuracy[case] == "BH"): c = "abnormal"
         net_results["real"].append(c)
 
     results = pd.DataFrame(net_results)
-    # results.to_csv("results_network_kmeans.csv", sep='\t', encoding='utf-8')
-    # print(results)
 
-    return results, stats
+    return results, stats, correction, labels
 
 
 def get_traces_csv(directory):
-    print("Reading Traces from "+directory)
-    directory1=directory
-    directory+="traces/"
-    #print(directory)
-    files=[]
-    path=[]
-    case_accuracy=[]
-    case_accuracy2=[]
-    #directory="./traces"
-    #directory=os.getcwd()+"/traces/"
-    d={}
+    print("Reading Traces from " + directory)
+    directory1 = directory
+    directory += "traces/"
+    # print(directory)
+    files = []
+    path = []
+    case_accuracy = []
+    case_accuracy2 = []
+    # directory="./traces"
+    # directory=os.getcwd()+"/traces/"
+    d = {}
     try:
 
         for subdirectory in os.listdir(directory):
-            #print(os.path.isdir(subdirectory))
-            #print(subdirectory)
+            # print(os.path.isdir(subdirectory))
+            # print(subdirectory)
 
-            subdirectory2=directory+"/"+subdirectory
+            subdirectory2 = directory + "/" + subdirectory
 
-            if(os.path.isdir(subdirectory2)):
+            if (os.path.isdir(subdirectory2)):
 
                 for file in os.listdir(subdirectory2):
 
-                    if("routes" in file):
-                        #print(subdirectory+"/"+file)
-                        path.append("traces/"+subdirectory[:])
-                        #print(file)
+                    if ("routes" in file):
+                        # print(subdirectory+"/"+file)
+                        path.append("traces/" + subdirectory[:])
+                        # print(file)
                         files.append(file[:-10])
-                        #print(file)
-                        if("normal" in file  ):
+                        # print(file)
+                        if ("normal" in file):
                             case_accuracy.append("normal")
                             case_accuracy2.append("normal")
-                        elif("bh" in file ):
+                        elif ("bh" in file):
                             case_accuracy.append("BH")
                             case_accuracy2.append("BH")
-                        elif("gh" in file ):
+                        elif ("gh" in file):
                             case_accuracy.append("BH")
                             case_accuracy2.append("GH")
                         continue
-        d={
-            "directory":path,
-            "case":files,
-            "case_accuracy":case_accuracy,
-            "case_accuracy2":case_accuracy2
+        d = {
+            "directory": path,
+            "case": files,
+            "case_accuracy": case_accuracy,
+            "case_accuracy2": case_accuracy2
 
-
-            }
+        }
     except:
         pass
 
-
-
-
-    traces=pd.DataFrame(d)
-    #print(directory)
-    traces.to_csv(directory+"traces.csv", sep=',', encoding='utf-8')
+    traces = pd.DataFrame(d)
+    # print(directory)
+    traces.to_csv(directory + "traces.csv", sep=',', encoding='utf-8')
     return traces
 
 
-def run(directory,df):
+def run(directory, df):
     colors = [
-    'orange','dodgerblue',
-     'forestgreen','violet',
-     "red","brown",
-     "pink","aqua",
-     "darkslategrey","darkred",
-     "darkblue","darkorchid",
-     "salmon","chocolate"
+        'orange', 'dodgerblue',
+        'forestgreen', 'violet',
+        "red", "brown",
+        "pink", "aqua",
+        "darkslategrey", "darkred",
+        "darkblue", "darkorchid",
+        "salmon", "chocolate"
 
-     ]
-    casesAccuracy=df["case_accuracy"].values
+    ]
+    casesAccuracy = df["case_accuracy"].values
 
-    cases=df["case"].values
-    folder=df["directory"].values+directory
+    cases = df["case"].values
+    folder = df["directory"].values + directory
 
-    data=import_Cooja2(df,directory)
+    data = import_Cooja2(df, directory)
 
-    #hops = hopPreparation(data)
+    # hops = hopPreparation(data)
 
-    #Distribution of the delay in correlation with the Cases
-    #dataHop=hopPreparation(data)
-    #Distribution of the delay in correlation with the Hops
-    #printDensityByCase(directory,data,hops,(15,90),"densitybyCase",colors,cases)
+    # Distribution of the delay in correlation with the Cases
+    # dataHop=hopPreparation(data)
+    # Distribution of the delay in correlation with the Hops
+    # printDensityByCase(directory,data,hops,(15,90),"densitybyCase",colors,cases)
 
-    #Distribution by Hop
-    #printDensityByHop(directory,data,hops,(30,90),"densitybyHop",colors,cases)
+    # Distribution by Hop
+    # printDensityByHop(directory,data,hops,(30,90),"densitybyHop",colors,cases)
 
-    #Prints on a file the big matrix (asked by professor)
-    #printBigPlot(directory,data,(90,90),"Big Plot",colors,cases)
+    # Prints on a file the big matrix (asked by professor)
+    # printBigPlot(directory,data,(90,90),"Big Plot",colors,cases)
 
-    #Print Density of delay without outliers in every node by Case
-    #densityOfDelayByCaseNoOutliers(directory,data,(15,90),"Density of delay by Case no outliers",colors,cases)
+    # Print Density of delay without outliers in every node by Case
+    # densityOfDelayByCaseNoOutliers(directory,data,(15,90),"Density of delay by Case no outliers",colors,cases)
 
-    #Density of outliers in every node by Case
-    #densityOutliersByCase(directory,data,(90,90),"Density Outliers of Delay by Case",colors,cases)
+    # Density of outliers in every node by Case
+    # densityOutliersByCase(directory,data,(90,90),"Density Outliers of Delay by Case",colors,cases)
 
-    #Distibution of the delay divided by Node in the differents Cases
-    #densityOfDelayByCase(directory,data,(15,90),"Density of Delay by Case",colors,cases)
+    # Distibution of the delay divided by Node in the differents Cases
+    # densityOfDelayByCase(directory,data,(15,90),"Density of Delay by Case",colors,cases)
 
-    #RTT Graph
-    RTTGraph(directory,data,(30,90),"RTT Graph",colors,cases)
+    # RTT Graph
+    RTTGraph(directory, data, (30, 90), "RTT Graph", colors, cases)
+
+
+def create_results(directory, features_to_drop):
+    df = pd.read_csv(directory + "/traces/traces.csv", sep=',', encoding='utf-8')
+    accuracy = {
+        "Model": [],
+        "Window Size": [],
+        "Accuracy": []
+
+    }
+    window_size = [25, 50, 100]
+    results_total = pd.DataFrame()
+    results_total_nodes = pd.DataFrame()
+    for i in window_size:
+        results_kmeans_network, results_kmeans_node, correction, labels = analyze_network(directory, df, 100, i,
+                                                                                          features_to_drop)
+        results_total = results_total.append(results_kmeans_network, ignore_index=True)
+        results_total_nodes = results_total_nodes.append(results_kmeans_node, ignore_index=True)
+
+        # Accuracy per node
+        # labels = results_kmeans_node["predicted number"].values
+        # correction = results_kmeans_node["correction number"].values
+        # accuracy["Accuracy"].append(sm.accuracy_score(correction, labels))
+
+        # Accuracy per network
+        accuracy["Accuracy"].append(sm.accuracy_score(correction, labels))
+
+        accuracy["Model"].append("Kmeans")
+        accuracy["Window Size"].append(i)
+
+    accuracy = pd.DataFrame(accuracy)
+
+    results_total.to_csv(directory + "results_total.csv", sep=',', encoding='utf-8')
+    accuracy.to_csv(directory + "accuracy.csv", sep=',', encoding='utf-8')
+    results_total_nodes.to_csv(directory + "results_total_node.csv", sep=',', encoding='utf-8')
+
+    return results_total, accuracy, results_total_nodes
