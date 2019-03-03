@@ -108,8 +108,8 @@ def knn_test_number_of_neighbors(trace_stats, max_neighbors):
 
         #Generate plot
         plt.title('Window Size {}'.format(trace_size))
-        pd.DataFrame({'accuracy':test_accuracy}).plot(label='Testing Accuracy', ax=ax)
-        pd.DataFrame({'accuracy':train_accuracy}).plot(label='Training accuracy', ax=ax)
+        pd.DataFrame({'Testing Accuracy':test_accuracy}).plot(label='Testing Accuracy', ax=ax)
+        pd.DataFrame({'Training Accuracy':train_accuracy}).plot(label='Training Accuracy', ax=ax)
         plt.xlabel('Number of neighbors')
         plt.ylabel('Accuracy')
         pos += 1
