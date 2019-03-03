@@ -9,307 +9,297 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import cross_val_score
 # SVM
 from sklearn import svm
-#Import Random Forest Model
+# Import Random Forest Model
 from sklearn.ensemble import RandomForestClassifier
 import time
 
 
-
-
 def random_forest_classification(trace_stats, features_to_drop, n_estimators=100, test_size=0.3):
-	# INPUT: 
-	######## trace_stats a dictionary containing (window_size, statistics per node) pairs 
-	######## features_to_drop a list of features to drop
-	######## n_estimators number of estimators
-	######## test_size the size of test set
+    # INPUT:
+    ######## trace_stats a dictionary containing (window_size, statistics per node) pairs
+    ######## features_to_drop a list of features to drop
+    ######## n_estimators number of estimators
+    ######## test_size the size of test set
 
-	# OUTPUT: return a dataframe containing accuracy, precision, recall and f1-score for each window size
-	
+    # OUTPUT: return a dataframe containing accuracy, precision, recall and f1-score for each window size
 
-	results = None
-	for trace_size in trace_stats:
-	    print('Computing trace {}'.format(trace_size))
-	    trace = trace_stats[trace_size]
-	    
-	    # separate features from target values
-	    features = trace.drop(columns=['node_id', 'experiment', 'label', 'hop', 'loss', 'count'])
-	    target = trace['label'].values
+    results = None
+    for trace_size in trace_stats:
+        print('Computing trace {}'.format(trace_size))
+        trace = trace_stats[trace_size]
 
-	    # split dataset into train and test data
-	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
-	     
-	    #Create a Gaussian Classifier
-	    rf_clf = RandomForestClassifier(n_estimators=n_estimators)
+        # separate features from target values
+        features = trace.drop(columns=['node_id', 'experiment', 'label', 'hop', 'loss', 'count'])
+        target = trace['label'].values
 
-	    t0 = time.time()  # Start a timer
+        # split dataset into train and test data
+        X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
 
-	    #Train the model using the training sets y_pred=clf.predict(X_test)
-	    rf_clf.fit(X_train,y_train)
+        # Create a Gaussian Classifier
+        rf_clf = RandomForestClassifier(n_estimators=n_estimators)
 
-	    y_pred = rf_clf.predict(X_test)
-	    
-	    # Add results to a Dataframe
-	    if results is None:
-	        results = pd.DataFrame({'Model': ['Random Forest'], 
-	                                'Window Size': [trace_size], 
-	                                'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
-	                                'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
-	                                'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
-	                                'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                'Time (ms)': [time.time() - t0]})
-	    else:
-	        results = pd.concat([results,pd.DataFrame({'Model': ['Random Forest'], 
-	                                                         'Window Size': [trace_size], 
-	                                                         'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
-	                                                         'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
-	                                                         'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
-	                                                         'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                                         'Time (ms)': [time.time() - t0]})])
+        t0 = time.time()  # Start a timer
 
+        # Train the model using the training sets y_pred=clf.predict(X_test)
+        rf_clf.fit(X_train, y_train)
 
-	return results
+        y_pred = rf_clf.predict(X_test)
 
+        # Add results to a Dataframe
+        if results is None:
+            results = pd.DataFrame({'Model': ['Random Forest'],
+                                    'Window Size': [trace_size],
+                                    'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
+                                    'Precision': [metrics.precision_score(y_test, y_pred, average='macro')],
+                                    'Recall': [metrics.recall_score(y_test, y_pred, average='macro')],
+                                    'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
+                                    'Time (ms)': [time.time() - t0]})
+        else:
+            results = pd.concat([results, pd.DataFrame({'Model': ['Random Forest'],
+                                                        'Window Size': [trace_size],
+                                                        'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
+                                                        'Precision': [
+                                                            metrics.precision_score(y_test, y_pred, average='macro')],
+                                                        'Recall': [
+                                                            metrics.recall_score(y_test, y_pred, average='macro')],
+                                                        'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
+                                                        'Time (ms)': [time.time() - t0]})])
+
+    return results
 
 
 def random_forest_cross_validation(trace_stats, features_to_drop, n_estimators=100, test_size=0.3, cross_val=5):
-	# INPUT: 
-	######## trace_stats a dictionary containing (window_size, statistics per node) pairs 
-	######## features_to_drop a list of features to drop
-	######## n_estimators number of estimators
-	######## test_size the size of test set
-	######## cross_val the size of cross validation 
+    # INPUT:
+    ######## trace_stats a dictionary containing (window_size, statistics per node) pairs
+    ######## features_to_drop a list of features to drop
+    ######## n_estimators number of estimators
+    ######## test_size the size of test set
+    ######## cross_val the size of cross validation
 
-	# OUTPUT: return a dataframe containing the mean accuracy
+    # OUTPUT: return a dataframe containing the mean accuracy
 
-	cv_results = None
+    cv_results = None
 
-	# Select the set of features and labels that we use to fit the algorithm
-	for trace_size in trace_stats:
-	    print('Computing trace {}'.format(trace_size))
-	    trace = trace_stats[trace_size]
-	    # separate features from target values
-	    features = trace.drop(columns=features_to_drop)
-	    target = trace['label'].values
+    # Select the set of features and labels that we use to fit the algorithm
+    for trace_size in trace_stats:
+        print('Computing trace {}'.format(trace_size))
+        trace = trace_stats[trace_size]
+        # separate features from target values
+        features = trace.drop(columns=features_to_drop)
+        target = trace['label'].values
 
-	    # split dataset into train and test data
-	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.3, random_state=1)
-	    
-	    #Create Random Forest Classifier
-	    rf_clf = RandomForestClassifier(n_estimators=100)
-	    
-	    #train model with cv of 5
-	    cv_scores = cross_val_score(rf_clf, features, target, cv = cross_val)
-	    
-	    if cv_results is None:
-	        cv_results = pd.DataFrame({'Model': ['Random Forest'], 
-	                                   'Window Size': [trace_size], 
-	                                   'Mean Accuracy': [np.mean(cv_scores)]})
-	    else:
-	        cv_results = pd.concat([cv_results, pd.DataFrame({'Model': ['Random Forest'], 
-	                                             'Window Size': [trace_size], 
-	                                             'Mean Accuracy': [np.mean(cv_scores)]})])
+        # split dataset into train and test data
+        X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.3, random_state=1)
 
-	return cv_results
+        # Create Random Forest Classifier
+        rf_clf = RandomForestClassifier(n_estimators=100)
 
+        # train model with cv of 5
+        cv_scores = cross_val_score(rf_clf, features, target, cv=cross_val)
 
+        if cv_results is None:
+            cv_results = pd.DataFrame({'Model': ['Random Forest'],
+                                       'Window Size': [trace_size],
+                                       'Mean Accuracy': [np.mean(cv_scores)]})
+        else:
+            cv_results = pd.concat([cv_results, pd.DataFrame({'Model': ['Random Forest'],
+                                                              'Window Size': [trace_size],
+                                                              'Mean Accuracy': [np.mean(cv_scores)]})])
+
+    return cv_results
 
 
 def k_nearest_neighbor_classification(trace_stats, features_to_drop, n_estimators=100, test_size=0.3, n_neighbors=3):
-	# INPUT: 
-	######## trace_stats a dictionary containing (window_size, statistics per node) pairs 
-	######## features_to_drop a list of features to drop
-	######## n_estimators number of estimators
-	######## test_size the size of test set
-	######## n_neighbors number of neighbors
+    # INPUT:
+    ######## trace_stats a dictionary containing (window_size, statistics per node) pairs
+    ######## features_to_drop a list of features to drop
+    ######## n_estimators number of estimators
+    ######## test_size the size of test set
+    ######## n_neighbors number of neighbors
 
-	# OUTPUT: return a dataframe containing accuracy, precision, recall and f1-score for each window size
+    # OUTPUT: return a dataframe containing accuracy, precision, recall and f1-score for each window size
 
-	results = None
-	
-	for trace_size in trace_stats:
-	    print('Computing trace {}'.format(trace_size))
-	    trace = trace_stats[trace_size]
-	    
-	    # separate features from target values
-	    features = trace.drop(columns=features_to_drop)
-	    target = trace['label'].values
-	    
-	    # split dataset into train and test data
-	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
-	     
-	    #Create KNN Classifier
-	    knn = KNeighborsClassifier(n_neighbors=n_neighbors)
+    results = None
 
-	    t0 = time.time()  # Start a timer
+    for trace_size in trace_stats:
+        print('Computing trace {}'.format(trace_size))
+        trace = trace_stats[trace_size]
 
-	    #Train the model using the training sets
-	    knn.fit(X_train, y_train)
+        # separate features from target values
+        features = trace.drop(columns=features_to_drop)
+        target = trace['label'].values
 
-	    #Predict the response for test dataset
-	    y_pred = knn.predict(X_test)
-	    
-	    # Add results to a Dataframe
-	    if results is None:
-	        results = pd.DataFrame({'Model': ['KNN'], 
-	                                'Window Size': [trace_size], 
-	                                'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
-	                                'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
-	                                'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
-	                                'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                'Time (ms)': [time.time() - t0]})
-	    else:
-	        results = pd.concat([results,pd.DataFrame({'Model': ['KNN'], 
-	                                                         'Window Size': [trace_size], 
-	                                                         'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
-	                                                         'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
-	                                                         'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
-	                                                         'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                                         'Time (ms)': [time.time() - t0]})])
+        # split dataset into train and test data
+        X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
 
+        # Create KNN Classifier
+        knn = KNeighborsClassifier(n_neighbors=n_neighbors)
 
-	return results
+        t0 = time.time()  # Start a timer
 
+        # Train the model using the training sets
+        knn.fit(X_train, y_train)
 
+        # Predict the response for test dataset
+        y_pred = knn.predict(X_test)
 
+        # Add results to a Dataframe
+        if results is None:
+            results = pd.DataFrame({'Model': ['KNN'],
+                                    'Window Size': [trace_size],
+                                    'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
+                                    'Precision': [metrics.precision_score(y_test, y_pred, average='macro')],
+                                    'Recall': [metrics.recall_score(y_test, y_pred, average='macro')],
+                                    'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
+                                    'Time (ms)': [time.time() - t0]})
+        else:
+            results = pd.concat([results, pd.DataFrame({'Model': ['KNN'],
+                                                        'Window Size': [trace_size],
+                                                        'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
+                                                        'Precision': [
+                                                            metrics.precision_score(y_test, y_pred, average='macro')],
+                                                        'Recall': [
+                                                            metrics.recall_score(y_test, y_pred, average='macro')],
+                                                        'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
+                                                        'Time (ms)': [time.time() - t0]})])
+
+    return results
 
 
 def k_nearest_neighbor_cross_validation(trace_stats, features_to_drop, n_neighbors=3, test_size=0.3, cross_val=5):
-	# INPUT: 
-	######## trace_stats a dictionary containing (window_size, statistics per node) pairs 
-	######## features_to_drop a list of features to drop
-	######## n_estimators number of estimators
-	######## test_size the size of test set
-	######## cross_val the size of cross validation 
+    # INPUT:
+    ######## trace_stats a dictionary containing (window_size, statistics per node) pairs
+    ######## features_to_drop a list of features to drop
+    ######## n_estimators number of estimators
+    ######## test_size the size of test set
+    ######## cross_val the size of cross validation
 
-	# OUTPUT: return a dataframe containing the mean accuracy
+    # OUTPUT: return a dataframe containing the mean accuracy
 
-	cv_results = None
+    cv_results = None
 
-	# Select the set of features and labels that we use to fit the algorithm
-	# Select the set of features and labels that we use to fit the algorithm
-	for trace_size in trace_stats:
-	    print('Computing trace {}'.format(trace_size))
-	    trace = trace_stats[trace_size]
-	    # separate features from target values
-	    features = trace.drop(columns=features_to_drop)
-	    target = trace['label'].values
-	    
-	    # split dataset into train and test data
-	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
-	    
-	    #Create KNN Classifier
-	    knn_clf = KNeighborsClassifier(n_neighbors=n_neighbors)
-	    
-	    #train model with cv of 5
-	    cv_scores = cross_val_score(knn_clf, features, target, cv = cross_val)
-	    
-	    if cv_results is None:
-	        cv_results = pd.DataFrame({'Model': ['KNN'], 
-	                                   'Window Size': [trace_size], 
-	                                   'Mean Accuracy': [np.mean(cv_scores)]})
-	    else:
-	        cv_results = pd.concat([cv_results, pd.DataFrame({'Model': ['KNN'], 
-	                                             'Window Size': [trace_size], 
-	                                             'Mean Accuracy': [np.mean(cv_scores)]})])
+    # Select the set of features and labels that we use to fit the algorithm
+    # Select the set of features and labels that we use to fit the algorithm
+    for trace_size in trace_stats:
+        print('Computing trace {}'.format(trace_size))
+        trace = trace_stats[trace_size]
+        # separate features from target values
+        features = trace.drop(columns=features_to_drop)
+        target = trace['label'].values
 
-	return cv_results
+        # split dataset into train and test data
+        X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
 
+        # Create KNN Classifier
+        knn_clf = KNeighborsClassifier(n_neighbors=n_neighbors)
 
+        # train model with cv of 5
+        cv_scores = cross_val_score(knn_clf, features, target, cv=cross_val)
 
+        if cv_results is None:
+            cv_results = pd.DataFrame({'Model': ['KNN'],
+                                       'Window Size': [trace_size],
+                                       'Mean Accuracy': [np.mean(cv_scores)]})
+        else:
+            cv_results = pd.concat([cv_results, pd.DataFrame({'Model': ['KNN'],
+                                                              'Window Size': [trace_size],
+                                                              'Mean Accuracy': [np.mean(cv_scores)]})])
+
+    return cv_results
 
 
 def support_vector_machines_classification(trace_stats, features_to_drop, kernel='linear', test_size=0.3):
-	# INPUT: 
-	######## trace_stats a dictionary containing (window_size, statistics per node) pairs 
-	######## features_to_drop a list of features to drop
-	######## kernel 
-	######## test_size the size of test set
+    # INPUT:
+    ######## trace_stats a dictionary containing (window_size, statistics per node) pairs
+    ######## features_to_drop a list of features to drop
+    ######## kernel
+    ######## test_size the size of test set
 
-	# OUTPUT: return a dataframe containing accuracy, precision, recall and f1-score for each window size
-	
-	results = None
-	for trace_size in trace_stats:
-	    print('Computing trace {}'.format(trace_size))
-	    trace = trace_stats[trace_size]
-	    
-	    # separate features from target values
-	    features = trace.drop(columns=features_to_drop)
-	    target = trace['label'].values
-	    
-	    # split dataset into train and test data
-	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
-	     
-	    #Create a svm Classifier
-	    svm_clf = svm.SVC(kernel=kernel, random_state=9, gamma='scale') # Linear Kernel
+    # OUTPUT: return a dataframe containing accuracy, precision, recall and f1-score for each window size
 
-	    t0 = time.time()  # Start a timer
+    results = None
+    for trace_size in trace_stats:
+        print('Computing trace {}'.format(trace_size))
+        trace = trace_stats[trace_size]
 
-	    #Train the model using the training sets
-	    svm_clf.fit(X_train, y_train)
+        # separate features from target values
+        features = trace.drop(columns=features_to_drop)
+        target = trace['label'].values
 
-	    #Predict the response for test dataset
-	    y_pred = svm_clf.predict(X_test)
-	    
-	    # Add results to a Dataframe
-	    if results is None:
-	        results = pd.DataFrame({'Model': ['SVM'], 
-	                                'Window Size': [trace_size], 
-	                                'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
-	                                'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
-	                                'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
-	                                'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                'Time (ms)': [time.time() - t0]})
-	    else:
-	        results = pd.concat([results,pd.DataFrame({'Model': ['SVM'], 
-	                                                         'Window Size': [trace_size], 
-	                                                         'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
-	                                                         'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
-	                                                         'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
-	                                                         'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                                         'Time (ms)': [time.time() - t0]})])
+        # split dataset into train and test data
+        X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
+
+        # Create a svm Classifier
+        svm_clf = svm.SVC(kernel=kernel, random_state=9, gamma='scale')  # Linear Kernel
+
+        t0 = time.time()  # Start a timer
+
+        # Train the model using the training sets
+        svm_clf.fit(X_train, y_train)
+
+        # Predict the response for test dataset
+        y_pred = svm_clf.predict(X_test)
+
+        # Add results to a Dataframe
+        if results is None:
+            results = pd.DataFrame({'Model': ['SVM'],
+                                    'Window Size': [trace_size],
+                                    'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
+                                    'Precision': [metrics.precision_score(y_test, y_pred, average='macro')],
+                                    'Recall': [metrics.recall_score(y_test, y_pred, average='macro')],
+                                    'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
+                                    'Time (ms)': [time.time() - t0]})
+        else:
+            results = pd.concat([results, pd.DataFrame({'Model': ['SVM'],
+                                                        'Window Size': [trace_size],
+                                                        'Accuracy': [metrics.accuracy_score(y_test, y_pred)],
+                                                        'Precision': [
+                                                            metrics.precision_score(y_test, y_pred, average='macro')],
+                                                        'Recall': [
+                                                            metrics.recall_score(y_test, y_pred, average='macro')],
+                                                        'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
+                                                        'Time (ms)': [time.time() - t0]})])
+
+    return results
 
 
+def support_vector_machines_cross_validation(trace_stats, features_to_drop, kernel='linear', test_size=0.3,
+                                             cross_val=5):
+    # INPUT:
+    ######## trace_stats a dictionary containing (window_size, statistics per node) pairs
+    ######## features_to_drop a list of features to drop
+    ######## n_estimators number of estimators
+    ######## kernel
+    ######## cross_val the size of cross validation
 
-	return results
+    # OUTPUT: return a dataframe containing the mean accuracy
 
+    cv_results = None
 
+    # Select the set of features and labels that we use to fit the algorithm
+    for trace_size in trace_stats:
+        print('Computing trace {}'.format(trace_size))
+        trace = trace_stats[trace_size]
+        # separate features from target values
+        features = trace.drop(columns=features_to_drop)
+        target = trace['label'].values
 
-def support_vector_machines_cross_validation(trace_stats, features_to_drop, kernel='linear', test_size=0.3, cross_val=5):
-	# INPUT: 
-	######## trace_stats a dictionary containing (window_size, statistics per node) pairs 
-	######## features_to_drop a list of features to drop
-	######## n_estimators number of estimators
-	######## kernel
-	######## cross_val the size of cross validation 
+        # split dataset into train and test data
+        X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
 
-	# OUTPUT: return a dataframe containing the mean accuracy
+        # Create SVM Classifier
+        svm_clf = svm.SVC(kernel=kernel, random_state=9, gamma='scale')  # Linear Kernel
 
-	cv_results = None
+        # train model with cv of 5
+        cv_scores = cross_val_score(svm_clf, features, target, cv=cross_val)
 
-	# Select the set of features and labels that we use to fit the algorithm
-	for trace_size in trace_stats:
-	    print('Computing trace {}'.format(trace_size))
-	    trace = trace_stats[trace_size]
-	    # separate features from target values
-	    features = trace.drop(columns=features_to_drop)
-	    target = trace['label'].values
-	    
-	    # split dataset into train and test data
-	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
-	    
-	    #Create SVM Classifier
-	    svm_clf = svm.SVC(kernel=kernel, random_state=9, gamma='scale') # Linear Kernel
-	    
-	    #train model with cv of 5
-	    cv_scores = cross_val_score(svm_clf, features, target, cv = cross_val)
-	    
-	    if cv_results is None:
-	        cv_results = pd.DataFrame({'Model': ['SVM'], 
-	                                   'Window Size': [trace_size], 
-	                                   'Mean Accuracy': [np.mean(cv_scores)]})
-	    else:
-	        cv_results = pd.concat([cv_results, pd.DataFrame({'Model': ['SVM'], 
-	                                             'Window Size': [trace_size], 
-	                                             'Mean Accuracy': [np.mean(cv_scores)]})])
+        if cv_results is None:
+            cv_results = pd.DataFrame({'Model': ['SVM'],
+                                       'Window Size': [trace_size],
+                                       'Mean Accuracy': [np.mean(cv_scores)]})
+        else:
+            cv_results = pd.concat([cv_results, pd.DataFrame({'Model': ['SVM'],
+                                                              'Window Size': [trace_size],
+                                                              'Mean Accuracy': [np.mean(cv_scores)]})])
 
-	return cv_results
+    return cv_results

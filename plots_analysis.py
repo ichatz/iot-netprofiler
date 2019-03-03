@@ -1,5 +1,5 @@
 #    This module implements data visualization
-from functions import *
+from lib.functions import *
 
 from lib.functions import *
 import pandas as pd

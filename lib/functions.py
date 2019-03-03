@@ -375,117 +375,104 @@ def import_Cooja2(df,directory):
     #print(len(data[0]))
     return data
 
-def analyze_network(directory,df,pings,window):
-    cases=[]
-    casesAccuracy=df["case_accuracy"].values
-#     for row in plots:
-#         cases.append(row[1])
-#         casesAccuracy.append(row[2])
-#         data=import_Cooja2(plots)
-    cases=df["case"].values
-    folder=df["directory"].values+directory
 
-    data=import_Cooja2(df,directory)
+def analyze_network(directory, df, pings, window,features_to_drop):
+    cases = []
+    casesAccuracy = df["case_accuracy"].values
+    casesAccuracy2 = df["case_accuracy2"].values
+    #     for row in plots:
+    #         cases.append(row[1])
+    #         casesAccuracy.append(row[2])
+    #         data=import_Cooja2(plots)
+    cases = df["case"].values
+    folder = df["directory"].values + directory
 
-    #pings=getPings(data)
-    #All data collection is in variable node that is a list of list of nodes
-    #3 nets input x 9 nodes by net
+    data = import_Cooja2(df, directory)
+
+    # pings=getPings(data)
+    # All data collection is in variable node that is a list of list of nodes
+    # 3 nets input x 9 nodes by net
     print("Processing...")
-    d={ "label":[],
-       "type":[],
-        "count":[],
-        "std":  [],
-        "mean": [],
-        "var":  [],
-        "hop":[],
+    d = {"label": [],
+         "type": [],
+         "count": [],
+         "std": [],
+         "mean": [],
+         "var": [],
+         "hop": [],
 
-       "packet loss":[],
-       "outliers":[],
-       "node":[]
-    }
-    #count=[]
-    labels=[]
-    var=[]
-    #window=100
-    #stats=pd.DataFrame(columns=columns)
-    n=pings
+         "packet loss": [],
+         "outliers": [],
+         "node": [],
+         "window": []
+         }
+    # count=[]
+    labels = []
+    var = []
+    # window=100
+    # stats=pd.DataFrame(columns=columns)
+    n = pings
 
     for i in range(len(data)):
-        #window=pings[i]
+        # window=pings[i]
 
         for j in range(len(data[i])):
-            #n=pings[i]
+            # n=pings[i]
 
-            #print(n)
-            for z in range(0,n,int(window)):
-                #if(z+window>n):break
-                #print(z,z+window)
+            # print(n)
+            for z in range(0, n, int(window)):
+                # if(z+window>n):break
+                # print(z,z+window)
 
-                #df1 = df1.assign(e=p.Series(np.random.randn(sLength)).values)
-                node=data[i][j].pkts
-                name=str(j)+" "+cases[i]
-                nodeWindow=node[(node["seq"]<z+window) & (node["seq"]>=z)]
-                nodeWindowP=nodeWindow["rtt"]
+                # df1 = df1.assign(e=p.Series(np.random.randn(sLength)).values)
+                node = data[i][j].pkts
+                name = str(j) + " " + cases[i]
+                nodeWindow = node[(node["seq"] < z + window) & (node["seq"] >= z)]
+                nodeWindowP = nodeWindow["rtt"]
                 d["count"].append(nodeWindowP.count())
-                #Case without outliers
-                #Case with outliers
-                std=0
-                if (nodeWindowP.std()>10):
-                    std=1
-                    std=nodeWindowP.std()
+                # Case without outliers
+                # Case with outliers
+                std = 0
+                if (nodeWindowP.std() > 10):
+                    std = 1
+                    std = nodeWindowP.std()
 
                 d["std"].append(std)
-                mean=nodeWindowP.mean()
-                #if(mean<1):print(mean)
+                mean = nodeWindowP.mean()
+                # if(mean<1):print(mean)
                 d["mean"].append(mean)
-                var=0
-                if (nodeWindowP.var()>var): var=nodeWindowP.var()
+                var = 0
+                if (nodeWindowP.var() > var): var = nodeWindowP.var()
                 d["var"].append(var)
                 d["label"].append(cases[i])
                 d["hop"].append(data[i][j].hop)
                 d["type"].append(casesAccuracy[i])
                 d["outliers"].append(getOutliers(nodeWindow)["rtt"].count())
-                missing=window-nodeWindow.count()
+                missing = window - nodeWindow.count()
                 d["node"].append(data[i][j].ip)
-                mP=getPercentageMissingPackets(nodeWindow,window)
-                PL=0
-                if(mP>30):
-                    PL=1
-                    PL=mP
+                mP = getPercentageMissingPackets(nodeWindow, window)
+                PL = 0
+                if (mP > 30):
+                    PL = 1
+                    PL = mP
                 d["packet loss"].append(mP)
+                d["window"].append(window)
 
+    stats = pd.DataFrame(d)
 
+    dataK = stats.drop(features_to_drop, axis=1)
+    dataK = dataK.fillna(0)
 
-    stats=pd.DataFrame(d)
-
-
-
-
-
-    dataK=stats.drop([
-        "label",
-        "mean",
-        "var",
-        "std",
-        #"packet loss",
-        "outliers",
-        "hop",
-        "count",
-        "node",
-        #"type"
-    ],axis=1)
-    dataK=dataK.fillna(0)
-
-    #print(dataK)
-    correction=[]
-    correction_alt=[]
-    col=np.array(dataK["type"])
-    dataK=dataK.drop(["type"],axis=1)
-    #Creating simple array to correct unsupervised learning
-    #NB as it is unsupervised could happen that the correction are inverted
+    # print(dataK)
+    correction = []
+    correction_alt = []
+    col = np.array(dataK["type"])
+    dataK = dataK.drop(["type"], axis=1)
+    # Creating simple array to correct unsupervised learning
+    # NB as it is unsupervised could happen that the correction are inverted
     for i in range(len(col)):
-        el=d["type"][i]
-        if el=="normal":
+        el = d["type"][i]
+        if el == "normal":
             correction.append(1)
             correction_alt.append(0)
 
@@ -494,25 +481,25 @@ def analyze_network(directory,df,pings,window):
             correction.append(0)
             correction_alt.append(1)
 
-
-    dataC=stats["label"]
+    dataC = stats["label"]
     kmeans = KMeans(n_clusters=2)
     kmeans.fit(dataK)
     labels = kmeans.predict(dataK)
     centroids = kmeans.cluster_centers_
-    labels=accuracy_score_corrected(correction,labels)
-    predicted=[]
+    labels = accuracy_score_corrected(correction, labels)
+    predicted = []
     for i in range(len(labels)):
 
-        if(labels[i]==1):
+        if (labels[i] == 1):
             predicted.append("normal")
-        else: predicted.append("BH")
+        else:
+            predicted.append("BH")
 
-    #print(len(predicted))
-    stats["predicted"]=pd.Series(np.array(predicted))
-    stats["predicted number"]=pd.Series(np.array(labels))
-    stats["correction number"]=pd.Series(np.array(correction))
-    stats_csv=stats[[
+    # print(len(predicted))
+    stats["predicted"] = pd.Series(np.array(predicted))
+    stats["predicted number"] = pd.Series(np.array(labels))
+    stats["correction number"] = pd.Series(np.array(correction))
+    stats_csv = stats[[
         "label",
         "type",
         "predicted",
@@ -523,46 +510,42 @@ def analyze_network(directory,df,pings,window):
         "node",
         "mean"
 
-
-          ]]
-    #stats_csv.to_csv("results_kmeans.csv", sep='\t', encoding='utf-8')
+    ]]
+    # stats_csv.to_csv("results_kmeans.csv", sep='\t', encoding='utf-8')
     stats.head()
-    net_results={
-       "case":[],
-        "normal_behaving_nodes_percentage":[],
-        "predicted":[],
-        "real":[],
-        "pings":[],
-        "window":[],
+    net_results = {
+        "case": [],
+        "normal_behaving_nodes_percentage": [],
+        "predicted": [],
+        "real": [],
+        "pings": [],
+        "window": [],
 
     }
-    #print(stats["predicted number"])
+    # print(stats["predicted number"])
     for case in range(len(cases)):
-        subset=stats[stats["label"]==cases[case]]
-        mean_predicted=str(subset["predicted number"].mean()*100)#+"% normal"
+        subset = stats[stats["label"] == cases[case]]
+        mean_predicted = str(subset["predicted number"].mean() * 100)  # +"% normal"
         net_results["case"].append(cases[case])
         net_results["normal_behaving_nodes_percentage"].append(mean_predicted)
         net_results["pings"].append(pings)
         net_results["window"].append(window)
 
-
-        p="normal"
-        if(float(mean_predicted)<87.5): p="abnormal"
+        p = "normal"
+        if (float(mean_predicted) < 85): p = "abnormal"
 
         net_results["predicted"].append(p)
 
-
-
-        c="normal"
-        if(casesAccuracy[case]=="BH"):c="abnormal"
+        c = "normal"
+        if (casesAccuracy[case] == "BH"): c = "abnormal"
         net_results["real"].append(c)
 
+    results = pd.DataFrame(net_results)
+    # results.to_csv("results_network_kmeans.csv", sep='\t', encoding='utf-8')
+    # print(results)
 
+    return results, stats
 
-    results=pd.DataFrame(net_results)
-    #results.to_csv("results_network_kmeans.csv", sep='\t', encoding='utf-8')
-    #print(results)
-    return results,stats
 
 def get_traces_csv(directory):
     print("Reading Traces from "+directory)
