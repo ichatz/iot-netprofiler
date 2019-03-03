@@ -660,7 +660,10 @@ def create_results(directory, features_to_drop):
     accuracy = {
         "Model": [],
         "Window Size": [],
-        "Accuracy": []
+        "Accuracy": [],
+        "Precision":[],
+        "Recall":[],
+        "F1-score":[]
 
     }
     window_size = [25, 50, 100]
@@ -682,6 +685,10 @@ def create_results(directory, features_to_drop):
 
         accuracy["Model"].append("Kmeans")
         accuracy["Window Size"].append(i)
+        accuracy["Precision"].append(sm.precision_score(correction,labels,average='macro'))
+        accuracy["Recall"].append(sm.recall_score(correction, labels,average='macro'))
+        accuracy["F1-score"].append(sm.f1_score(correction, labels,average='macro'))
+        
 
     accuracy = pd.DataFrame(accuracy)
 
