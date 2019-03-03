@@ -6,7 +6,7 @@ import sys
 
 sys.path.append('../')
 
-from plots_analysis import *
+from lib.plots_analysis import *
 # scipy
 
 import random
@@ -14,7 +14,6 @@ random.seed(6666)
 
 sys.path.append('../lib/')
 
-from plots_analysis import *
 from lib.functions import *
 
 

@@ -1,46 +1,18 @@
 #Modules to install via pip pandas,ipynb
-import os
 import sys
 sys.path.append('../')
 
-import os
-import pandas as pd
-import numpy as np
-import json
 #Modules to install via pip pandas,ipynb
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import json
-from pprint import pprint
-import os
-import import_ipynb
 import sys
 sys.path.append('../')
-from pandas.plotting import scatter_matrix
-from trace_analysis import *
-from node import *
-import sklearn.metrics as sm
-import pandas as pd
-import matplotlib.pyplot as plt
-import os
-from node import *
 
-
-from plots_analysis import *
-from sklearn.metrics import confusion_matrix
-from sklearn.cluster import KMeans
-import sklearn.metrics as sm
-from sklearn.decomposition import PCA
-import random
-
+from lib.plots_analysis import *
 
 #Modules to install via pip pandas,ipynb
 import sys
 
 sys.path.append('../')
 
-from plots_analysis import *
 from sklearn.cluster import KMeans
 import pandas as pd
 # scipy

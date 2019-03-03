@@ -1,7 +1,5 @@
-import numpy as np
 import pandas as pd
-import os
-import trace_analysis
+from lib import trace_analysis
 
 
 def compute_window_labeled_statistics(nodes, packets_node, label, experiment, window_size):
