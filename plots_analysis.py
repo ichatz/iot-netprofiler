@@ -1,7 +1,8 @@
 #    This module implements data visualization
-from functions import *
+from lib.functions import *
+
+from lib.functions import *
 import pandas as pd
-import numpy as np
 import os
 from os import listdir
 # KNN
@@ -24,8 +25,8 @@ from sklearn.ensemble import RandomForestClassifier
 ##### Classification Analysis #########
 #######################################
 
-def random_forests_features_selection(trace_stats):    
-    # Plot the most relevant features 
+def random_forests_features_selection(trace_stats):
+    # Plot the most relevant features
     max_rows = len(trace_stats)/2
     max_cols = 2
     pos = 1
@@ -36,11 +37,11 @@ def random_forests_features_selection(trace_stats):
     for trace_size in trace_stats:
         ax = plt.subplot(max_rows, max_cols, pos)
         trace = trace_stats[trace_size]
-        
+
         # separate features from target values
         features = trace.drop(columns=['node_id', 'experiment', 'label'])
         target = trace['label'].values
-        
+
         # split dataset into train and test data
         X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.3, random_state=1)
 
@@ -53,22 +54,22 @@ def random_forests_features_selection(trace_stats):
 
         # Feature selection
         feature_imp = pd.Series(rf_clf.feature_importances_,index=features.columns).sort_values(ascending=False)
-    
-        # Plots features with their importance score    
+
+        # Plots features with their importance score
         feature_imp.plot.barh(ax=ax)
         #plt.yticks(feature_imp.index, objects)
         pos += 1
-   
-	    # Add labels to your graph    
-        plt.xlabel('Feature Importance Score')    
-        plt.ylabel('Features')    
-        plt.title("Window Size {}".format(trace_size))  
-    
+
+	    # Add labels to your graph
+        plt.xlabel('Feature Importance Score')
+        plt.ylabel('Features')
+        plt.title("Window Size {}".format(trace_size))
+
     st = fig.suptitle('Features\' Importance', fontsize="x-large")
     plt.show()
 
 
-def knn_test_number_of_neighbors(trace_stats, max_neighbors):    
+def knn_test_number_of_neighbors(trace_stats, max_neighbors):
     # Test the accuracy of KNN for different number of neighbors
     max_rows = len(trace_stats)/2
     max_cols = 2
@@ -80,11 +81,11 @@ def knn_test_number_of_neighbors(trace_stats, max_neighbors):
     for trace_size in trace_stats:
         ax = plt.subplot(max_rows, max_cols, pos)
         trace = trace_stats[trace_size]
-        
+
         # separate features from target values
         features = trace.drop(columns=['node_id', 'experiment', 'label'])
         target = trace['label'].values
-        
+
         # split dataset into train and test data
         X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.3, random_state=1)
 
