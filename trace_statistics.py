@@ -2,6 +2,108 @@ import numpy as np
 import pandas as pd
 import os
 import trace_analysis
+import sys
+
+def compute_labeled_statistics_by_network(stats, feature, n_nodes):
+	# Input: stats a dataframe containing the statistics of the network
+	#        feature a feature to extract
+	#        n_nodes the number of nodes in the network
+	#Output: extract feature for each node of the network
+
+    data = stats[['experiment',str(feature),'label']].sort_values(by=['experiment'])
+
+    network = None
+    experiment = None
+    label = None
+    nodes = []
+    for index in data.index:
+        # Write the experiment to a dataframe
+        if experiment != data.at[index,'experiment'] and experiment != None:
+            features = {'experiment': [experiment], 'label': [label]}
+            for node in range(1, n_nodes+1):
+                if node <= len(nodes):
+                    features[node] = [nodes[node-1]]
+                else:
+                    features[node] = [np.float32(sys.maxsize)]
+
+            # Create a new dataframe
+            if network is None:
+                network = pd.DataFrame(features)
+            else:
+                network = pd.concat([network, pd.DataFrame(features)])
+
+            nodes = []
+            experiment = data.at[index,'experiment']
+            label = data.at[index,'label']
+
+        # First iteration
+        elif experiment == None:
+            nodes = []
+            experiment = data.at[index,'experiment']
+            label = data.at[index,'label']
+
+
+
+        nodes.append(data.at[index, feature])
+
+    network = network.reset_index(drop=True)
+    return network
+
+
+
+def compute_window_labeled_statistics_by_network(win_stats, feature, n_nodes, window_size, n_packets=200):
+	# Input: stats a dataframe containing the statistics of the network
+	#        feature a feature to extract
+	#        n_nodes the number of nodes in the network
+	#        window_size the size of the window
+	#Output: extract feature for each node of the network
+
+    data = win_stats[['experiment','node_id',str(feature),'label']].sort_values(by=['experiment','node_id']).reset_index(drop=True)
+
+    network = None
+    experiment = None
+    label = None
+    nodes = {}
+    for index in data.index:
+        # Write the experiment to a dataframe
+        if experiment != data.at[index,'experiment'] and experiment != None:
+            features = {'experiment': [experiment for i in range(1,int(n_packets/window_size)+1)], 'label': [label for i in range(1,int(n_packets/window_size)+1)]}
+            # For each node in the network
+            for node in range(1, n_nodes+1):
+            	# For each node_id
+                for node_id in nodes:
+                    if node_id in nodes:
+                        features[node] = nodes[node_id]
+                    # If some window is lost we need to add infinite values
+                    if len(features[node]) < int(n_packets/window_size):
+                        while len(features[node]) < int(n_packets/window_size):
+                            features[node].append(np.float32(sys.maxsize))
+
+            # Create a new dataframe
+            if network is None:
+                network = pd.DataFrame(features)
+            else:
+                network = pd.concat([network, pd.DataFrame(features)])
+
+            nodes = {}
+            experiment = data.at[index,'experiment']
+            label = data.at[index,'label']
+
+        # First iteration
+        elif experiment == None:
+            nodes = {}
+            experiment = data.at[index,'experiment']
+            label = data.at[index,'label']
+
+
+        if data.at[index,'node_id'] not in nodes:
+            nodes[data.at[index,'node_id']] = [data.at[index, feature]]
+        else:
+            nodes[data.at[index,'node_id']].append(data.at[index, feature])
+
+    network = network.reset_index(drop=True)
+    return network
+
 
 
 def compute_window_labeled_statistics(nodes, packets_node, label, experiment, window_size):

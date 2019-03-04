@@ -36,7 +36,7 @@ def random_forest_classification(trace_stats, features_to_drop, n_estimators=100
 	    trace = trace_stats[trace_size]
 	    
 	    # separate features from target values
-	    features = trace.drop(columns=['node_id', 'experiment', 'label', 'hop', 'loss', 'count'])
+	    features = trace.drop(columns=features_to_drop)
 	    target = trace['label'].values
 
 	    # split dataset into train and test data
@@ -358,17 +358,11 @@ def ensalble_svm_classification(trace_stats, features_to_drop, n_estimators = 10
 	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
 
 	    # Create a SVM Classifier
-<<<<<<< HEAD
 	    ovr_clf = OneVsRestClassifier(BaggingClassifier(LinearSVC(random_state=9, max_iter=10000, C=1.2), max_samples=1.0/n_estimators, 
 	                                                    n_estimators=n_estimators))
 	    
-	    t0 = time.time()	# Start timer
-=======
-	    t0 = time.time()
-	    ovr_clf = OneVsRestClassifier(BaggingClassifier(LinearSVC(random_state=9, max_iter=10000, C=1.2), max_samples=1.0/n_estimators,
-	                                                    n_estimators=n_estimators))
 
->>>>>>> 61706834ce1446ac58450bf9aab3f3dc64a6e074
+	    t0 = time.time()	# Start timer
 	    #Train the model using the training sets
 	    ovr_clf.fit(X_train, y_train)
 	    training_time = time.time() - t0
@@ -376,12 +370,9 @@ def ensalble_svm_classification(trace_stats, features_to_drop, n_estimators = 10
 	    t0 = time.time()	# Start timer
 	    #Predict the response for test dataset
 	    y_pred = ovr_clf.predict(X_test)
-<<<<<<< HEAD
 	    testing_time = time.time() - t0
-	
-=======
 
->>>>>>> 61706834ce1446ac58450bf9aab3f3dc64a6e074
+		
 	    # Add results to a Dataframe
 	    if results is None:
 	        results = pd.DataFrame({'Model': ['OneVsRestClassifier (SVM)'],
