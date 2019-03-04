@@ -3,6 +3,8 @@ import os
 import sys
 import time
 
+import trace_classification
+
 sys.path.append('../')
 
 import os
@@ -555,6 +557,97 @@ def analyze_network(directory, df, pings, window, features_to_drop):
     results = pd.DataFrame(net_results)
 
     return results, stats, correction, labels
+def create_stats(directory, df, pings, window):
+    cases = []
+    casesAccuracy = df["case_accuracy"].values
+    casesAccuracy2 = df["case_accuracy2"].values
+
+    cases = df["case"].values
+    folder = df["directory"].values + directory
+
+    data = import_Cooja2(df, directory)
+
+
+    print("Processing...")
+    d = {"experiment": [],
+         "node_id": [],
+         "label": [],
+         "label_2":[],
+         "loss": [],
+         "count": [],
+         "std": [],
+         "mean": [],
+         "var": [],
+         "hop": [],
+        "min":[],
+         "max":[],
+
+         "outliers": [],
+
+         "window": []
+         }
+    # count=[]
+    labels = []
+    var = []
+    # window=100
+    # stats=pd.DataFrame(columns=columns)
+    n = pings
+
+    for i in range(len(data)):
+        # window=pings[i]
+
+        for j in range(len(data[i])):
+            # n=pings[i]
+
+            # print(n)
+            for z in range(0, n, int(window)):
+                # if(z+window>n):break
+                # print(z,z+window)
+
+
+                # df1 = df1.assign(e=p.Series(np.random.randn(sLength)).values)
+                node = data[i][j].pkts
+
+                name = str(j) + " " + cases[i]
+                nodeWindow = node[(node["seq"] < z + window) & (node["seq"] >= z)]
+                nodeWindowP = nodeWindow["rtt"]
+                d["count"].append(nodeWindowP.count())
+                # Case without outliers
+                # Case with outliers
+                std = 0
+                if (nodeWindowP.std() > 10):
+                    std = 1
+                    std = nodeWindowP.std()
+
+                d["std"].append(std)
+                mean=0
+
+                if(nodeWindowP.mean()>mean): mean=nodeWindowP.mean()
+                # if(mean<1):print(mean)
+                d["mean"].append(mean)
+                var = 0
+                if (nodeWindowP.var() > var): var = nodeWindowP.var()
+                d["var"].append(var)
+                d["experiment"].append(cases[i])
+                d["hop"].append(data[i][j].hop)
+                d["label_2"]=casesAccuracy2[i]
+                if(casesAccuracy[i]=="normal"):
+                    d["label"].append("Normal")
+                else:
+                    d["label"].append("Attacked")
+                d["outliers"].append(getOutliers(nodeWindow)["rtt"].count())
+                missing = window - nodeWindow.count()
+                d["node_id"].append(data[i][j].ip)
+                mP = getPercentageMissingPackets(nodeWindow, window)
+                d["min"].append(data[i][j].pkts["rtt"].min())
+                d["max"].append(data[i][j].pkts["rtt"].max())
+                d["loss"].append(mP)
+                d["window"].append(window)
+
+    stats = pd.DataFrame(d)
+    stats.to_csv(directory + "statsc.csv", sep=',', encoding='utf-8')
+    return stats
+
 
 
 def get_traces_csv(directory):
@@ -709,14 +802,14 @@ def kmeans_classification(trace_stats, features_to_drop):
         target = trace["label"].values
         correction = []
         for i in range(len(target)):
-            if (i == "normal"):
+            if (i == "Normal"):
                 correction.append(0)
             else:
                 correction.append(1)
 
         features = trace.drop(columns=features_to_drop)
 
-        print(features.columns)
+
         t0 = time.time()  # Start a timer
         kmeans = KMeans(n_clusters=2)
         kmeans.fit(features)
@@ -767,3 +860,69 @@ def correct_stats(df,directory):
 
     }).drop(columns="Unnamed: 0")
     return total
+
+
+
+
+
+def results(trace_stats,network_stats,features_to_drop,net_features_to_drop):
+    results = pd.DataFrame()            # Results from each classification algorithm
+    cv_results = pd.DataFrame()         # Cross validation results from each classification algorithm
+    net_results = pd.DataFrame()            # Results from each classification algorithm
+    cv_net_results = pd.DataFrame()
+    #Random Forest
+    results = pd.concat([results,
+                         trace_classification.random_forest_classification(trace_stats, features_to_drop)
+                        ])
+    cv_results = pd.concat([cv_results,
+                         trace_classification.random_forest_cross_validation(trace_stats, features_to_drop)
+                        ])
+    net_results = pd.concat([net_results,
+                         trace_classification.random_forest_classification(network_stats, net_features_to_drop)
+                        ])
+    cv_net_results = pd.concat([cv_net_results,
+                         trace_classification.random_forest_cross_validation(network_stats, net_features_to_drop, cross_val=3)
+                        ])
+    #KNN
+    results = pd.concat([results,
+                         trace_classification.k_nearest_neighbor_classification(trace_stats, features_to_drop, n_neighbors=11)
+                        ])
+    cv_results = pd.concat([cv_results,
+                         trace_classification.k_nearest_neighbor_cross_validation(trace_stats, features_to_drop, n_neighbors=11)
+                        ])
+    net_results = pd.concat([net_results,
+                         trace_classification.k_nearest_neighbor_classification(network_stats, net_features_to_drop)
+                        ])
+    cv_net_results = pd.concat([cv_net_results,
+                         trace_classification.k_nearest_neighbor_cross_validation(network_stats, net_features_to_drop, cross_val=3)
+                        ])
+    """
+    #SVN
+    results = pd.concat([results,
+                         trace_classification.support_vector_machines_classification(trace_stats, features_to_drop, kernel='rbf')
+                        ])
+    cv_results = pd.concat([cv_results,
+                         trace_classification.support_vector_machines_cross_validation(trace_stats, features_to_drop, kernel='rbf')
+                        ])
+    #One VS Rest
+    results = pd.concat([results,
+                         trace_classification.ensalble_svm_classification(trace_stats, features_to_drop, n_estimators=15)
+                        ])
+    cv_results = pd.concat([cv_results,
+                         trace_classification.ensalble_svm_cross_validation(trace_stats, features_to_drop, n_estimators=15)
+                        ])
+    net_results = pd.concat([net_results,
+                         trace_classification.ensalble_svm_classification(network_stats, net_features_to_drop)
+                        ])
+    """
+    #Kmeans
+    results = pd.concat([results,
+                         kmeans_classification(trace_stats, features_to_drop)
+                        ])
+
+    net_results = pd.concat([net_results,
+                         kmeans_classification(network_stats, net_features_to_drop)
+                        ])
+    return results.reset_index(drop=True),net_results.reset_index(drop=True)
+
+
