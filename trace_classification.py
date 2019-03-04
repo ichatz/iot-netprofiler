@@ -232,7 +232,7 @@ def k_nearest_neighbor_cross_validation(trace_stats, features_to_drop, n_neighbo
 
 
 
-def support_vector_machines_classification(trace_stats, features_to_drop, kernel='linear', test_size=0.3):
+def support_vector_machines_classification(trace_stats, features_to_drop, kernel='rbf', test_size=0.3):
 	# INPUT: 
 	######## trace_stats a dictionary containing (window_size, statistics per node) pairs 
 	######## features_to_drop a list of features to drop
@@ -293,7 +293,7 @@ def support_vector_machines_classification(trace_stats, features_to_drop, kernel
 
 
 
-def support_vector_machines_cross_validation(trace_stats, features_to_drop, kernel='linear', test_size=0.3, cross_val=5):
+def support_vector_machines_cross_validation(trace_stats, features_to_drop, kernel='rbf', test_size=0.3, cross_val=5):
 	# INPUT: 
 	######## trace_stats a dictionary containing (window_size, statistics per node) pairs 
 	######## features_to_drop a list of features to drop

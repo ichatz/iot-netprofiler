@@ -10,7 +10,7 @@ def compute_labeled_statistics_by_network(stats, feature, n_nodes):
 	#        n_nodes the number of nodes in the network
 	#Output: extract feature for each node of the network
 
-    data = stats[['experiment',str(feature),'label']].sort_values(by=['experiment'])
+    data = stats[['experiment',str(feature),'label']].sort_values(by=['experiment']).reset_index(drop=True)
 
     network = None
     experiment = None
@@ -42,9 +42,23 @@ def compute_labeled_statistics_by_network(stats, feature, n_nodes):
             experiment = data.at[index,'experiment']
             label = data.at[index,'label']
 
-
-
         nodes.append(data.at[index, feature])
+
+    # Write the last experiment
+    experiment = data["experiment"].iloc[-1]
+    label = data["label"].iloc[-1]
+    features = {'experiment': [experiment], 'label': [label]}
+    for node in range(1, n_nodes+1):
+        if node <= len(nodes):
+            features[node] = [nodes[node-1]]
+        else:
+            features[node] = [np.float32(sys.maxsize)]
+
+    # Create a new dataframe
+    if network is None:
+        network = pd.DataFrame(features)
+    else:
+        network = pd.concat([network, pd.DataFrame(features)])
 
     network = network.reset_index(drop=True)
     return network
@@ -100,6 +114,25 @@ def compute_window_labeled_statistics_by_network(win_stats, feature, n_nodes, wi
             nodes[data.at[index,'node_id']] = [data.at[index, feature]]
         else:
             nodes[data.at[index,'node_id']].append(data.at[index, feature])
+
+    # Write the last experiment
+    features = {'experiment': [experiment for i in range(1,int(n_packets/window_size)+1)], 'label': [label for i in range(1,int(n_packets/window_size)+1)]}
+    # For each node in the network
+    for node in range(1, n_nodes+1):
+      # For each node_id
+        for node_id in nodes:
+            if node_id in nodes:
+                features[node] = nodes[node_id]
+            # If some window is lost we need to add infinite values
+            if len(features[node]) < int(n_packets/window_size):
+                while len(features[node]) < int(n_packets/window_size):
+                    features[node].append(np.float32(sys.maxsize))
+
+    # Create a new dataframe
+    if network is None:
+        network = pd.DataFrame(features)
+    else:
+        network = pd.concat([network, pd.DataFrame(features)])
 
     network = network.reset_index(drop=True)
     return network
