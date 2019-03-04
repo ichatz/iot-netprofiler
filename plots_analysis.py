@@ -390,7 +390,7 @@ def plot_tumbling_windows_hops_nodes(nodes, packets_node, max_x, max_y, tracemas
                     ax.set_ylabel('')
 
                 if (count == 1):
-                    ax.set_title('Tumbling Window of Nodes at Hop ' + str(rank))
+                    ax.set_title('Window of size ' + str(window_size) + ' of Nodes at Hop ' + str(rank))
 
                 ax.set_xlabel('Window')
                 ax.grid(axis='y')

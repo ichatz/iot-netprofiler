@@ -49,8 +49,11 @@ def random_forest_classification(trace_stats, features_to_drop, n_estimators=100
 
 	    #Train the model using the training sets y_pred=clf.predict(X_test)
 	    rf_clf.fit(X_train,y_train)
+	    training_time = time.time() - t0
 
+	    t0 = time.time()  # Start a timer
 	    y_pred = rf_clf.predict(X_test)
+	    testing_time = time.time() - t0
 	    
 	    # Add results to a Dataframe
 	    if results is None:
@@ -60,7 +63,8 @@ def random_forest_classification(trace_stats, features_to_drop, n_estimators=100
 	                                'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
 	                                'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
 	                                'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                'Time (ms)': [time.time() - t0]})
+	                                'Training Time (sec)': [training_time],
+	                                'Testing Time (sec)': [testing_time]})
 	    else:
 	        results = pd.concat([results,pd.DataFrame({'Model': ['Random Forest'], 
 	                                                         'Window Size': [trace_size], 
@@ -68,7 +72,8 @@ def random_forest_classification(trace_stats, features_to_drop, n_estimators=100
 	                                                         'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
 	                                                         'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
 	                                                         'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                                         'Time (ms)': [time.time() - t0]})])
+	                                                         'Training Time (sec)': [training_time],
+	                                                         'Testing Time (sec)': [testing_time]})])
 
 
 	return results
@@ -148,9 +153,12 @@ def k_nearest_neighbor_classification(trace_stats, features_to_drop, n_estimator
 
 	    #Train the model using the training sets
 	    knn.fit(X_train, y_train)
+	    training_time = time.time() - t0
 
+	    t0 = time.time()	# Start timer
 	    #Predict the response for test dataset
 	    y_pred = knn.predict(X_test)
+	    testing_time = time.time() - t0
 	    
 	    # Add results to a Dataframe
 	    if results is None:
@@ -160,7 +168,8 @@ def k_nearest_neighbor_classification(trace_stats, features_to_drop, n_estimator
 	                                'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
 	                                'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
 	                                'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                'Time (ms)': [time.time() - t0]})
+	                                'Training Time (sec)': [training_time],
+	                                'Testing Time (sec)': [testing_time]})
 	    else:
 	        results = pd.concat([results,pd.DataFrame({'Model': ['KNN'], 
 	                                                         'Window Size': [trace_size], 
@@ -168,7 +177,8 @@ def k_nearest_neighbor_classification(trace_stats, features_to_drop, n_estimator
 	                                                         'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
 	                                                         'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
 	                                                         'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                                         'Time (ms)': [time.time() - t0]})])
+	                                                         'Training Time (sec)': [training_time],
+	                                                         'Testing Time (sec)': [testing_time]})])
 
 
 	return results
@@ -250,9 +260,12 @@ def support_vector_machines_classification(trace_stats, features_to_drop, kernel
 
 	    #Train the model using the training sets
 	    svm_clf.fit(X_train, y_train)
+	    training_time = time.time() - t0
 
+	    t0 = time.time()	# Start timer
 	    #Predict the response for test dataset
 	    y_pred = svm_clf.predict(X_test)
+	    testing_time = time.time() - t0
 	    
 	    # Add results to a Dataframe
 	    if results is None:
@@ -262,7 +275,8 @@ def support_vector_machines_classification(trace_stats, features_to_drop, kernel
 	                                'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
 	                                'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
 	                                'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                'Time (ms)': [time.time() - t0]})
+	                                'Training Time (sec)': [training_time],
+	                                'Testing Time (sec)': [testing_time]})
 	    else:
 	        results = pd.concat([results,pd.DataFrame({'Model': ['SVM'], 
 	                                                         'Window Size': [trace_size], 
@@ -270,7 +284,8 @@ def support_vector_machines_classification(trace_stats, features_to_drop, kernel
 	                                                         'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
 	                                                         'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
 	                                                         'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                                         'Time (ms)': [time.time() - t0]})])
+	                                                         'Training Time (sec)': [training_time],
+	                                                         'Testing Time (sec)': [testing_time]})])
 
 
 
@@ -343,16 +358,18 @@ def ensalble_svm_classification(trace_stats, features_to_drop, n_estimators = 10
 	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
          
 	    # Create a SVM Classifier
-	    t0 = time.time()
 	    ovr_clf = OneVsRestClassifier(BaggingClassifier(LinearSVC(random_state=9, max_iter=10000, C=1.2), max_samples=1.0/n_estimators, 
 	                                                    n_estimators=n_estimators))
 	    
+	    t0 = time.time()	# Start timer
 	    #Train the model using the training sets
 	    ovr_clf.fit(X_train, y_train)
-	    end = time.time()
+	    training_time = time.time() - t0
 
+	    t0 = time.time()	# Start timer
 	    #Predict the response for test dataset
 	    y_pred = ovr_clf.predict(X_test)
+	    testing_time = time.time() - t0
 	
 	    # Add results to a Dataframe
 	    if results is None:
@@ -362,7 +379,8 @@ def ensalble_svm_classification(trace_stats, features_to_drop, n_estimators = 10
 	                                'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
 	                                'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
 	                                'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                'Time (ms)': [time.time() - t0]})
+	                                'Training Time (sec)': [training_time],
+	                                'Testing Time (sec)': [testing_time]})
 	    else:
 	        results = pd.concat([results,pd.DataFrame({'Model': ['OneVsRestClassifier (SVM)'], 
 	                                                         'Window Size': [trace_size], 
@@ -370,7 +388,8 @@ def ensalble_svm_classification(trace_stats, features_to_drop, n_estimators = 10
 	                                                         'Precision': [metrics.precision_score(y_test, y_pred, average='macro')], 
 	                                                         'Recall': [metrics.recall_score(y_test, y_pred, average='macro')], 
 	                                                         'F1-score': [metrics.f1_score(y_test, y_pred, average='macro')],
-	                                                         'Time (ms)': [time.time() - t0]})])
+	                                                         'Training Time (sec)': [training_time],
+	                                                         'Testing Time (sec)': [testing_time]})])
 
 
 
