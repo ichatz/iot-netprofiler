@@ -109,8 +109,8 @@ def knn_test_number_of_neighbors(trace_stats, max_neighbors):
 
         #Generate plot
         plt.title('Window Size {}'.format(trace_size))
-        pd.DataFrame({'accuracy':test_accuracy}).plot(label='Testing Accuracy', ax=ax)
-        pd.DataFrame({'accuracy':train_accuracy}).plot(label='Training accuracy', ax=ax)
+        pd.DataFrame({'Testing Accuracy':test_accuracy}).plot(label='Testing Accuracy', ax=ax)
+        pd.DataFrame({'Training Accuracy':train_accuracy}).plot(label='Training Accuracy', ax=ax)
         plt.xlabel('Number of neighbors')
         plt.ylabel('Accuracy')
         pos += 1
@@ -391,7 +391,7 @@ def plot_tumbling_windows_hops_nodes(nodes, packets_node, max_x, max_y, tracemas
                     ax.set_ylabel('')
 
                 if (count == 1):
-                    ax.set_title('Tumbling Window of Nodes at Hop ' + str(rank))
+                    ax.set_title('Window of size ' + str(window_size) + ' of Nodes at Hop ' + str(rank))
 
                 ax.set_xlabel('Window')
                 ax.grid(axis='y')

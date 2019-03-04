@@ -10,6 +10,7 @@ def compute_window_labeled_statistics(nodes, packets_node, label, experiment, wi
     # Output: compute a dataframe containing node_id, count, mean, var, std, hop, min, max, loss, label for each window
     
     win_stats = None
+    outliers = trace_analysis.compute_outliers_by_node(packets_node)
     for node in packets_node:
         count = packets_node[node]['rtt'].groupby(packets_node[node]['rtt'].index // window_size * window_size).count()
         mean = packets_node[node]['rtt'].groupby(packets_node[node]['rtt'].index // window_size * window_size).mean()
@@ -18,6 +19,7 @@ def compute_window_labeled_statistics(nodes, packets_node, label, experiment, wi
         hop = int(nodes[nodes['node_id'] == node]['rank'])
         min_val = packets_node[node]['rtt'].groupby(packets_node[node]['rtt'].index // window_size * window_size).min()
         max_val = packets_node[node]['rtt'].groupby(packets_node[node]['rtt'].index // window_size * window_size).max()
+        n_outliers = outliers[node]['rtt'].groupby(outliers[node]['rtt'].index // window_size * window_size).count()
         loss = count.copy().apply(lambda x: 1 - float(x)/window_size)
 
         
@@ -33,6 +35,7 @@ def compute_window_labeled_statistics(nodes, packets_node, label, experiment, wi
                                        'min': [min_val.loc[index]],
                                        'max': [max_val.loc[index]],
                                        'loss': [loss.loc[index]],
+                                       'outliers': [n_outliers.get(index, 0)],
                                        'label': [label]})
             else:
                 win_stats = pd.concat([win_stats, pd.DataFrame({'node_id': [node],
@@ -45,7 +48,7 @@ def compute_window_labeled_statistics(nodes, packets_node, label, experiment, wi
                                        'min': [min_val.loc[index]],
                                        'max': [max_val.loc[index]],
                                        'loss': [loss.loc[index]],
-                                 
+                                       'outliers': [n_outliers.get(index, 0)],
                                        'label': [label]})])
     # Drop duplicates
     if win_stats is not None:
@@ -60,6 +63,7 @@ def compute_labeled_statistics(nodes, packets_node, label, experiment):
     # Output: compute a dataframe containing node_id, count, mean, var, std, hop, min, max, loss, label
     
     stats = None
+    outliers = trace_analysis.compute_outliers_by_node(packets_node)
     for node in packets_node:
         count = packets_node[node]['rtt'].count()
         mean = packets_node[node]['rtt'].mean()
@@ -68,6 +72,7 @@ def compute_labeled_statistics(nodes, packets_node, label, experiment):
         hop = int(nodes[nodes['node_id'] == node]['rank'])
         min_val = packets_node[node]['rtt'].min()
         max_val = packets_node[node]['rtt'].max()
+        n_outliers = outliers[node]['rtt'].count()
         loss = 1 - float(count)/200
         if stats is None:
             stats = pd.DataFrame({'node_id': [node],
@@ -80,6 +85,7 @@ def compute_labeled_statistics(nodes, packets_node, label, experiment):
                                    'min': [min_val],
                                    'max': [max_val],
                                    'loss': [loss],
+                                   'outliers': [n_outliers],
                                    'label': [label]})
         else:
             stats = pd.concat([stats, pd.DataFrame({'node_id': [node],
@@ -92,6 +98,7 @@ def compute_labeled_statistics(nodes, packets_node, label, experiment):
                                    'min': [min_val],
                                    'max': [max_val],
                                    'loss': [loss],
+                                   'outliers': [n_outliers],
                                    'label': [label]})])
     
     return stats
