@@ -1,6 +1,8 @@
 #Modules to install via pip pandas,ipynb
 import os
 import sys
+import time
+
 sys.path.append('../')
 
 import os
@@ -688,7 +690,7 @@ def create_results(directory, features_to_drop):
         accuracy["Precision"].append(sm.precision_score(correction,labels,average='macro'))
         accuracy["Recall"].append(sm.recall_score(correction, labels,average='macro'))
         accuracy["F1-score"].append(sm.f1_score(correction, labels,average='macro'))
-        
+
 
     accuracy = pd.DataFrame(accuracy)
 
@@ -697,3 +699,71 @@ def create_results(directory, features_to_drop):
     results_total_nodes.to_csv(directory + "results_total_node.csv", sep=',', encoding='utf-8')
 
     return results_total, accuracy, results_total_nodes
+
+
+def kmeans_classification(trace_stats, features_to_drop):
+    results = pd.DataFrame()
+    for trace_size in trace_stats:
+        print('Computing trace {}'.format(trace_size))
+        trace = trace_stats[trace_size]
+        target = trace["label"].values
+        correction = []
+        for i in range(len(target)):
+            if (i == "normal"):
+                correction.append(0)
+            else:
+                correction.append(1)
+
+        features = trace.drop(columns=features_to_drop)
+
+        print(features.columns)
+        t0 = time.time()  # Start a timer
+        kmeans = KMeans(n_clusters=2)
+        kmeans.fit(features)
+        labels = kmeans.predict(features)
+        labels = accuracy_score_corrected(correction, labels)
+
+        predicted = []
+        for i in range(len(labels)):
+            if (labels[i] == 0):
+                predicted.append("normal")
+            else:
+                predicted.append("abnormal")
+        # kmeans["predicted"]=predicted
+        # kmeans[kmeans["predicted"]=="normal"]
+        results = pd.concat([results, pd.DataFrame({'Model': ['Kmeans'],
+                                                    'Window Size': [trace_size],
+                                                    'Accuracy': [metrics.accuracy_score(correction, labels)],
+                                                    'Precision': [
+                                                        metrics.precision_score(correction, labels, average='macro')],
+                                                    'Recall': [
+                                                        metrics.recall_score(correction, labels, average='macro')],
+                                                    'F1-score': [metrics.f1_score(correction, labels, average='macro')],
+                                                    'Time (ms)': [time.time() - t0]})])
+    return results
+
+
+def correct_stats(df,directory):
+    df_labels = df["label"].unique().tolist()
+    df_nodes = df["node"].unique().tolist()
+    # print(df_nodes)
+
+    results = pd.read_csv(directory + "results_total_node.csv")
+    total = pd.DataFrame()
+    for label in df_labels:
+        for node in df_nodes:
+            case = df.loc[df["label"] == label]
+            node_case = case.loc[case["node"] == node]
+            if (len(node_case) > 0):
+                a = results.loc[results["label"] == label].loc[results["node"] == node]
+                a["type_corrected_2"] = node_case["type_corrected_2"].iloc[0]
+                # print(node_case["type_corrected_2"].iloc[0])
+                total = total.append(a, ignore_index=True)
+    total = total.rename(columns={
+        'label': 'experiment',
+        'type_corrected_2': 'label',
+        'node': "node_id",
+        "packet loss": "loss",
+
+    }).drop(columns="Unnamed: 0")
+    return total
