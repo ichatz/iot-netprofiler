@@ -21,6 +21,7 @@ def process_cooja2_traces(path, tracemask, node_defaults):
 
     # Load the ICMP traces
     for file in files:
+        print(path, file)
         packets = pd.read_csv(path + '/' + file,
                               sep=' |icmp_seq=|ttl=|time=',
                               na_filter=True,
@@ -33,12 +34,13 @@ def process_cooja2_traces(path, tracemask, node_defaults):
 
         if len(packets) < 1:
             # Nodes affected by a black hole did not receive any packet
-            node_id = file[-24:-4]
+            lpos = file.rfind('_')
+            node_id = file[lpos + 1:-4]
             packets = pd.DataFrame(columns=['node_id', 'seq', 'hop', 'rtt'],
                                    data=[[node_id, 1, node_defaults[node_id], 1]])
 
-            nodes.loc[len(nodes)] = [file[-24:-4], node_defaults[node_id]]
-            packets_node[file[-24:-4]] = packets
+            nodes.loc[len(nodes)] = [node_id, node_defaults[node_id]]
+            packets_node[node_id] = packets
 
         else:
             packets['node_id'] = packets.apply(lambda row: row['node_id'][:-1], axis=1)
@@ -159,7 +161,7 @@ def plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, path, tracemas
     plt.savefig(path + tracemask + 'hist.png')
 
 
-def produce_stats(traces, node_defaults, do_plots=True):
+def produce_stats(traces, node_defaults, base_path, do_plots=True, max_x = 1000, max_y = 0.02):
     stat = {'pkt_loss': pd.DataFrame(columns=node_defaults.keys()),
             'outliers_std': pd.DataFrame(columns=node_defaults.keys()),
             'outliers_iqr': pd.DataFrame(columns=node_defaults.keys()),
@@ -174,9 +176,9 @@ def produce_stats(traces, node_defaults, do_plots=True):
         clean_iqr = compute_iqr_outliers_by_node(packets_node)
 
         if do_plots:
-            plot_histograms_hops_nodes(nodes, packets_node, 1000, 0.02, "cooja3-9nodes/plots-complete/", row[1])
-            plot_histograms_hops_nodes(nodes, clean_std, 1000, 0.02, "cooja3-9nodes/plots-std/", row[1])
-            plot_histograms_hops_nodes(nodes, clean_iqr, 1000, 0.02, "cooja3-9nodes/plots-iqr/", row[1])
+            plot_histograms_hops_nodes(nodes, packets_node, max_x, max_y, base_path + "/plots-complete/", row[1])
+            plot_histograms_hops_nodes(nodes, clean_std, max_x, max_y, base_path + "/plots-std/", row[1])
+            plot_histograms_hops_nodes(nodes, clean_iqr, max_x, max_y, base_path + "/plots-iqr/", row[1])
 
         pkt_loss = {}
         outliers_std = {}
@@ -203,34 +205,77 @@ def produce_stats(traces, node_defaults, do_plots=True):
     return stat
 
 
-traces = [("cooja3-9nodes/traces/normal", 'grid9_normal_2019-02-13_17:05_'),
-          ("cooja3-9nodes/traces/normal", 'grid9_normal_2019-02-13_18:51_'),
-          ("cooja3-9nodes/traces/normal", 'grid9_normal_2019-02-13_22:23_'),
-          ("cooja3-9nodes/traces/1bh-3", 'grid9_1bh-3_2019-02-13_16:28_'),
-          ("cooja3-9nodes/traces/1bh-3", 'grid9_1bh-3_2019-02-13_22:05_'),
-          ("cooja3-9nodes/traces/1bh-5", 'grid9_1bh-5_2019-02-13_15:31_'),
-          ("cooja3-9nodes/traces/1bh-5", 'grid9_1bh-5_2019-02-13_21:44_'),
-          ("cooja3-9nodes/traces/1bh-6", 'grid9_1bh-6_2019-02-13_12:59_'),
-          ("cooja3-9nodes/traces/1bh-6", 'grid9_1bh-6_2019-02-13_19:15_'),
-          ("cooja3-9nodes/traces/1bh-7", 'grid9_1bh-7_2019-02-13_15:08_'),
-          ("cooja3-9nodes/traces/1bh-7", 'grid9_1bh-7_2019-02-13_20:02_'),
-          ("cooja3-9nodes/traces/1bh-9", 'grid9_1bh-9_2019-02-13_15:57_'),
-          ("cooja3-9nodes/traces/1bh-9", 'grid9_1bh-9_2019-02-13_19:35_')]
+traces_9nodes = [
+("cooja3-9nodes/traces/1bh-9", 'grid9_1bh-9_2019-02-13_19:35_'),
+    ("cooja3-9nodes/traces/1gh-3", 'grid_1gh-3_2019-02-15_22:33_'),
+    ("cooja3-9nodes/traces/1gh-5", 'grid_1gh-5_2019-02-15_22:09_'),
+    ("cooja3-9nodes/traces/1gh-6", 'grid_1gh-6_2019-02-15_18:25_'),
+    ("cooja3-9nodes/traces/1gh-7", 'grid_1gh-7_2019-02-15_21:28_'),
+    ("cooja3-9nodes/traces/1gh-9", 'grid_1gh-9_2019-02-15_19:19_'),
+    ("cooja3-9nodes/traces/normal", 'grid9_normal_2019-02-13_17:05_'),
+    ("cooja3-9nodes/traces/normal", 'grid9_normal_2019-02-13_18:51_'),
+    ("cooja3-9nodes/traces/normal", 'grid9_normal_2019-02-13_22:23_'),
+    ("cooja3-9nodes/traces/1bh-3", 'grid9_1bh-3_2019-02-13_16:28_'),
+    ("cooja3-9nodes/traces/1bh-3", 'grid9_1bh-3_2019-02-13_22:05_'),
+    ("cooja3-9nodes/traces/1bh-5", 'grid9_1bh-5_2019-02-13_15:31_'),
+    ("cooja3-9nodes/traces/1bh-5", 'grid9_1bh-5_2019-02-13_21:44_'),
+    ("cooja3-9nodes/traces/1bh-6", 'grid9_1bh-6_2019-02-13_12:59_'),
+    ("cooja3-9nodes/traces/1bh-6", 'grid9_1bh-6_2019-02-13_19:15_'),
+    ("cooja3-9nodes/traces/1bh-7", 'grid9_1bh-7_2019-02-13_15:08_'),
+    ("cooja3-9nodes/traces/1bh-7", 'grid9_1bh-7_2019-02-13_20:02_'),
+    ("cooja3-9nodes/traces/1bh-9", 'grid9_1bh-9_2019-02-13_15:57_')
+    ]
 
-node_defaults = {
-    "aaaa::212:7403:3:303": 1,
+node_defaults_9nodes = {
     "aaaa::212:7402:2:202": 2,
+    "aaaa::212:7403:3:303": 1,
     "aaaa::212:7404:4:404": 2,
-    "aaaa::212:7406:6:606": 2,
     "aaaa::212:7405:5:505": 3,
+    "aaaa::212:7406:6:606": 2,
     "aaaa::212:7407:7:707": 3,
-    "aaaa::212:7409:9:909": 3,
     "aaaa::212:7408:8:808": 4,
+    "aaaa::212:7409:9:909": 3,
     "aaaa::212:740a:a:a0a": 4}
 
-stats = produce_stats(traces, node_defaults, True)
+traces_16nodes = [
+    ("cooja3-16nodes/traces/normal", 'grid_normal_2019-02-19_21:23_'),
+    ("cooja3-16nodes/traces/normal", 'grid_normal_2019-02-26_10:29_'),
+    ("cooja3-16nodes/traces/normal", 'grid_normal_2019-02-26_10:53_'),
+    ("cooja3-16nodes/traces/normal", 'grid_normal_2019-02-26_11:10_'),
+    ("cooja3-16nodes/traces/normal", 'grid_normal_2019-02-26_11:48_'),
+    ("cooja3-16nodes/traces/1bh-7", 'grid_1bh-7_2019-02-19_22:13_'),
+    ("cooja3-16nodes/traces/1bh-9", 'grid_1bh-9_2019-02-20_00:30_'),
+    ("cooja3-16nodes/traces/1gh30-7", 'grid_1gh30-7_2019-02-19_22:35_'),
+    ("cooja3-16nodes/traces/1gh30-9", 'grid_1gh30-9_2019-02-20_00:12_'),
+    ("cooja3-16nodes/traces/1gh50-7", 'grid_1gh50-7_2019-02-19_22:53_'),
+    ("cooja3-16nodes/traces/1gh50-9", 'grid_1gh50-9_2019-02-19_23:54_'),
+    ("cooja3-16nodes/traces/1gh70-7", 'grid_1gh70-7_2019-02-19_23:11_'),
+    ("cooja3-16nodes/traces/1gh70-9", 'grid_1gh70-9_2019-02-19_23:34_')
+]
+
+node_defaults_16nodes = {
+    "aaaa::212:7402:2:202": 2,
+    "aaaa::212:7403:3:303": 1,
+    "aaaa::212:7404:4:404": 1,
+    "aaaa::212:7405:5:505": 2,
+    "aaaa::212:7406:6:606": 3,
+    "aaaa::212:7407:7:707": 2,
+    "aaaa::212:7408:8:808": 2,
+    "aaaa::212:7409:9:909": 2,
+    "aaaa::212:740a:a:a0a": 4,
+    "aaaa::212:740b:b:b0b": 3,
+    "aaaa::212:740c:c:c0c": 3,
+    "aaaa::212:740d:d:d0d": 4,
+    "aaaa::212:740e:e:e0e": 5,
+    "aaaa::212:740f:f:f0f": 4,
+    "aaaa::212:7410:10:1010": 4,
+    "aaaa::212:7411:11:1111": 5
+}
+
+#stats = produce_stats(traces_16nodes, node_defaults_16nodes, "cooja3-16nodes", True, 1200, 0.02)
+stats = produce_stats(traces_9nodes, node_defaults_9nodes, "cooja3-9nodes", True, 1000, 0.02)
 
 for key in stats.keys():
-    file = open('stats-' + key + '.json', 'w')
+    file = open('cooja3-9nodes/stats-9-' + key + '.json', 'w')
     file.write(stats[key].to_json(orient='split'))
     file.close()
