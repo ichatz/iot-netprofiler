@@ -304,6 +304,7 @@ def import_nodes_Cooja_2(directory,tracemask,node_defaults):
         if len(packets) < 1:
             # Nodes affected by a black hole did not receive any packet
             node_id = file[-24:-4]
+            if(node_id=="aa::212:7411:11:1111"): node_id="aaaa::212:7411:11:1111"
             packets = pd.DataFrame(columns=['node_id', 'seq', 'hop', 'rtt'],
                                    data=[[node_id, 1, node_defaults[node_id], 1]])
 
@@ -345,19 +346,19 @@ def import_nodes_Cooja_2(directory,tracemask,node_defaults):
 def import_Cooja2(df,directory):
     data=[]
     node_defaults = {
-        "aaaa::212:7403:3:303": 1,
-        "aaaa::212:7402:2:202": 2,
-        "aaaa::212:7404:4:404": 2,
-        "aaaa::212:7406:6:606": 2,
-        "aaaa::212:7405:5:505": 3,
-        "aaaa::212:7407:7:707": 3,
-        "aaaa::212:7409:9:909": 3,
-        "aaaa::212:7408:8:808": 4,
-        "aaaa::212:740a:a:a0a": 4,
+        "aaaa::212:7403:3:303": 10,
+        "aaaa::212:7402:2:202": 10,
+        "aaaa::212:7404:4:404": 10,
+        "aaaa::212:7406:6:606": 10,
+        "aaaa::212:7405:5:505": 10,
+        "aaaa::212:7407:7:707": 10,
+        "aaaa::212:7409:9:909": 10,
+        "aaaa::212:7408:8:808": 10,
+        "aaaa::212:740a:a:a0a": 10,
         "aaaa::212:740b:b:b0b": 10,
-    "aaaa::212:740f:f:f0f":10,
-        "aa::212:7411:11:1111":10,
-"aaaa::212:740d:d:d0d":10,
+        "aaaa::212:740f:f:f0f":  10,
+        "aaaa::212:7411:11:1111": 10,
+        "aaaa::212:740d:d:d0d":    10,
 
 
 
@@ -645,7 +646,7 @@ def create_stats(directory, df, pings, window):
                 d["window"].append(window)
 
     stats = pd.DataFrame(d)
-    stats.to_csv(directory + "statsc.csv", sep=',', encoding='utf-8')
+    stats.to_csv(directory + "stats.csv", sep=',', encoding='utf-8')
     return stats
 
 
@@ -836,12 +837,13 @@ def kmeans_classification(trace_stats, features_to_drop):
     return results
 
 
-def correct_stats(df,directory):
+def correct_stats(df, directory):
     df_labels = df["label"].unique().tolist()
     df_nodes = df["node"].unique().tolist()
     # print(df_nodes)
 
     results = pd.read_csv(directory + "results_total_node.csv")
+
     total = pd.DataFrame()
     for label in df_labels:
         for node in df_nodes:
@@ -849,61 +851,72 @@ def correct_stats(df,directory):
             node_case = case.loc[case["node"] == node]
             if (len(node_case) > 0):
                 a = results.loc[results["label"] == label].loc[results["node"] == node]
+                a["type_corrected"] = node_case["type_corrected"].iloc[0]
                 a["type_corrected_2"] = node_case["type_corrected_2"].iloc[0]
                 # print(node_case["type_corrected_2"].iloc[0])
                 total = total.append(a, ignore_index=True)
     total = total.rename(columns={
         'label': 'experiment',
-        'type_corrected_2': 'label',
+
+        'type_corrected': 'label',
+        'type_corrected_2': 'label_2',
         'node': "node_id",
         "packet loss": "loss",
 
-    }).drop(columns="Unnamed: 0")
+    }).drop(columns=["Unnamed: 0", "predicted number", "correction number", "predicted", "type"])
     return total
 
 
 
 
 
-def results(trace_stats,network_stats,features_to_drop,net_features_to_drop):
-    results = pd.DataFrame()            # Results from each classification algorithm
-    cv_results = pd.DataFrame()         # Cross validation results from each classification algorithm
-    net_results = pd.DataFrame()            # Results from each classification algorithm
+def results_2_classes(trace_stats,network_stats,features_to_drop,net_features_to_drop):
+    results = pd.DataFrame()  # Results from each classification algorithm
+    cv_results = pd.DataFrame()  # Cross validation results from each classification algorithm
+    net_results = pd.DataFrame()  # Results from each classification algorithm
     cv_net_results = pd.DataFrame()
-    #Random Forest
+    # Random Forest
     results = pd.concat([results,
                          trace_classification.random_forest_classification(trace_stats, features_to_drop)
-                        ])
+                         ])
     cv_results = pd.concat([cv_results,
-                         trace_classification.random_forest_cross_validation(trace_stats, features_to_drop)
-                        ])
+                            trace_classification.random_forest_cross_validation(trace_stats, features_to_drop)
+                            ])
     net_results = pd.concat([net_results,
-                         trace_classification.random_forest_classification(network_stats, net_features_to_drop)
-                        ])
+                             trace_classification.random_forest_classification(network_stats, net_features_to_drop)
+                             ])
     cv_net_results = pd.concat([cv_net_results,
-                         trace_classification.random_forest_cross_validation(network_stats, net_features_to_drop, cross_val=3)
-                        ])
-    #KNN
+                                trace_classification.random_forest_cross_validation(network_stats, net_features_to_drop,
+                                                                                    cross_val=3)
+                                ])
+    # KNN
     results = pd.concat([results,
-                         trace_classification.k_nearest_neighbor_classification(trace_stats, features_to_drop, n_neighbors=11)
-                        ])
+                         trace_classification.k_nearest_neighbor_classification(trace_stats, features_to_drop,
+                                                                                n_neighbors=11)
+                         ])
     cv_results = pd.concat([cv_results,
-                         trace_classification.k_nearest_neighbor_cross_validation(trace_stats, features_to_drop, n_neighbors=11)
-                        ])
+                            trace_classification.k_nearest_neighbor_cross_validation(trace_stats, features_to_drop,
+                                                                                     n_neighbors=11)
+                            ])
     net_results = pd.concat([net_results,
-                         trace_classification.k_nearest_neighbor_classification(network_stats, net_features_to_drop)
-                        ])
+                             trace_classification.k_nearest_neighbor_classification(network_stats, net_features_to_drop)
+                             ])
     cv_net_results = pd.concat([cv_net_results,
-                         trace_classification.k_nearest_neighbor_cross_validation(network_stats, net_features_to_drop, cross_val=3)
-                        ])
-    """
-    #SVN
-    results = pd.concat([results,
+                                trace_classification.k_nearest_neighbor_cross_validation(network_stats,
+                                                                                         net_features_to_drop,
+                                                                                         cross_val=3)
+                                ])
+
+    # SVN
+    """results = pd.concat([results,
                          trace_classification.support_vector_machines_classification(trace_stats, features_to_drop, kernel='rbf')
                         ])
     cv_results = pd.concat([cv_results,
                          trace_classification.support_vector_machines_cross_validation(trace_stats, features_to_drop, kernel='rbf')
                         ])
+    net_results = pd.concat([net_results,
+                             trace_classification.support_vector_machines_classification(network_stats, net_features_to_drop)
+                             ])
     #One VS Rest
     results = pd.concat([results,
                          trace_classification.ensalble_svm_classification(trace_stats, features_to_drop, n_estimators=15)
@@ -915,14 +928,69 @@ def results(trace_stats,network_stats,features_to_drop,net_features_to_drop):
                          trace_classification.ensalble_svm_classification(network_stats, net_features_to_drop)
                         ])
     """
-    #Kmeans
-    results = pd.concat([results,
-                         kmeans_classification(trace_stats, features_to_drop)
-                        ])
+    # Kmeans
+    cv_results = pd.concat([results,
+                            kmeans_classification(trace_stats, features_to_drop)
+                            ])
 
-    net_results = pd.concat([net_results,
-                         kmeans_classification(network_stats, net_features_to_drop)
-                        ])
-    return results.reset_index(drop=True),net_results.reset_index(drop=True)
+    cv_net_results = pd.concat([net_results,
+                                kmeans_classification(network_stats, net_features_to_drop)
+                                ])
+
+    return cv_results.reset_index(drop=True),cv_net_results.reset_index(drop=True)
+
+
+def results_3_classes(trace_stats,network_stats,features_to_drop,net_features_to_drop):
+    results,net_results=results_2_classes(trace_stats,network_stats,features_to_drop,net_features_to_drop)
+    results=results.reset_index(drop=True)
+    results=results[results["Model"]!="Kmeans"]
+
+def create_network_stats(df):
+    nodes = df["node_id"].unique().tolist()
+    experiments = df["experiment"].unique().tolist()
+    features = []
+    a = {
+        "experiment": [],
+        "label": [],
+        "label_2": []
+    }
+    for i in range(len(nodes)):
+        features.append(str(i))
+        a[str(i)] = []
+
+    len_loss = 0
+
+    for i in experiments:
+
+        d = df[df["experiment"] == i]
+
+        for node in range(len(nodes)):
+            loss = d[d["node_id"] == nodes[node]]["loss"].tolist()
+            len_loss = len(loss)
+            # print(len(loss))
+            # print(loss)
+            for j in range(len(loss)):
+                a[str(node)].append(loss[j])
+                None
+
+        for x in range(len(loss)):
+            a["experiment"].append(i)
+            label = 'Normal'
+            label2 = 'Normal'
+
+            # Assign a label
+            if i.find('gh') >= 0:
+                label = "Attacked"
+                label2 = 'Gray Hole'
+            elif i.find('bh') >= 0:
+                label = "Attacked"
+                label = 'Black Hole'
+            a["label"].append(label)
+            a["label_2"].append(label2)
+
+    data = pd.DataFrame(a)
+
+    return data
+
 
 
