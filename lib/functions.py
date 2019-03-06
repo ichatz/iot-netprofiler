@@ -631,11 +631,19 @@ def create_stats(directory, df, pings, window):
                 d["var"].append(var)
                 d["experiment"].append(cases[i])
                 d["hop"].append(data[i][j].hop)
-                d["label_2"]=casesAccuracy2[i]
+
                 if(casesAccuracy[i]=="normal"):
                     d["label"].append("Normal")
+
                 else:
                     d["label"].append("Attacked")
+
+                if (casesAccuracy[i] == "normal"):
+                    d["label_2"].append("Normal")
+                elif(casesAccuracy[i] == "BH"):
+                    d["label_2"].append("BH")
+                else:
+                    d["label_2"].append("GH")
                 d["outliers"].append(getOutliers(nodeWindow)["rtt"].count())
                 missing = window - nodeWindow.count()
                 d["node_id"].append(data[i][j].ip)
