@@ -761,16 +761,8 @@ def run(directory, df):
 
 def create_results(directory, features_to_drop):
     df = pd.read_csv(directory + "/traces/traces.csv", sep=',', encoding='utf-8')
-    accuracy = {
-        "Model": [],
-        "Window Size": [],
-        "Accuracy": [],
-        "Precision":[],
-        "Recall":[],
-        "F1-score":[]
 
-    }
-    window_size = [25, 50, 100]
+    window_size = [25, 50, 100,200]
     results_total = pd.DataFrame()
     results_total_nodes = pd.DataFrame()
     for i in window_size:
@@ -797,7 +789,7 @@ def create_results(directory, features_to_drop):
     accuracy = pd.DataFrame(accuracy)
 
     results_total.to_csv(directory + "results_total.csv", sep=',', encoding='utf-8')
-    accuracy.to_csv(directory + "accuracy.csv", sep=',', encoding='utf-8')
+
     results_total_nodes.to_csv(directory + "results_total_node.csv", sep=',', encoding='utf-8')
 
     return results_total, accuracy, results_total_nodes
@@ -806,7 +798,7 @@ def create_results(directory, features_to_drop):
 def kmeans_classification(trace_stats, features_to_drop):
     results = pd.DataFrame()
     for trace_size in trace_stats:
-        print('Computing trace {}'.format(trace_size))
+        #print('Computing trace {}'.format(trace_size))
         trace = trace_stats[trace_size]
         target = trace["label"].values
         correction = []
@@ -835,13 +827,14 @@ def kmeans_classification(trace_stats, features_to_drop):
         # kmeans[kmeans["predicted"]=="normal"]
         results = pd.concat([results, pd.DataFrame({'Model': ['Kmeans'],
                                                     'Window Size': [trace_size],
-                                                    'Accuracy': [metrics.accuracy_score(correction, labels)],
-                                                    'Precision': [
-                                                        metrics.precision_score(correction, labels, average='macro')],
-                                                    'Recall': [
-                                                        metrics.recall_score(correction, labels, average='macro')],
-                                                    'F1-score': [metrics.f1_score(correction, labels, average='macro')],
-                                                    'Time (ms)': [time.time() - t0]})])
+                                                    'Mean Accuracy': [metrics.accuracy_score(correction, labels)],
+                                                    #'Precision': [
+                                                        #metrics.precision_score(correction, labels, average='macro')],
+                                                    #'Recall': [
+                                                        #metrics.recall_score(correction, labels, average='macro')],
+                                                    #'F1-score': [metrics.f1_score(correction, labels, average='macro')],
+                                                    #'Time (ms)': [time.time() - t0]
+                                                    })])
     return results
 
 
@@ -874,84 +867,102 @@ def correct_stats(df, directory):
     }).drop(columns=["Unnamed: 0", "predicted number", "correction number", "predicted", "type"])
     return total
 
+def correct_stats2(df, directory):
+    df_labels = df["label"].unique().tolist()
+    df_nodes = df["node"].unique().tolist()
+    # print(df_nodes)
+
+    results = pd.read_csv(directory + "stats_per_node.csv")
+
+    total = pd.DataFrame()
+    for label in df_labels:
+        for node in df_nodes:
+            case = df.loc[df["label"] == label]
+            node_case = case.loc[case["node"] == node]
+            if (len(node_case) > 0):
+                a = results.loc[results["experiment"] == label].loc[results["node_id"] == node]
+                a["label"] = node_case["type_corrected"].iloc[0]
+                a["label_2"] = node_case["type_corrected_2"].iloc[0]
+                # print(node_case["type_corrected_2"].iloc[0])
+                total = total.append(a, ignore_index=True)
+
+    total = total.rename(columns={
+        #'label': 'experiment',
+
+        #'type_corrected': 'label',
+        #'type_corrected_2': 'label_2',
+        #'node': "node_id",
+        "packet loss": "loss",
+
+    }).drop(columns=["Unnamed: 0", ])
+
+    return total
 
 
 
 
 def results_2_classes(trace_stats,network_stats,features_to_drop,net_features_to_drop):
-    results = pd.DataFrame()  # Results from each classification algorithm
+    #results = pd.DataFrame()  # Results from each classification algorithm
     cv_results = pd.DataFrame()  # Cross validation results from each classification algorithm
-    net_results = pd.DataFrame()  # Results from each classification algorithm
+    #net_results = pd.DataFrame()  # Results from each classification algorithm
     cv_net_results = pd.DataFrame()
     # Random Forest
-    results = pd.concat([results,
-                         trace_classification.random_forest_classification(trace_stats, features_to_drop)
-                         ])
     cv_results = pd.concat([cv_results,
                             trace_classification.random_forest_cross_validation(trace_stats, features_to_drop)
                             ])
-    net_results = pd.concat([net_results,
-                             trace_classification.random_forest_classification(network_stats, net_features_to_drop)
-                             ])
-    cv_net_results = pd.concat([cv_net_results,
-                                trace_classification.random_forest_cross_validation(network_stats, net_features_to_drop,
-                                                                                    cross_val=3)
-                                ])
-    # KNN
-    results = pd.concat([results,
-                         trace_classification.k_nearest_neighbor_classification(trace_stats, features_to_drop,
-                                                                                n_neighbors=11)
-                         ])
     cv_results = pd.concat([cv_results,
                             trace_classification.k_nearest_neighbor_cross_validation(trace_stats, features_to_drop,
                                                                                      n_neighbors=11)
                             ])
-    net_results = pd.concat([net_results,
-                             trace_classification.k_nearest_neighbor_classification(network_stats, net_features_to_drop)
-                             ])
-    cv_net_results = pd.concat([cv_net_results,
-                                trace_classification.k_nearest_neighbor_cross_validation(network_stats,
-                                                                                         net_features_to_drop,
-                                                                                         cross_val=3)
-                                ])
+    cv_results = pd.concat([cv_results,
+                            trace_classification.support_vector_machines_cross_validation(trace_stats, features_to_drop,
+                                                                                          kernel='rbf')
+                            ])
 
-    # SVN
-    """results = pd.concat([results,
-                         trace_classification.support_vector_machines_classification(trace_stats, features_to_drop, kernel='rbf')
-                        ])
     cv_results = pd.concat([cv_results,
-                         trace_classification.support_vector_machines_cross_validation(trace_stats, features_to_drop, kernel='rbf')
-                        ])
-    net_results = pd.concat([net_results,
-                             trace_classification.support_vector_machines_classification(network_stats, net_features_to_drop)
-                             ])
-    #One VS Rest
-    results = pd.concat([results,
-                         trace_classification.ensalble_svm_classification(trace_stats, features_to_drop, n_estimators=15)
-                        ])
-    cv_results = pd.concat([cv_results,
-                         trace_classification.ensalble_svm_cross_validation(trace_stats, features_to_drop, n_estimators=15)
-                        ])
-    net_results = pd.concat([net_results,
-                         trace_classification.ensalble_svm_classification(network_stats, net_features_to_drop)
-                        ])
-    """
-    # Kmeans
-    cv_results = pd.concat([results,
                             kmeans_classification(trace_stats, features_to_drop)
                             ])
 
-    cv_net_results = pd.concat([net_results,
-                                kmeans_classification(network_stats, net_features_to_drop)
+    if(network_stats is not None):
+        cv_net_results = pd.concat([cv_net_results,
+                                    trace_classification.random_forest_cross_validation(network_stats,
+                                                                                        net_features_to_drop,
+                                                                                        cross_val=3)
+                                    ])
+        cv_net_results = pd.concat([cv_net_results,
+                                    trace_classification.k_nearest_neighbor_cross_validation(network_stats,
+                                                                                             net_features_to_drop,
+                                                                                             cross_val=3)
+                                    ])
+
+        # SVN
+
+
+
+        cv_net_results = pd.concat([cv_net_results,
+                                trace_classification.support_vector_machines_cross_validation(trace_stats, features_to_drop,
+                                                                                              kernel='rbf')
                                 ])
+        """#One VS Rest
+        
+        cv_results = pd.concat([cv_results,
+                             trace_classification.ensalble_svm_cross_validation(trace_stats, features_to_drop, n_estimators=15)
+                            ])
+        net_results = pd.concat([net_results,
+                             trace_classification.ensalble_svm_classification(network_stats, net_features_to_drop)
+                            ])
+        """
+        # Kmeans
+
+
+        cv_net_results = pd.concat([cv_net_results,
+                                    kmeans_classification(network_stats, net_features_to_drop)
+                                    ])
 
     return cv_results.reset_index(drop=True),cv_net_results.reset_index(drop=True)
 
 
-def results_3_classes(trace_stats,network_stats,features_to_drop,net_features_to_drop):
-    results,net_results=results_2_classes(trace_stats,network_stats,features_to_drop,net_features_to_drop)
-    results=results.reset_index(drop=True)
-    results=results[results["Model"]!="Kmeans"]
+
 
 def create_network_stats(df):
     nodes = df["node_id"].unique().tolist()
@@ -1000,5 +1011,155 @@ def create_network_stats(df):
 
     return data
 
+def results_3_classes(trace_stats,network_stats,features_to_drop,net_features_to_drop):
+    results,net_results=results_2_classes(trace_stats,network_stats,features_to_drop,net_features_to_drop)
+    #print(results)
+    results=results.reset_index(drop=True)
+    net_results=results.reset_index(drop=True)
+    net_results=net_results[net_results["Model"]!="Kmeans"]
+    results=results[results["Model"]!="Kmeans"]
+    return results,net_results
 
 
+
+def run_all(directory):
+    """
+    df = pd.read_csv(directory + "/traces/traces.csv", sep=',', encoding='utf-8')
+
+    win_25_stats = create_stats(directory, df, pings=100, window=25)
+    win_50_stats = create_stats(directory, df, pings=100, window=50)
+    win_100_stats = create_stats(directory, df, pings=100, window=100)
+    win_200_stats = create_stats(directory, df, pings=200, window=200)
+
+    stats=pd.DataFrame()
+    stats=pd.concat([
+        win_25_stats,
+        win_50_stats,
+        win_100_stats,
+        win_200_stats,
+    ], ignore_index=True)
+    stats.to_csv(directory+"stats_per_node.csv", sep=',', encoding='utf-8')
+
+    """
+    df = pd.read_csv(directory + "stats_per_node.csv", sep=',', encoding='utf-8')
+    win_25_stats = df[df["window"] == 25]
+    win_50_stats = df[df["window"] == 50]
+    win_100_stats= df[df["window"] == 100]
+    win_200_stats = df[df["window"] == 200]
+
+    trace_stats = {
+        25: win_25_stats.drop(columns=["label_2"]),
+        50: win_50_stats.drop(columns=["label_2"]),
+        100: win_100_stats.drop(columns=["label_2"]),
+        200: win_200_stats.drop(columns=["label_2"]),
+    }
+
+    net_win_25_stats = create_network_stats(win_25_stats).drop(columns=["label_2"])
+    net_win_50_stats = create_network_stats(win_50_stats).drop(columns=["label_2"])
+    net_win_100_stats = create_network_stats(win_100_stats).drop(columns=["label_2"])
+    net_win_200_stats = create_network_stats(win_100_stats).drop(columns=["label_2"])
+
+    # Create a dictionary containing all the statistics for each trace size
+    network_stats = {200: net_win_200_stats, 25: net_win_25_stats, 50: net_win_50_stats, 100: net_win_100_stats}
+
+    features_to_drop = [
+        'node_id', 'experiment', 'label', "window",
+        "mean",
+        #'loss',
+        'count',
+        'outliers',
+        "std",
+        #"var",
+        "hop",
+         #"min",
+        "max"
+    ]
+    net_features_to_drop = ['experiment', 'label']
+    results_2_classes_node, results_2_classes_network = results_2_classes(trace_stats,network_stats,features_to_drop,net_features_to_drop)
+
+
+
+    #######3 Classes
+
+    df = pd.read_csv(directory + "stats_per_node.csv", sep=',', encoding='utf-8')
+    win_25_stats = df[df["window"] == 25].drop(columns="label").rename(columns={"label_2": "label"})
+    win_50_stats = df[df["window"] == 50].drop(columns="label").rename(columns={"label_2": "label"})
+    win_100_stats = df[df["window"] == 100].drop(columns="label").rename(columns={"label_2": "label"})
+    win_200_stats = df[df["window"] == 200].drop(columns="label").rename(columns={"label_2": "label"})
+    """win_25_stats = create_stats(directory, df, pings=100, window=25).drop(columns="label").rename(
+        columns={"label_2": "label"})
+    win_50_stats = create_stats(directory, df, pings=100, window=50).drop(columns="label").rename(
+        columns={"label_2": "label"})
+    win_100_stats =create_stats(directory, df, pings=100, window=100).drop(columns="label").rename(
+        columns={"label_2": "label"})
+    win_200_stats = create_stats(directory, df, pings=200, window=200).drop(columns="label").rename(
+        columns={"label_2": "label"})"""
+
+
+    trace_stats_3_classes = {
+        25: win_25_stats,
+        50: win_50_stats,
+        100: win_100_stats,
+        200: win_200_stats
+    }
+    net_win_25_stats = create_network_stats(win_25_stats).drop(columns=["label_2"])
+    net_win_50_stats = create_network_stats(win_50_stats).drop(columns=["label_2"])
+    net_win_100_stats = create_network_stats(win_100_stats).drop(columns=["label_2"])
+    net_win_200_stats = create_network_stats(win_100_stats).drop(columns=["label_2"])
+
+    # Create a dictionary containing all the statistics for each trace size
+    network_stats_3_classes = {200: net_win_200_stats, 25: net_win_25_stats, 50: net_win_50_stats,
+                               100: net_win_100_stats}
+
+
+
+    results_3_classes_node, results_3_classes_network = results_3_classes(trace_stats_3_classes,
+                                                                                              network_stats_3_classes,
+                                                                                              features_to_drop,
+                                                                                              net_features_to_drop)
+    return results_2_classes_node, results_2_classes_network , results_3_classes_node, results_3_classes_network
+
+def run_all_corrected(directory):
+    print("Processing...")
+    df = pd.read_csv(directory + "stats_corrected2.csv")
+    df = correct_stats2(df, directory)
+    df3 = df.drop(columns="label").rename(columns={"label_2": "label"})
+    df2 = df.rename(columns={"label": "label"}).drop(columns="label_2")
+
+    win_25_stats_c = df2[df2["window"] == 25].drop(columns=["mean", "window"])
+    win_50_stats_c = df2[df2["window"] == 50].drop(columns=["mean", "window"])
+    win_100_stats_c = df2[df2["window"] == 100].drop(columns=["mean", "window"])
+    win_200_stats_c = df2[df2["window"] == 200].drop(columns=["mean", "window"])
+    trace_stats_corrected_2_classes = {25: win_25_stats_c,
+                                       50: win_50_stats_c,
+                                       100: win_100_stats_c,
+                                       200: win_200_stats_c
+                                       }
+
+    win_25_stats_c = df3[df3["window"] == 25].drop(columns=["mean", "window"])
+    win_50_stats_c = df2[df3["window"] == 50].drop(columns=["mean", "window"])
+    win_100_stats_c = df3[df3["window"] == 100].drop(columns=["mean", "window"])
+    win_200_stats_c = df3[df3["window"] == 200].drop(columns=["mean", "window"])
+    trace_stats_corrected_3_classes = {25: win_25_stats_c,
+                                       50: win_50_stats_c,
+                                       100: win_100_stats_c,
+                                       200: win_200_stats_c,
+                                       }
+
+    features_to_drop = ['node_id', 'experiment',
+
+                        "std",
+                         "var",
+                        'label',
+                        'hop',
+                        # 'loss',
+                        'count', 'outliers'
+                        ]
+    net_features_to_drop = ['experiment', 'label']
+
+    results_2_classes_node_16_nodes_corrected, _ = results_2_classes(trace_stats_corrected_2_classes,None,
+                                                                        features_to_drop, net_features_to_drop)
+    results_3_classes_node_16_nodes_corrected, _ = results_3_classes(trace_stats_corrected_3_classes,
+                                                                     None, features_to_drop,
+                                                                     net_features_to_drop)
+    return results_2_classes_node_16_nodes_corrected,results_3_classes_node_16_nodes_corrected
