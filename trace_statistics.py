@@ -17,7 +17,7 @@ def compute_one_sample_t_test(trace_stats):
     onesample_results = {}
     for trace in trace_stats:
         t_test = None
-        mu = stats[['node_id','experiment', 'mean']]
+        mu = stats[['node_id','experiment', 'mean', 'min', 'max']]
         win = trace_stats[trace][['node_id','experiment','mean']].reset_index(drop=True)
 
         for values in win[['node_id','experiment']].drop_duplicates().values:
@@ -26,18 +26,24 @@ def compute_one_sample_t_test(trace_stats):
 
             data = win[(win.node_id == node_id) & (win.experiment == experiment)]['mean']
             true_mu = mu[(mu.node_id == node_id) & (mu.experiment == experiment)]['mean']
+            min_val = mu[(mu.node_id == node_id) & (mu.experiment == experiment)]['min']
+            max_val = mu[(mu.node_id == node_id) & (mu.experiment == experiment)]['max']
             onesample_result = scipy.stats.ttest_1samp(data, true_mu)
 
             if t_test is None:
                 t_test = pd.DataFrame({'node_id': node_id, 
                                        'experiment': experiment, 
                                        'test statistic': onesample_result[0], 
-                                       'p-value': onesample_result[1]})
+                                       'p-value': onesample_result[1],
+                                       'min': min_val,
+                                       'max': max_val})
             else:
                 t_test = pd.concat([t_test, pd.DataFrame({'node_id': node_id, 
                                                           'experiment': experiment, 
                                                           'test statistic': onesample_result[0],
-                                                          'p-value': onesample_result[1]})])
+                                                          'p-value': onesample_result[1],
+                                                          'min': min_val,
+                                                          'max': max_val})])
 
 
         onesample_results[trace] = t_test.sort_values(by=['node_id','experiment']).reset_index(drop=True)
