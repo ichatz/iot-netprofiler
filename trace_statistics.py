@@ -4,6 +4,52 @@ import os
 import trace_analysis
 import sys
 import scipy
+import scipy.stats
+
+def compute_kolmogorov_smirnov_2_samp(trace_stats):
+    # Perform a 1 Sample T-Test on each node of the network
+    
+    max_win = max(list(trace_stats.keys()))
+    stats = trace_stats[max_win]
+    windows = list(trace_stats.keys())
+    windows.remove(max_win)
+    
+    ks_2_samp = {}
+    for trace in trace_stats:
+        t_test = None
+        mu = stats[['node_id','experiment', 'mean', 'min', 'max']]
+        win = trace_stats[trace][['node_id','experiment','mean']].reset_index(drop=True)
+
+        for values in win[['node_id','experiment']].drop_duplicates().values:
+            node_id = values[0]
+            experiment = values[1]
+
+            data = win[(win.node_id == node_id) & (win.experiment == experiment)]['mean']
+            true_mu = mu[(mu.node_id == node_id) & (mu.experiment == experiment)]['mean']
+            min_val = mu[(mu.node_id == node_id) & (mu.experiment == experiment)]['min']
+            max_val = mu[(mu.node_id == node_id) & (mu.experiment == experiment)]['max']
+            ks_2_samp_result = scipy.stats.ks_2samp(data, true_mu)
+
+            if t_test is None:
+                t_test = pd.DataFrame({'node_id': node_id, 
+                                       'experiment': experiment, 
+                                       'test statistic': ks_2_samp_result[0], 
+                                       'p-value': ks_2_samp_result[1],
+                                       'min': min_val,
+                                       'max': max_val})
+            else:
+                t_test = pd.concat([t_test, pd.DataFrame({'node_id': node_id, 
+                                                          'experiment': experiment, 
+                                                          'test statistic': ks_2_samp_result[0],
+                                                          'p-value': ks_2_samp_result[1],
+                                                          'min': min_val,
+                                                          'max': max_val})])
+
+
+        ks_2_samp[trace] = t_test.sort_values(by=['node_id','experiment']).reset_index(drop=True)
+
+    return ks_2_samp
+
 
 
 def compute_one_sample_t_test(trace_stats):
