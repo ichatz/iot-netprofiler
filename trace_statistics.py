@@ -3,6 +3,77 @@ import pandas as pd
 import os
 import trace_analysis
 import sys
+import scipy
+import scipy.stats
+
+def compute_kolmogorov_smirnov_2_samp(packets_node, window_size, experiment):
+    # Perform a Kolmogorov Smirnov Test on each node of the network
+    
+    ks_2_samp = None
+    for node_id in packets_node:
+        true_mu = packets_node[node_id]['rtt']
+        min_index = 0
+        max_index = window_size-1
+
+        # Compute the t-test for each window
+        while max_index < 200:
+            window_packets = packets_node[node_id].loc[(packets_node[node_id]['seq'] >= min_index) & (packets_node[node_id]['seq'] <= max_index)]['rtt']
+            onesample_result = scipy.stats.ks_2samp(window_packets, true_mu)
+            
+            if ks_2_samp is None:
+                ks_2_samp = pd.DataFrame({'node_id': node_id, 
+                                       'experiment': experiment, 
+                                       'ks-test statistic': onesample_result[0], 
+                                       'p-value': onesample_result[1],
+                                       'window': [str(min_index+1) + '-' + str(max_index+1)]})
+            else:
+                ks_2_samp = pd.concat([ks_2_samp, pd.DataFrame({'node_id': node_id, 
+                                                          'experiment': experiment, 
+                                                          'ks-test statistic': onesample_result[0],
+                                                          'p-value': onesample_result[1],
+                                                          'window': [str(min_index+1) + '-' + str(max_index+1)]})])
+            
+            
+            min_index = max_index + 1
+            max_index += window_size
+
+    return ks_2_samp
+
+
+
+def compute_one_sample_t_test(packets_node, window_size, experiment):
+    # Perform a 1 Sample T-Test on each node of the network
+    
+    t_test = None
+    for node_id in packets_node:
+        true_mu = packets_node[node_id]['rtt'].mean()
+        min_index = 0
+        max_index = window_size-1
+
+        # Compute the t-test for each window
+        while max_index < 200:
+            window_packets = packets_node[node_id].loc[(packets_node[node_id]['seq'] >= min_index) & (packets_node[node_id]['seq'] <= max_index)]['rtt']
+            onesample_result = scipy.stats.ttest_1samp(window_packets, true_mu)
+            
+            if t_test is None:
+                t_test = pd.DataFrame({'node_id': node_id, 
+                                       'experiment': experiment, 
+                                       't-test statistic': onesample_result[0], 
+                                       'p-value': onesample_result[1],
+                                       'window': [str(min_index+1) + '-' + str(max_index+1)]})
+            else:
+                t_test = pd.concat([t_test, pd.DataFrame({'node_id': node_id, 
+                                                          'experiment': experiment, 
+                                                          't-test statistic': onesample_result[0],
+                                                          'p-value': onesample_result[1],
+                                                          'window': [str(min_index+1) + '-' + str(max_index+1)]})])
+            
+            
+            min_index = max_index + 1
+            max_index += window_size
+
+    return t_test
+
 
 def compute_labeled_statistics_by_network(stats, feature, n_nodes):
 	# Input: stats a dataframe containing the statistics of the network
