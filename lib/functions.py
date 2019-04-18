@@ -3,7 +3,7 @@ import os
 import sys
 import time
 
-import trace_classification
+from lib import trace_classification
 
 sys.path.append('../')
 
@@ -18,11 +18,11 @@ import matplotlib.pyplot as plt
 import json
 from pprint import pprint
 import os
-import import_ipynb
+#import import_ipynb
 import sys
 sys.path.append('../')
 from pandas.plotting import scatter_matrix
-from trace_analysis import *
+from lib import trace_analysis 
 from node import *
 import sklearn.metrics as sm
 import pandas as pd
@@ -31,7 +31,7 @@ import os
 from node import *
 
 
-from plots_analysis import *
+from lib import plots_analysis 
 from sklearn.metrics import confusion_matrix
 from sklearn.cluster import KMeans
 import sklearn.metrics as sm
@@ -44,7 +44,7 @@ import sys
 
 sys.path.append('../')
 
-from plots_analysis import *
+from lib import plots_analysis 
 from sklearn.cluster import KMeans
 import pandas as pd
 # scipy
