@@ -104,7 +104,7 @@ def random_forest_cross_validation(trace_stats, features_to_drop, n_estimators=1
 	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.3, random_state=1)
 	    
 	    #Create Random Forest Classifier
-	    rf_clf = RandomForestClassifier(n_estimators=100)
+	    rf_clf = RandomForestClassifier(n_estimators=n_estimators)
 	    
 	    #train model with cv of 5
 	    cv_scores = cross_val_score(rf_clf, features, target, cv = cross_val)
@@ -123,11 +123,10 @@ def random_forest_cross_validation(trace_stats, features_to_drop, n_estimators=1
 
 
 
-def k_nearest_neighbor_classification(trace_stats, features_to_drop, n_estimators=100, test_size=0.3, n_neighbors=3):
+def k_nearest_neighbor_classification(trace_stats, features_to_drop, test_size=0.3, n_neighbors=3):
 	# INPUT: 
 	######## trace_stats a dictionary containing (window_size, statistics per node) pairs 
 	######## features_to_drop a list of features to drop
-	######## n_estimators number of estimators
 	######## test_size the size of test set
 	######## n_neighbors number of neighbors
 
@@ -191,7 +190,6 @@ def k_nearest_neighbor_cross_validation(trace_stats, features_to_drop, n_neighbo
 	# INPUT: 
 	######## trace_stats a dictionary containing (window_size, statistics per node) pairs 
 	######## features_to_drop a list of features to drop
-	######## n_estimators number of estimators
 	######## test_size the size of test set
 	######## cross_val the size of cross validation 
 
@@ -254,7 +252,7 @@ def support_vector_machines_classification(trace_stats, features_to_drop, kernel
 	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
 	     
 	    #Create a svm Classifier
-	    svm_clf = svm.SVC(kernel=kernel, random_state=9, gamma='scale') # Linear Kernel
+	    svm_clf = svm.SVC(kernel=kernel, random_state=9, gamma='auto') # Linear Kernel
 
 	    t0 = time.time()  # Start a timer
 
@@ -297,7 +295,6 @@ def support_vector_machines_cross_validation(trace_stats, features_to_drop, kern
 	# INPUT: 
 	######## trace_stats a dictionary containing (window_size, statistics per node) pairs 
 	######## features_to_drop a list of features to drop
-	######## n_estimators number of estimators
 	######## kernel
 	######## cross_val the size of cross validation 
 
@@ -317,7 +314,7 @@ def support_vector_machines_cross_validation(trace_stats, features_to_drop, kern
 	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
 	    
 	    #Create SVM Classifier
-	    svm_clf = svm.SVC(kernel=kernel, random_state=9, gamma='scale') # Linear Kernel
+	    svm_clf = svm.SVC(kernel=kernel, random_state=9, gamma='auto') # Linear Kernel
 	    
 	    #train model with cv of 5
 	    cv_scores = cross_val_score(svm_clf, features, target, cv = cross_val)
@@ -358,7 +355,7 @@ def ensalble_svm_classification(trace_stats, features_to_drop, n_estimators = 10
 	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
 
 	    # Create a SVM Classifier
-	    ovr_clf = OneVsRestClassifier(BaggingClassifier(LinearSVC(random_state=9, max_iter=10000, C=1.2), max_samples=1.0/n_estimators,
+	    ovr_clf = OneVsRestClassifier(BaggingClassifier(LinearSVC(random_state=9, max_iter=10000, C=1.2), max_samples=1.0,
 	                                                    n_estimators=n_estimators))
 
 
@@ -426,7 +423,7 @@ def ensalble_svm_cross_validation(trace_stats, features_to_drop, n_estimators = 
 	    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=1)
 
 	    # create SVM Classifier
-	    ovr_clf = OneVsRestClassifier(BaggingClassifier(LinearSVC(random_state=9, max_iter=10000, C=1.2), max_samples=1.0/n_estimators,
+	    ovr_clf = OneVsRestClassifier(BaggingClassifier(LinearSVC(random_state=9, max_iter=10000, C=1.2), max_samples=1.0,
 	                                                    n_estimators=n_estimators))
 
 	    # train model with cv of 5
