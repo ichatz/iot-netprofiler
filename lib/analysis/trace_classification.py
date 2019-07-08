@@ -166,10 +166,10 @@ def neural_net_classifier(X_train, y_train, X_test, y_test, model_name, epochs=1
         model.add(Dense(32, input_dim=len(X_train.columns), activation='relu'))
         model.add(Dropout(0.2))
         model.add(Dense(64, activation='relu', kernel_regularizer=regularizers.l1(0.001)))
-        model.add(Dense(96, activation='relu', kernel_regularizer=regularizers.l1(0.001)))
+        model.add(Dense(96, activation='relu', kernel_regularizer=regularizers.l1(0.003)))
         model.add(Dense(64, activation='relu', kernel_regularizer=regularizers.l1(0.001)))
         model.add(Dense(32, activation='relu', kernel_regularizer=regularizers.l1(0.001)))
-        model.add(Dropout(0.4))
+        model.add(Dropout(0.3))
         if len(set(y_train)) <= 2:
         	model.add(Dense(1, activation='sigmoid'))
         else:
@@ -359,3 +359,33 @@ def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
 
 
 
+# -----------------------------------------------
+# 				Results
+# -----------------------------------------------
+def write_results(models_results, feature_list, n_classes=2,):
+	# INPUT: 
+	######## list of model results
+	######## feature_list: list of features used during training 
+	######## number of labels used during training n_classes
+
+	# OUTPUT: return a roc auc score for multple classes
+    
+    columns = ['model','n_classes','accuracy','precision','recall','f1-score','auc roc','features']
+    final_results= pd.DataFrame(columns=columns) 
+    features = ''
+    for feat in sorted(feature_list):
+    	if len(features) == 0:
+    		features += feat
+    	else:
+    		features += str(', ') + feat
+    for model in models_results:
+        model = model.join(pd.DataFrame({'n_classes': [n_classes], 'features': [features]}))
+        final_results = pd.concat([final_results, model])
+        
+    final_results = final_results.reset_index(drop=True)
+    if 'results' not in listdir(os.getcwd() + '/data/'):
+            # If destination folders do not exist
+            os.makedirs('data/results')
+    final_results.to_csv('data/results/'+str(n_classes)+'classes_results.csv')
+    
+    return final_results[columns]
