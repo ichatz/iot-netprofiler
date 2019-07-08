@@ -1,0 +1,14 @@
+,directory,case,case_accuracy,case_accuracy2
+0,traces/normal,grid_normal_2019-02-26_11:48_,normal,normal
+1,traces/normal,grid_normal_2019-02-26_11:10_,normal,normal
+2,traces/normal,grid_normal_2019-02-19_21:23_,normal,normal
+3,traces/normal,grid_normal_2019-02-26_10:29_,normal,normal
+4,traces/normal,grid_normal_2019-02-26_10:53_,normal,normal
+5,traces/1bh-7,grid_1bh-7_2019-02-19_22:13_,BH,BH
+6,traces/1gh30-9,grid_1gh30-9_2019-02-20_00:12_,BH,GH
+7,traces/1bh-9,grid_1bh-9_2019-02-20_00:30_,BH,BH
+8,traces/1gh50-7,grid_1gh50-7_2019-02-19_22:53_,BH,GH
+9,traces/1gh70-9,grid_1gh70-9_2019-02-19_23:34_,BH,GH
+10,traces/1gh50-9,grid_1gh50-9_2019-02-19_23:54_,BH,GH
+11,traces/1gh30-7,grid_1gh30-7_2019-02-19_22:35_,BH,GH
+12,traces/1gh70-7,grid_1gh70-7_2019-02-19_23:11_,BH,GH

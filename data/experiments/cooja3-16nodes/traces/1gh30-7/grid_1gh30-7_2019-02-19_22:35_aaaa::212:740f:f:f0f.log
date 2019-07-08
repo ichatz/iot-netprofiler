@@ -1,0 +1,28 @@
+PING aaaa::212:740f:f:f0f(aaaa::212:740f:f:f0f) 56 data bytes
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=8 ttl=60 time=895 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=9 ttl=60 time=3184 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=10 ttl=60 time=1148 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=35 ttl=59 time=1484 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=36 ttl=59 time=555 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=37 ttl=59 time=792 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=39 ttl=59 time=570 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=42 ttl=60 time=580 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=43 ttl=60 time=910 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=46 ttl=60 time=2671 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=47 ttl=58 time=1539 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=51 ttl=59 time=3700 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=52 ttl=59 time=1459 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=54 ttl=60 time=1529 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=69 ttl=60 time=2241 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=140 ttl=60 time=1333 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=170 ttl=60 time=2743 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=171 ttl=60 time=1937 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=172 ttl=60 time=2013 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=184 ttl=60 time=1152 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=193 ttl=60 time=2219 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=195 ttl=60 time=2332 ms
+64 bytes from aaaa::212:740f:f:f0f: icmp_seq=198 ttl=60 time=1504 ms
+
+--- aaaa::212:740f:f:f0f ping statistics ---
+200 packets transmitted, 23 received, 88% packet loss, time 1017315ms
+rtt min/avg/max/mdev = 555.959/1674.006/3700.021/839.422 ms

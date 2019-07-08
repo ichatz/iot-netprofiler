@@ -3,7 +3,6 @@ import numpy as np
 import json
 import networkx as nx
 import os
-from node import *
 
 
 
@@ -47,6 +46,7 @@ def process_cooja2_traces(path, tracemask):
         packets_node[packets['node_id'][0]] = packets
 
     return nodes.sort_values(by=['rank','node_id']), packets_node
+
 
 def separate_outliers_by_node(packets_node):
     clean_packets_node = {}

@@ -1,0 +1,64 @@
+PING aaaa::212:740e:e:e0e(aaaa::212:740e:e:e0e) 56 data bytes
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=2 ttl=59 time=460 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=3 ttl=59 time=983 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=4 ttl=59 time=824 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=5 ttl=59 time=633 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=6 ttl=59 time=379 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=7 ttl=59 time=424 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=8 ttl=59 time=367 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=9 ttl=59 time=1717 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=24 ttl=59 time=1003 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=30 ttl=59 time=612 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=31 ttl=59 time=417 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=32 ttl=59 time=371 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=33 ttl=59 time=981 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=34 ttl=59 time=1795 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=35 ttl=59 time=689 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=36 ttl=59 time=701 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=37 ttl=59 time=553 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=38 ttl=59 time=679 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=39 ttl=59 time=304 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=40 ttl=59 time=272 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=41 ttl=59 time=1041 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=43 ttl=59 time=439 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=47 ttl=59 time=1140 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=48 ttl=59 time=798 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=50 ttl=59 time=709 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=51 ttl=59 time=822 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=54 ttl=59 time=1346 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=55 ttl=59 time=356 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=56 ttl=59 time=510 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=57 ttl=59 time=623 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=58 ttl=59 time=342 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=59 ttl=59 time=3976 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=60 ttl=59 time=1221 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=61 ttl=59 time=851 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=65 ttl=59 time=1107 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=79 ttl=59 time=515 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=90 ttl=59 time=4550 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=92 ttl=59 time=4236 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=93 ttl=59 time=3980 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=119 ttl=59 time=344 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=120 ttl=59 time=1319 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=123 ttl=58 time=2481 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=128 ttl=59 time=940 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=132 ttl=59 time=381 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=136 ttl=59 time=368 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=137 ttl=59 time=1903 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=138 ttl=59 time=1500 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=139 ttl=59 time=815 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=141 ttl=59 time=1497 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=142 ttl=59 time=1035 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=143 ttl=59 time=828 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=144 ttl=59 time=689 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=151 ttl=59 time=1348 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=153 ttl=59 time=3010 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=168 ttl=59 time=2744 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=174 ttl=59 time=1847 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=181 ttl=59 time=1771 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=190 ttl=59 time=1324 ms
+64 bytes from aaaa::212:740e:e:e0e: icmp_seq=198 ttl=59 time=1375 ms
+
+--- aaaa::212:740e:e:e0e ping statistics ---
+200 packets transmitted, 59 received, 70% packet loss, time 1013456ms
+rtt min/avg/max/mdev = 272.299/1191.033/4550.534/1005.880 ms
