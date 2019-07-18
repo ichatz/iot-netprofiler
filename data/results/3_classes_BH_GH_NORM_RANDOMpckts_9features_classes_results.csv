@@ -1,0 +1,6 @@
+,model,n_classes,accuracy,precision,recall,f1-score,auc roc,features
+0,knn,3,0.7129629629629629,0.6980798425170578,0.7087994587994588,0.701689752444744,0.7770393167162831,"hop, loss, max, mean, min, outliers, pckt_count, tr_time, var"
+1,random forest,3,0.75,0.7596384874434592,0.7270072270072271,0.7405927863952066,0.7915640976122017,"hop, loss, max, mean, min, outliers, pckt_count, tr_time, var"
+2,svm,3,0.6166666666666667,0.6860752082837559,0.5038115038115037,0.514423904238961,0.6287167189115925,"hop, loss, max, mean, min, outliers, pckt_count, tr_time, var"
+3,neural network,3,0.5055555555555555,0.1685185185185185,0.3333333333333333,0.22386223862238622,0.5,"hop, loss, max, mean, min, outliers, pckt_count, tr_time, var"
+4,kmeans,3,0.4395848776871757,0.43313119252695875,0.38186029999220894,0.3764260603163591,0.5387047315454861,"hop, loss, max, mean, min, outliers, pckt_count, tr_time, var"
