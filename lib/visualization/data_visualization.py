@@ -127,7 +127,7 @@ def visualize_loss_function(model, history):
     
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
+    plt.legend(['train', 'Validation'], loc='upper left')
 
     plt.title('Training and Validation Loss functions', fontsize="x-large")
     #plt.show()

@@ -159,16 +159,16 @@ def svm_classifier(X_train, y_train, X_test, y_test, kernel='rbf', cross_val=5):
 
 
 
-def neural_net_classifier(X_train, y_train, X_test, y_test, model_name, epochs=1500, batch_size=64, corss_val=5):
+def neural_net_classifier(X_train, y_train, X_test, y_test, model_name, epochs=1500, batch_size=32, corss_val=5):
     def create_model():
         # define the keras model
         model = Sequential()
         model.add(Dense(32, input_dim=len(X_train.columns), activation='relu'))
-        model.add(Dropout(0.2))
-        model.add(Dense(64, activation='relu', kernel_regularizer=regularizers.l1(0.001)))
-        model.add(Dense(96, activation='relu', kernel_regularizer=regularizers.l1(0.003)))
-        model.add(Dense(64, activation='relu', kernel_regularizer=regularizers.l1(0.001)))
-        model.add(Dense(32, activation='relu', kernel_regularizer=regularizers.l1(0.001)))
+        model.add(Dropout(0.1))
+        model.add(Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+        model.add(Dense(96, activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+        model.add(Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+        model.add(Dense(32, activation='relu', kernel_regularizer=regularizers.l2(0.01)))
         model.add(Dropout(0.3))
         if len(set(y_train)) <= 2:
         	model.add(Dense(1, activation='sigmoid'))
@@ -190,7 +190,7 @@ def neural_net_classifier(X_train, y_train, X_test, y_test, model_name, epochs=1
     k_clf = KerasClassifier(build_fn=create_model, epochs=epochs, batch_size=batch_size, verbose=0)
     kfold = StratifiedKFold(n_splits=corss_val, shuffle=True, random_state=15)
     results = cross_val_score(k_clf, X_train, y_train, cv=kfold, scoring='accuracy')
-    print("Mean Accuracy: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100))
+    print("Mean Accuracy: %.2f%% (Std +/- %.2f%%)" % (results.mean()*100, results.std()*100))
 
     clf = create_model()
     history = clf.fit(X_train, y_train, validation_split=0.2, epochs=epochs, batch_size=batch_size, shuffle=True, verbose=0)
@@ -362,7 +362,7 @@ def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
 # -----------------------------------------------
 # 				Results
 # -----------------------------------------------
-def write_results(models_results, feature_list, n_classes=2,):
+def write_results(models_results, feature_list, experiment_id, n_classes=2):
 	# INPUT: 
 	######## list of model results
 	######## feature_list: list of features used during training 
@@ -382,10 +382,10 @@ def write_results(models_results, feature_list, n_classes=2,):
         model = model.join(pd.DataFrame({'n_classes': [n_classes], 'features': [features]}))
         final_results = pd.concat([final_results, model])
         
-    final_results = final_results.reset_index(drop=True)
+    final_results = final_results.reset_index(drop=True)[columns]
     if 'results' not in listdir(os.getcwd() + '/data/'):
             # If destination folders do not exist
             os.makedirs('data/results')
-    final_results.to_csv('data/results/'+str(n_classes)+'classes_results.csv')
+    final_results.to_csv('data/results/'+str(n_classes) + '_classes_' + experiment_id + '_' + str(len(feature_list)) +'features_classes_results.csv')
     
-    return final_results[columns]
+    return final_results
